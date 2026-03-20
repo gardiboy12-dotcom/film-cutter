@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>필름 재단 최적화</title>
+<meta name="description" content="인테리어 필름 재단 최적화 계산기">
+<meta name="theme-color" content="#1a1814">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="필름재단">
+<link rel="manifest" href="manifest.json">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#f4f1ec;color:#1a1814;font-family:sans-serif;min-height:100vh;padding-bottom:60px;}
+.hdr{background:#1a1814;color:#fff;padding:14px 18px;display:flex;align-items:center;gap:12px;}
+.hdr h1{font-size:17px;font-weight:900;}
+.hdr h1 span{color:#e8c14a;}
+.hdr-sub{font-size:10px;color:rgba(255,255,255,.35);letter-spacing:1px;margin-left:4px;}
+.fbar{background:#262218;padding:10px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.flbl{font-size:10px;color:rgba(255,255,255,.5);white-space:nowrap;}
+.fbar input{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:5px;color:#fff;font-size:14px;font-weight:600;padding:5px 8px;text-align:center;width:75px;}
+.fbar input:focus{outline:none;border-color:#e8c14a;}
+.funit{font-size:11px;color:rgba(255,255,255,.4);}
+.allow-g{margin-left:auto;display:flex;align-items:center;gap:6px;}
+.allow-g label{font-size:10px;color:rgba(255,255,255,.5);}
+.wrap{max-width:1200px;margin:0 auto;padding:14px 12px;display:grid;grid-template-columns:1fr;gap:14px;}
+@media(min-width:900px){.wrap{grid-template-columns:400px 1fr;align-items:start;}}
+.panel{background:#fff;border:1px solid #e2ddd7;border-radius:10px;margin-bottom:12px;overflow:hidden;}
+.panel:last-child{margin-bottom:0;}
+.ph{padding:10px 14px;border-bottom:1px solid #e2ddd7;background:#f9f7f4;display:flex;align-items:center;justify-content:space-between;}
+.ph-t{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#9a9590;}
+.pb{padding:14px;}
+.icard{border:1px solid #e2ddd7;border-radius:8px;margin-bottom:10px;overflow:hidden;}
+.icard:last-child{margin-bottom:0;}
+.ich{display:flex;align-items:center;gap:8px;padding:8px 11px;background:#f9f7f4;border-bottom:1px solid #e2ddd7;}
+.inum{width:20px;height:20px;border-radius:50%;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;}
+.iname{border:none;background:transparent;font-size:12px;font-weight:700;color:#1a1814;flex:1;min-width:0;}
+.iname:focus{outline:none;}
+.dbtn{background:none;border:none;cursor:pointer;color:#9a9590;font-size:15px;padding:0 3px;line-height:1;}
+.icb{padding:10px;}
+.cgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;margin-bottom:10px;}
+.cb{padding:5px 3px;border:1.5px solid #e2ddd7;border-radius:5px;background:#fff;color:#9a9590;font-size:11px;cursor:pointer;text-align:center;line-height:1.3;}
+.cb.on{font-weight:700;border-color:#2c5f8a;background:#eef4fa;color:#2c5f8a;}
+.drow{display:grid;grid-template-columns:1fr 1fr 68px;gap:6px;}
+.dw{display:flex;flex-direction:column;gap:3px;}
+.dw label{font-size:9px;color:#9a9590;text-transform:uppercase;letter-spacing:1px;}
+.dw input{background:#f9f7f4;border:1px solid #e2ddd7;border-radius:5px;color:#1a1814;font-size:14px;font-weight:600;padding:7px 7px;width:100%;}
+.dw input:focus{outline:none;border-color:#1a5c8a;}
+.du{font-size:9px;color:#9a9590;text-align:right;margin-top:1px;}
+.add-btn{width:100%;padding:10px;background:#fff;border:1.5px dashed #ccc8c0;border-radius:7px;color:#9a9590;font-size:12px;cursor:pointer;margin-bottom:8px;display:block;}
+.go-btn{width:100%;padding:13px;background:#1a1814;color:#e8c14a;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;}
+.sg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+.sb{background:#f9f7f4;border:1px solid #e2ddd7;border-radius:8px;padding:12px 8px;text-align:center;}
+.sv{font-size:18px;font-weight:700;color:#c0392b;line-height:1;margin-bottom:4px;}
+.sl{font-size:10px;color:#9a9590;}
+.urow{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:11px;}
+.ulbl{width:56px;color:#9a9590;flex-shrink:0;}
+.ubg{flex:1;height:8px;background:#e2ddd7;border-radius:4px;overflow:hidden;}
+.ufill{height:100%;border-radius:4px;background:#1a5c8a;}
+.ufill.ov{background:#c0392b;}
+.uval{font-size:11px;font-weight:600;width:46px;text-align:right;color:#5a5650;}
+.warn{background:#fff8e6;border:1px solid #f0c040;border-radius:7px;padding:10px 14px;font-size:12px;color:#8a6500;margin-bottom:12px;}
+.dbox{background:#111;border-radius:8px;padding:10px;overflow:auto;max-height:600px;}
+.zctrl{display:flex;align-items:center;gap:4px;}
+.zb{background:#fff;border:1px solid #ccc8c0;border-radius:5px;color:#5a5650;font-size:14px;width:28px;height:26px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.zr{width:auto;padding:0 8px;font-size:11px;}
+.zl{font-size:11px;color:#9a9590;min-width:36px;text-align:center;}
+.leg{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;align-items:center;}
+.li{display:flex;align-items:center;gap:5px;font-size:11px;color:#5a5650;}
+.ld{width:11px;height:11px;border-radius:2px;flex-shrink:0;}
+.tw{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th{text-align:left;padding:8px 10px;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:#9a9590;border-bottom:2px solid #e2ddd7;white-space:nowrap;}
+td{padding:7px 10px;border-bottom:1px solid #e2ddd7;font-size:11px;white-space:nowrap;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:#f9f7f4;}
+.tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;border:1px solid;}
+.empty{padding:50px 20px;text-align:center;color:#9a9590;font-size:13px;line-height:2;}
+.ei{font-size:36px;margin-bottom:10px;}
+.info{font-size:11px;color:#9a9590;text-align:right;margin-top:6px;}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <h1>필름 재단 <span>최적화</span></h1>
+  <span class="hdr-sub">INTERIOR FILM PRO</span>
+</div>
+<div class="fbar">
+  <span class="flbl">필름 폭</span>
+  <input id="fw" type="number" value="1220">
+  <span class="funit">mm</span>
+  <span class="flbl">필름 길이</span>
+  <input id="fl" type="number" value="0">
+  <span class="funit">m</span>
+  <div class="allow-g">
+    <label>여유분</label>
+    <input id="al" type="number" value="0" style="width:58px;">
+    <span class="funit">mm</span>
+  </div>
+</div>
+<div class="wrap">
+  <div>
+    <div class="panel">
+      <div class="ph">
+        <span class="ph-t">재단 항목 목록</span>
+        <span id="icnt" style="font-size:11px;color:#9a9590;">0개</span>
+      </div>
+      <div class="pb">
+        <div id="ilist"></div>
+        <button class="add-btn" id="addBtn">+ 항목 추가</button>
+        <button class="go-btn" id="calcBtn">✂ 최적 재단 계산하기</button>
+      </div>
+    </div>
+  </div>
+  <div id="rcol">
+    <div class="panel"><div class="pb">
+      <div class="empty"><div class="ei">✂</div>항목을 추가하고<br><strong>최적 재단 계산하기</strong>를 눌러주세요</div>
+    </div></div>
+  </div>
+</div>
+<script type="text/javascript">
+var CATS=[{id:"1",lb:"문"},{id:"1-1",lb:"문틀"},{id:"2",lb:"창"},{id:"2-1",lb:"창틀"},{id:"3",lb:"싱크대 문"},{id:"3-1",lb:"싱크대 틀"},{id:"4",lb:"벽"},{id:"5",lb:"천장"},{id:"6",lb:"기타"}];
+var CC={"1":"#2c7be5","1-1":"#74b3fa","2":"#27ae60","2-1":"#82e0aa","3":"#e67e22","3-1":"#f0b27a","4":"#8e44ad","5":"#c0392b","6":"#7f8c8d"};
+function cc(c){return CC[c]||"#7f8c8d";}
+function cl(c){for(var i=0;i<CATS.length;i++)if(CATS[i].id===c)return CATS[i].lb;return c;}
+var seq=0,IDS=[];
+
+function addItem(){
+  seq++;
+  var id="item"+seq,cat="1";
+  IDS.push(id);
+  var card=document.createElement("div");card.className="icard";card.id=id;
+  var head=document.createElement("div");head.className="ich";
+  var num=document.createElement("div");num.className="inum";num.style.background=cc(cat);num.textContent=IDS.length;
+  var ni=document.createElement("input");ni.className="iname";ni.type="text";ni.placeholder="이름 입력";
+  var db=document.createElement("button");db.className="dbtn";db.textContent="X";
+  db.setAttribute("data-id",id);
+  db.addEventListener("click",function(){delItem(this.getAttribute("data-id"));});
+  head.appendChild(num);head.appendChild(ni);head.appendChild(db);
+  var body=document.createElement("div");body.className="icb";
+  var cg=document.createElement("div");cg.className="cgrid";
+  for(var i=0;i<CATS.length;i++){
+    (function(c,cg,num){
+      var b=document.createElement("button");
+      b.className="cb"+(c.id===cat?" on":"");
+      b.textContent=c.lb;b.setAttribute("data-c",c.id);
+      b.addEventListener("click",function(){
+        var bs=cg.querySelectorAll(".cb");
+        for(var j=0;j<bs.length;j++)bs[j].className="cb";
+        this.className="cb on";
+        num.style.background=cc(this.getAttribute("data-c"));
+      });
+      cg.appendChild(b);
+    })(CATS[i],cg,num);
+  }
+  var dr=document.createElement("div");dr.className="drow";
+  function mk(lbl,cls,def){
+    var w=document.createElement("div");w.className="dw";
+    var l=document.createElement("label");l.textContent=lbl;
+    var inp=document.createElement("input");inp.type="number";inp.className=cls;inp.value=def;
+    var dv=String(def);
+    inp.addEventListener("focus",function(){if(this.value===dv)this.value="";});
+    inp.addEventListener("blur",function(){if(this.value==="")this.value=dv;});
+    var u=document.createElement("div");u.className="du";u.textContent=cls==="iq"?"개":"mm";
+    w.appendChild(l);w.appendChild(inp);w.appendChild(u);return w;
+  }
+  dr.appendChild(mk("폭 (W)","iw",0));
+  dr.appendChild(mk("길이 (L)","il",0));
+  dr.appendChild(mk("수량","iq",1));
+  body.appendChild(cg);body.appendChild(dr);
+  card.appendChild(head);card.appendChild(body);
+  document.getElementById("ilist").appendChild(card);
+  document.getElementById("icnt").textContent=IDS.length+"개";
+}
+
+function delItem(id){
+  var i=IDS.indexOf(id);if(i>-1)IDS.splice(i,1);
+  var el=document.getElementById(id);if(el)el.parentNode.removeChild(el);
+  document.getElementById("icnt").textContent=IDS.length+"개";
+  var ns=document.querySelectorAll(".inum");
+  for(var i=0;i<ns.length;i++)ns[i].textContent=i+1;
+}
+
+function getItems(){
+  var res=[];
+  for(var i=0;i<IDS.length;i++){
+    var el=document.getElementById(IDS[i]);if(!el)continue;
+    var on=el.querySelector(".cb.on");
+    var cat=on?on.getAttribute("data-c"):"6";
+    var nm=el.querySelector(".iname").value.trim()||cl(cat);
+    var pW=parseFloat(el.querySelector(".iw").value)||0;
+    var pL=parseFloat(el.querySelector(".il").value)||0;
+    var qty=Math.max(1,parseInt(el.querySelector(".iq").value)||1);
+    res.push({idx:i,cat:cat,name:nm,pW:pW,pL:pL,qty:qty});
+  }
+  return res;
+}
+
+function pack(pieces,fw){
+  var sorts=[
+    function(a,b){return b.pW*b.pH-a.pW*a.pH;},
+    function(a,b){return b.pH-a.pH;},
+    function(a,b){return b.pW-a.pW;},
+    function(a,b){return(b.pW+b.pH)-(a.pW+a.pH);}
+  ];
+  var bestTotal=Infinity,bestFlat=null;
+  for(var si=0;si<sorts.length;si++){
+    var sp=pieces.slice().sort(sorts[si]);
+    var segs=[{x0:0,x1:fw,h:0}];
+    var placed=[];
+    for(var pi=0;pi<sp.length;pi++){
+      var p=sp[pi],xs=[],gi,ni;
+      for(gi=0;gi<segs.length;gi++){
+        var x0=segs[gi].x0;
+        if(x0+p.pW<=fw){var f=false;for(var xi=0;xi<xs.length;xi++)if(xs[xi]===x0){f=true;break;}if(!f)xs.push(x0);}
+      }
+      if(!xs.length)xs.push(0);
+      var bx=0,by=Infinity,bw=Infinity;
+      for(var xi=0;xi<xs.length;xi++){
+        var x=xs[xi],y=0,waste=0;
+        for(gi=0;gi<segs.length;gi++){var ox=Math.max(x,segs[gi].x0),ex=Math.min(x+p.pW,segs[gi].x1);if(ox<ex&&segs[gi].h>y)y=segs[gi].h;}
+        for(gi=0;gi<segs.length;gi++){var ox=Math.max(x,segs[gi].x0),ex=Math.min(x+p.pW,segs[gi].x1);if(ox<ex)waste+=(y-segs[gi].h)*(ex-ox);}
+        if(y<by||(y===by&&waste<bw)){by=y;bw=waste;bx=x;}
+      }
+      if(by===Infinity){var mh=0;for(gi=0;gi<segs.length;gi++)if(segs[gi].h>mh)mh=segs[gi].h;by=mh;bx=0;}
+      placed.push({label:p.label,cat:p.cat,pW:p.pW,pH:p.pH,x:bx,y:by});
+      var nx=[];
+      for(gi=0;gi<segs.length;gi++){
+        var s=segs[gi],ox=Math.max(bx,s.x0),ex=Math.min(bx+p.pW,s.x1);
+        if(ox>=ex){nx.push({x0:s.x0,x1:s.x1,h:s.h});}
+        else{if(s.x0<ox)nx.push({x0:s.x0,x1:ox,h:s.h});nx.push({x0:ox,x1:ex,h:by+p.pH});if(ex<s.x1)nx.push({x0:ex,x1:s.x1,h:s.h});}
+      }
+      nx.sort(function(a,b){return a.x0-b.x0;});
+      var mg=[];
+      for(ni=0;ni<nx.length;ni++){if(mg.length&&mg[mg.length-1].x1===nx[ni].x0&&mg[mg.length-1].h===nx[ni].h)mg[mg.length-1].x1=nx[ni].x1;else mg.push({x0:nx[ni].x0,x1:nx[ni].x1,h:nx[ni].h});}
+      segs=mg;
+    }
+    var mh=0;for(gi=0;gi<segs.length;gi++)if(segs[gi].h>mh)mh=segs[gi].h;
+    if(mh<bestTotal){bestTotal=mh;bestFlat=placed.slice();}
+  }
+  var ySet={},ys=[],strips=[];
+  for(var i=0;i<bestFlat.length;i++)ySet[bestFlat[i].y]=true;
+  for(var y in ySet)ys.push(parseFloat(y));
+  ys.sort(function(a,b){return a-b;});
+  for(var i=0;i<ys.length;i++){
+    var y=ys[i],items=[],mb=0;
+    for(var j=0;j<bestFlat.length;j++)if(bestFlat[j].y===y)items.push(bestFlat[j]);
+    for(var j=0;j<items.length;j++)if(items[j].y+items[j].pH>mb)mb=items[j].y+items[j].pH;
+    strips.push({y:y,height:mb-y,slots:items});
+  }
+  return{flat:bestFlat,total:bestTotal,strips:strips};
+}
+
+function calculate(){
+  var items=getItems();
+  if(!items.length){alert("항목을 먼저 추가하세요.");return;}
+  var fw=parseFloat(document.getElementById("fw").value)||1220;
+  var fl=(parseFloat(document.getElementById("fl").value)||0)*1000;
+  var al=parseFloat(document.getElementById("al").value)||0;
+  var pieces=[];
+  for(var i=0;i<items.length;i++){
+    var it=items[i];
+    for(var q=0;q<it.qty;q++)
+      pieces.push({label:it.qty>1?it.name+"("+(q+1)+"/"+it.qty+")":it.name,cat:it.cat,pW:it.pW+al*2,pH:it.pL+al*2});
+  }
+  var over=[];
+  for(var i=0;i<pieces.length;i++)if(pieces[i].pW>fw)over.push(pieces[i]);
+  if(over.length){var msg="필름 폭 초과:\n";for(var i=0;i<over.length;i++)msg+="- "+over[i].label+": "+over[i].pW+"mm\n";alert(msg);return;}
+  var res=pack(pieces,fw);
+  var ua=0;for(var i=0;i<pieces.length;i++)ua+=pieces[i].pW*pieces[i].pH;
+  var eff=(ua/(fw*res.total)*100).toFixed(1);
+  renderResult(res.flat,res.strips,res.total,eff,fl>0&&res.total>fl,fw,fl,al);
+}
+
+var dS=1,dB=1,dD=null,zI=false;
+
+function renderResult(flat,strips,total,eff,ovl,fw,fl,al){
+  zI=false;
+  var col=document.getElementById("rcol");
+  col.innerHTML="";
+
+  function mkP(title){
+    var p=document.createElement("div");p.className="panel";
+    var ph=document.createElement("div");ph.className="ph";
+    var pt=document.createElement("span");pt.className="ph-t";pt.textContent=title;
+    var ps=document.createElement("span");ps.style.cssText="font-size:11px;color:#9a9590;";
+    ph.appendChild(pt);ph.appendChild(ps);
+    var pb=document.createElement("div");pb.className="pb";
+    p.appendChild(ph);p.appendChild(pb);return p;
+  }
+  function mkSb(v,l){
+    var sb=document.createElement("div");sb.className="sb";
+    var sv=document.createElement("div");sv.className="sv";sv.textContent=v;
+    var sl=document.createElement("div");sl.className="sl";sl.textContent=l;
+    sb.appendChild(sv);sb.appendChild(sl);return sb;
+  }
+  function el(tag,cls,txt){var e=document.createElement(tag);if(cls)e.className=cls;if(txt)e.textContent=txt;return e;}
+
+  // 요약
+  var p1=mkP("결과 요약"),pb1=p1.querySelector(".pb");
+  var sg=el("div","sg");
+  sg.appendChild(mkSb((total/1000).toFixed(2)+"M","필요 필름 길이"));
+  sg.appendChild(mkSb(total.toLocaleString()+"mm","필요 길이"));
+  sg.appendChild(mkSb(eff+"%","필름 사용률"));
+  pb1.appendChild(sg);
+  if(ovl){var w=el("div","warn");w.textContent="⚠ 필요 길이("+total.toLocaleString()+"mm)가 필름 길이("+fl.toLocaleString()+"mm)를 초과합니다.";pb1.appendChild(w);}
+  if(fl>0){
+    var ur=el("div","urow");
+    ur.innerHTML="<span class='ulbl'>필름 사용</span><div class='ubg'><div class='ufill"+(ovl?" ov":"")+"' style='width:"+Math.min(total/fl*100,100).toFixed(1)+"%'></div></div><span class='uval'>"+((total/fl*100).toFixed(1))+"%</span>";
+    pb1.appendChild(ur);
+  }
+  var info=el("div","info");info.textContent="필름: "+fw+"mm × "+(fl?fl.toLocaleString()+"mm":"미설정")+" | 여유분: "+al+"mm";pb1.appendChild(info);
+  col.appendChild(p1);
+
+  // 배치도
+  var p2=mkP("재단 배치도"),ph2=p2.querySelector(".ph"),pb2=p2.querySelector(".pb");
+  var zc=el("div","zctrl");
+  var zm=el("button","zb");zm.textContent="-";zm.addEventListener("click",function(){zD(0.7);});
+  var zl=el("span","zl");zl.id="zlbl";zl.textContent="100%";
+  var zp=el("button","zb");zp.textContent="+";zp.addEventListener("click",function(){zD(1.4);});
+  var zr=el("button","zb zr");zr.textContent="맞춤";zr.addEventListener("click",function(){rZ();});
+  zc.appendChild(zm);zc.appendChild(zl);zc.appendChild(zp);zc.appendChild(zr);ph2.appendChild(zc);
+  var dbox=el("div","dbox");dbox.id="dscroll";
+  var cv=document.createElement("canvas");cv.id="dcv";dbox.appendChild(cv);
+  var lg=el("div","leg");lg.id="dleg";
+  var cd={};
+  for(var i=0;i<flat.length;i++){
+    if(!cd[flat[i].cat]){
+      cd[flat[i].cat]=true;var c=cc(flat[i].cat);
+      var li=el("div","li");
+      var ld=el("div","ld");ld.style.background=c+"88";ld.style.border="1.5px solid "+c;
+      var ls=el("span");ls.textContent=cl(flat[i].cat);ls.style.color=c;ls.style.fontWeight="700";
+      li.appendChild(ld);li.appendChild(ls);lg.appendChild(li);
+    }
+  }
+  var li2=el("span");li2.style.cssText="margin-left:auto;font-size:10px;color:#9a9590;";li2.textContent=fw+"x"+total+"mm";lg.appendChild(li2);
+  pb2.appendChild(dbox);pb2.appendChild(lg);col.appendChild(p2);
+
+  // 테이블
+  var p3=mkP("재단 조각 목록"),pb3=p3.querySelector(".pb");
+  p3.querySelector(".ph").lastChild.textContent=flat.length+"개";
+  var tw=el("div","tw"),tbl=document.createElement("table");
+  var thead=document.createElement("thead"),htr=document.createElement("tr");
+  ["#","항목명","카테고리","재단폭mm","재단길이mm","Y위치mm","X위치mm"].forEach(function(h){var th=el("th");th.textContent=h;htr.appendChild(th);});
+  thead.appendChild(htr);tbl.appendChild(thead);
+  var tbody=document.createElement("tbody");
+  for(var i=0;i<flat.length;i++){
+    var p=flat[i],c=cc(p.cat),tr=document.createElement("tr");
+    var td0=el("td");var dot=el("span");dot.style.cssText="display:inline-block;width:9px;height:9px;border-radius:2px;background:"+c+";margin-right:4px;vertical-align:middle;";td0.appendChild(dot);td0.appendChild(document.createTextNode(i+1));
+    var td1=el("td");td1.textContent=p.label;
+    var td2=el("td");var tag=el("span","tag");tag.style.cssText="background:"+c+"18;color:"+c+";border-color:"+c+"44;";tag.textContent=cl(p.cat);td2.appendChild(tag);
+    [td0,td1,td2,el("td",null,String(p.pW)),el("td",null,String(p.pH)),el("td",null,String(p.y)),el("td",null,String(p.x))].forEach(function(t){tr.appendChild(t);});
+    tbody.appendChild(tr);
+  }
+  tbl.appendChild(tbody);tw.appendChild(tbl);pb3.style.padding="0";pb3.appendChild(tw);col.appendChild(p3);
+
+  dD={flat:flat,strips:strips,total:total,fw:fw};
+  setTimeout(function(){
+    var box=document.getElementById("dscroll");if(!box)return;
+    dB=Math.min(box.clientWidth-4,960)/fw;dS=dB;drw();uzl();iZ();
+  },50);
+}
+
+function drw(){
+  if(!dD)return;
+  var flat=dD.flat,strips=dD.strips,total=dD.total,fw=dD.fw;
+  var cv=document.getElementById("dcv");if(!cv)return;
+  var sc=dS,W=Math.round(fw*sc),H=Math.round(total*sc);
+  cv.width=W;cv.height=H;cv.style.width=W+"px";cv.style.height=H+"px";
+  var ctx=cv.getContext("2d");
+  ctx.fillStyle="#141414";ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle="rgba(255,255,255,0.04)";ctx.lineWidth=1;
+  for(var m=100;m<total;m+=100){ctx.beginPath();ctx.moveTo(0,m*sc);ctx.lineTo(W,m*sc);ctx.stroke();}
+  for(var m=100;m<fw;m+=100){ctx.beginPath();ctx.moveTo(m*sc,0);ctx.lineTo(m*sc,H);ctx.stroke();}
+  for(var i=0;i<strips.length;i++){
+    if(strips[i].y>0){
+      var sy=strips[i].y*sc;
+      ctx.strokeStyle="rgba(255,255,255,0.12)";ctx.lineWidth=1;ctx.setLineDash([5,4]);
+      ctx.beginPath();ctx.moveTo(0,sy);ctx.lineTo(W,sy);ctx.stroke();ctx.setLineDash([]);
+      ctx.fillStyle="rgba(255,255,255,0.3)";ctx.font="9px sans-serif";ctx.textAlign="left";ctx.textBaseline="top";
+      ctx.fillText(strips[i].y.toLocaleString()+"mm",3,sy+2);
+    }
+  }
+  var ey=H-1;
+  ctx.strokeStyle="rgba(232,193,74,0.6)";ctx.lineWidth=1.5;ctx.setLineDash([6,4]);
+  ctx.beginPath();ctx.moveTo(0,ey);ctx.lineTo(W,ey);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle="rgba(232,193,74,0.85)";ctx.font="bold 9px sans-serif";ctx.textAlign="left";ctx.textBaseline="bottom";
+  ctx.fillText("▲ "+total.toLocaleString()+"mm",3,ey-2);
+  for(var i=0;i<flat.length;i++){
+    var p=flat[i],c=cc(p.cat);
+    var r=parseInt(c.slice(1,3),16),g=parseInt(c.slice(3,5),16),b=parseInt(c.slice(5,7),16);
+    var x=p.x*sc,y=p.y*sc,w=p.pW*sc,h=p.pH*sc;
+    ctx.fillStyle="rgba("+r+","+g+","+b+",0.28)";ctx.fillRect(x+1,y+1,w-2,h-2);
+    ctx.strokeStyle="rgba("+r+","+g+","+b+",0.9)";ctx.lineWidth=1.5;ctx.strokeRect(x+1,y+1,w-2,h-2);
+    if(w>22&&h>14){
+      ctx.textAlign="center";ctx.textBaseline="middle";
+      var fs=Math.max(7,Math.min(12,w*0.13,h*0.2));
+      ctx.font="700 "+fs+"px sans-serif";ctx.fillStyle="rgba("+r+","+g+","+b+",1)";
+      var sn=p.label.length>9?p.label.slice(0,8)+"…":p.label;
+      ctx.fillText(sn,x+w/2,y+h/2+(h>fs*3?-fs*0.7:0));
+      if(h>fs*3){ctx.font=Math.max(6,fs-1.5)+"px sans-serif";ctx.fillStyle="rgba(255,255,255,0.4)";ctx.fillText(p.pW+"x"+p.pH,x+w/2,y+h/2+fs*0.8);}
+    }
+  }
+  ctx.strokeStyle="rgba(255,255,255,0.2)";ctx.lineWidth=2;ctx.strokeRect(1,1,W-2,H-2);
+  ctx.fillStyle="rgba(232,193,74,0.7)";ctx.font="9px sans-serif";ctx.textAlign="center";ctx.textBaseline="top";
+  ctx.fillText("< "+fw+"mm >",W/2,3);
+}
+
+function zD(d){dS=Math.min(Math.max(dB*0.3,dS*d),dB*10);drw();uzl();}
+function rZ(){dS=dB;drw();uzl();}
+function uzl(){var e=document.getElementById("zlbl");if(e)e.textContent=Math.round(dS/dB*100)+"%";}
+function iZ(){
+  var box=document.getElementById("dscroll");
+  if(!box||zI)return;zI=true;
+  box.addEventListener("wheel",function(e){e.preventDefault();dS=Math.min(Math.max(dB*0.3,dS*(e.deltaY<0?1.1:0.9)),dB*10);drw();uzl();},{passive:false});
+  var ld=null;
+  box.addEventListener("touchstart",function(e){if(e.touches.length===2)ld=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);},{passive:true});
+  box.addEventListener("touchmove",function(e){if(e.touches.length===2&&ld!==null){e.preventDefault();var d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);dS=Math.min(Math.max(dB*0.3,dS*(d/ld)),dB*10);ld=d;drw();uzl();}},{passive:false});
+  box.addEventListener("touchend",function(){ld=null;},{passive:true});
+}
+
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./sw.js').catch(function(){});
+}
+
+function init(){
+  document.getElementById("addBtn").onclick=addItem;
+  document.getElementById("calcBtn").onclick=calculate;
+  var fw=document.getElementById("fw");
+  fw.onfocus=function(){if(this.value==="1220")this.value="";};
+  fw.onblur=function(){if(this.value==="")this.value="1220";};
+  var fl=document.getElementById("fl");
+  fl.onfocus=function(){if(this.value==="0")this.value="";};
+  fl.onblur=function(){if(this.value==="")this.value="0";};
+  var al=document.getElementById("al");
+  al.onfocus=function(){if(this.value==="0")this.value="";};
+  al.onblur=function(){if(this.value==="")this.value="0";};
+  addItem();
+}
+if(document.readyState==="loading"){
+  document.addEventListener("DOMContentLoaded",init);
+} else {
+  init();
+}
+</script>
+</body>
+</html>
