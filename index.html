@@ -80,11 +80,73 @@ tr:hover td{background:#f9f7f4;}
 .empty{padding:50px 20px;text-align:center;color:#9a9590;font-size:13px;line-height:2;}
 .ei{font-size:36px;margin-bottom:10px;}
 .info{font-size:11px;color:#9a9590;text-align:right;margin-top:6px;}
+/* 탭바 */
+.tabbar{position:fixed;bottom:0;left:0;right:0;background:#1a1814;display:flex;border-top:1px solid #333;z-index:100;}
+.tab{flex:1;padding:10px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;border:none;background:none;color:rgba(255,255,255,.45);font-size:9px;letter-spacing:.5px;}
+.tab.on{color:#e8c14a;}
+.tab-icon{font-size:20px;line-height:1;}
+/* 페이지 */
+.page{display:none;}
+.page.on{display:block;}
+/* 기록 카드 */
+.hcard{background:#fff;border:1px solid #e2ddd7;border-radius:10px;margin-bottom:12px;overflow:hidden;}
+.hcard-head{padding:12px 14px;border-bottom:1px solid #e2ddd7;background:#f9f7f4;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.hcard-date{font-size:11px;color:#9a9590;}
+.hcard-title{font-size:13px;font-weight:700;color:#1a1814;flex:1;}
+.hcard-badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#f0ede8;color:#5a5650;}
+.hcard-body{padding:12px 14px;}
+.hcard-btns{display:flex;gap:8px;margin-top:10px;}
+.load-btn{flex:1;padding:9px;background:#1a1814;color:#e8c14a;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;}
+.del-btn2{padding:9px 14px;background:#fff;color:#c0392b;border:1px solid #e2ddd7;border-radius:7px;font-size:12px;cursor:pointer;}
+.hist-empty{padding:40px 20px;text-align:center;color:#9a9590;font-size:13px;line-height:2;}
+.save-toast{position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#27ae60;color:#fff;padding:8px 20px;border-radius:20px;font-size:13px;font-weight:700;z-index:200;opacity:0;transition:opacity .3s;pointer-events:none;}
+.save-toast.show{opacity:1;}
+/* 커스텀 확인 모달 */
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:500;display:flex;align-items:center;justify-content:center;}
+.modal-box{background:#fff;border-radius:14px;padding:24px 20px;width:80%;max-width:320px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.2);}
+.modal-title{font-size:15px;font-weight:700;color:#1a1814;margin-bottom:8px;}
+.modal-msg{font-size:13px;color:#5a5650;margin-bottom:20px;line-height:1.6;}
+.modal-btns{display:flex;gap:8px;}
+.modal-cancel{flex:1;padding:11px;background:#f4f1ec;color:#5a5650;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;}
+.modal-confirm{flex:1;padding:11px;background:#c0392b;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;}
+/* 현장정보 폼 */
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+.info-grid.full{grid-template-columns:1fr;}
+.info-row{display:flex;flex-direction:column;gap:3px;}
+.info-row label{font-size:9px;color:#9a9590;text-transform:uppercase;letter-spacing:1px;font-weight:700;}
+.info-input{background:#f9f7f4;border:1px solid #e2ddd7;border-radius:5px;color:#1a1814;font-size:13px;font-weight:600;padding:8px 10px;width:100%;}
+.info-input:focus{outline:none;border-color:#1a5c8a;}
+.section-divider{font-size:9px;color:#9a9590;text-transform:uppercase;letter-spacing:2px;font-weight:700;padding:10px 0 6px;border-bottom:1px solid #e2ddd7;margin-bottom:8px;}
+/* 브랜드 선택 */
+.brand-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:4px;}
+.brand-btn{padding:7px 4px;border:1.5px solid #e2ddd7;border-radius:6px;background:#fff;color:#5a5650;font-size:12px;font-weight:600;cursor:pointer;text-align:center;transition:all .15s;}
+.brand-btn:hover{border-color:#1a5c8a;color:#1a5c8a;}
+.brand-btn.on{border-color:#1a5c8a;background:#eef4fa;color:#1a5c8a;font-weight:700;}
+/* 모델명 입력 - lang 속성으로 영문 키패드 */
+.model-input{background:#f9f7f4;border:1px solid #e2ddd7;border-radius:5px;color:#1a1814;font-size:13px;font-weight:600;padding:8px 10px;width:100%;ime-mode:disabled;}
+.model-input:focus{outline:none;border-color:#1a5c8a;}
 </style>
 </head>
 <body>
+<div class="save-toast" id="toast">저장됐어요!</div>
+
+<!-- 커스텀 확인 모달 -->
+<div class="modal-overlay" id="confirmModal" style="display:none;">
+  <div class="modal-box">
+    <div class="modal-title" id="modalTitle">확인</div>
+    <div class="modal-msg" id="modalMsg"></div>
+    <div class="modal-btns">
+      <button class="modal-cancel" id="modalCancel">취소</button>
+      <button class="modal-confirm" id="modalConfirm">삭제</button>
+    </div>
+  </div>
+</div>
+
+<!-- 계산 페이지 -->
+<div class="page on" id="page-calc">
 <div class="hdr">
-  <h1>필름 재단 <span>최적화</span></h1>
+  <h1>재단<span>왕</span></h1>
   <span class="hdr-sub">INTERIOR FILM PRO</span>
 </div>
 <div class="fbar">
@@ -95,13 +157,87 @@ tr:hover td{background:#f9f7f4;}
   <input id="fl" type="number" value="0">
   <span class="funit">m</span>
   <div class="allow-g">
-    <label>여유분</label>
-    <input id="al" type="number" value="0" style="width:58px;">
-    <span class="funit">mm</span>
+    <label>방염</label>
+    <div style="display:flex;gap:5px;">
+      <button id="btn-flameyes" onclick="setFlame(true)"
+        style="padding:5px 12px;border-radius:5px;border:1.5px solid rgba(255,255,255,.25);background:#e8c14a;color:#1a1814;font-size:12px;font-weight:700;cursor:pointer;">방염</button>
+      <button id="btn-flameno" onclick="setFlame(false)"
+        style="padding:5px 12px;border-radius:5px;border:1.5px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);color:rgba(255,255,255,.6);font-size:12px;font-weight:600;cursor:pointer;">비방염</button>
+    </div>
+  </div>
+  <div class="allow-g">
+    <label>나무 무늬</label>
+    <div style="display:flex;gap:5px;">
+      <button id="btn-patternyes" onclick="setPattern(true)"
+        style="padding:5px 12px;border-radius:5px;border:1.5px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);color:rgba(255,255,255,.6);font-size:12px;font-weight:600;cursor:pointer;">있음</button>
+      <button id="btn-patternno" onclick="setPattern(false)"
+        style="padding:5px 12px;border-radius:5px;border:1.5px solid rgba(255,255,255,.25);background:#e8c14a;color:#1a1814;font-size:12px;font-weight:700;cursor:pointer;">없음</button>
+    </div>
   </div>
 </div>
 <div class="wrap">
   <div>
+    <div class="panel">
+      <div class="ph"><span class="ph-t">현장 정보</span></div>
+      <div class="pb" style="padding:12px 14px;">
+
+        <!-- 현장명 -->
+        <div class="info-grid full" style="margin-bottom:8px;">
+          <div class="info-row">
+            <label>현장명</label>
+            <input type="text" id="siteName" class="info-input" placeholder="예) 강남 아파트 101호">
+          </div>
+        </div>
+
+        <!-- 고객명 + 연락처 -->
+        <div class="info-grid">
+          <div class="info-row">
+            <label>고객명</label>
+            <input type="text" id="clientName" class="info-input" placeholder="홍길동">
+          </div>
+          <div class="info-row">
+            <label>연락처</label>
+            <input type="tel" id="clientPhone" class="info-input" placeholder="010-0000-0000">
+          </div>
+        </div>
+
+        <!-- 원단 정보 -->
+        <div class="section-divider">원단 정보</div>
+
+        <!-- 브랜드 선택 -->
+        <div class="info-row" style="margin-bottom:8px;">
+          <label>브랜드</label>
+          <div class="brand-grid" id="brandGrid">
+            <button class="brand-btn" data-brand="LX" onclick="selectBrand(this)">LX</button>
+            <button class="brand-btn" data-brand="현대보닥" onclick="selectBrand(this)">현대보닥</button>
+            <button class="brand-btn" data-brand="KCC" onclick="selectBrand(this)">KCC</button>
+            <button class="brand-btn" data-brand="영림" onclick="selectBrand(this)">영림</button>
+            <button class="brand-btn" data-brand="예림" onclick="selectBrand(this)">예림</button>
+            <button class="brand-btn" data-brand="3M" onclick="selectBrand(this)">3M</button>
+            <button class="brand-btn" data-brand="삼성" onclick="selectBrand(this)">삼성</button>
+          </div>
+        </div>
+
+        <!-- 브랜드 직접입력 -->
+        <div class="info-row" style="margin-bottom:8px;">
+          <label>브랜드 직접입력</label>
+          <input type="text" id="brandCustom" class="info-input"
+            placeholder="직접 입력"
+            oninput="clearBrandBtn()">
+        </div>
+
+        <!-- 모델명 -->
+        <div class="info-row">
+          <label>모델명</label>
+          <input type="text" id="modelName" class="model-input"
+            placeholder="예) EW20098-51"
+            lang="en" autocomplete="off" autocorrect="off"
+            autocapitalize="off" spellcheck="false"
+            inputmode="text">
+        </div>
+
+      </div>
+    </div>
     <div class="panel">
       <div class="ph">
         <span class="ph-t">재단 항목 목록</span>
@@ -120,8 +256,33 @@ tr:hover td{background:#f9f7f4;}
     </div></div>
   </div>
 </div>
+</div>
+
+<!-- 기록 페이지 -->
+<div class="page" id="page-hist">
+<div class="hdr">
+  <h1>계산 <span>기록</span></h1>
+</div>
+<div style="max-width:800px;margin:0 auto;padding:14px 12px;">
+  <div style="margin-bottom:12px;">
+    <input type="text" id="searchBox" placeholder="🔍 현장명으로 검색" oninput="renderHistory()"
+      style="width:100%;padding:10px 14px;border:1px solid #e2ddd7;border-radius:8px;font-size:14px;background:#fff;color:#1a1814;">
+  </div>
+  <div id="hist-list"></div>
+</div>
+</div>
+
+<!-- 하단 탭바 -->
+<div class="tabbar">
+  <button class="tab on" id="tab-calc" onclick="showTab('calc')">
+    <span class="tab-icon">✂</span>재단 계산
+  </button>
+  <button class="tab" id="tab-hist" onclick="showTab('hist')">
+    <span class="tab-icon">📋</span>계산 기록
+  </button>
+</div>
 <script type="text/javascript">
-var CATS=[{id:"1",lb:"문"},{id:"1-1",lb:"문틀"},{id:"2",lb:"창"},{id:"2-1",lb:"창틀"},{id:"3",lb:"싱크대 문"},{id:"3-1",lb:"싱크대 틀"},{id:"4",lb:"벽"},{id:"5",lb:"천장"},{id:"6",lb:"기타"}];
+var CATS=[{id:"1",lb:"문"},{id:"1-1",lb:"문틀"},{id:"2",lb:"창"},{id:"2-1",lb:"창틀"},{id:"3",lb:"싱크대 문"},{id:"3-1",lb:"싱크대 틀"},{id:"4",lb:"알판"},{id:"5",lb:"몰딩"},{id:"6",lb:"기타"}];
 var CC={"1":"#2c7be5","1-1":"#74b3fa","2":"#27ae60","2-1":"#82e0aa","3":"#e67e22","3-1":"#f0b27a","4":"#8e44ad","5":"#c0392b","6":"#7f8c8d"};
 function cc(c){return CC[c]||"#7f8c8d";}
 function cl(c){for(var i=0;i<CATS.length;i++)if(CATS[i].id===c)return CATS[i].lb;return c;}
@@ -198,7 +359,62 @@ function getItems(){
   return res;
 }
 
-function pack(pieces,fw){
+// ── 공통: 세그먼트 업데이트 ─────────────────────────────────
+function updateSegs(segs,bx,pw,by,ph){
+  var nx=[];
+  for(var gi=0;gi<segs.length;gi++){
+    var s=segs[gi],ox=Math.max(bx,s.x0),ex=Math.min(bx+pw,s.x1);
+    if(ox>=ex){nx.push({x0:s.x0,x1:s.x1,h:s.h});}
+    else{
+      if(s.x0<ox)nx.push({x0:s.x0,x1:ox,h:s.h});
+      nx.push({x0:ox,x1:ex,h:by+ph});
+      if(ex<s.x1)nx.push({x0:ex,x1:s.x1,h:s.h});
+    }
+  }
+  nx.sort(function(a,b){return a.x0-b.x0;});
+  var mg=[];
+  for(var ni=0;ni<nx.length;ni++){
+    if(mg.length&&mg[mg.length-1].x1===nx[ni].x0&&mg[mg.length-1].h===nx[ni].h)
+      mg[mg.length-1].x1=nx[ni].x1;
+    else mg.push({x0:nx[ni].x0,x1:nx[ni].x1,h:nx[ni].h});
+  }
+  return mg;
+}
+
+function getBestPos(segs,pw,fw){
+  var xs=[],gi;
+  for(gi=0;gi<segs.length;gi++){
+    var x0=segs[gi].x0;
+    if(x0+pw<=fw){var f=false;for(var xi=0;xi<xs.length;xi++)if(xs[xi]===x0){f=true;break;}if(!f)xs.push(x0);}
+  }
+  if(!xs.length)xs.push(0);
+  var bx=0,by=Infinity,bw=Infinity;
+  for(var xi=0;xi<xs.length;xi++){
+    var x=xs[xi],y=0,waste=0;
+    for(gi=0;gi<segs.length;gi++){var ox=Math.max(x,segs[gi].x0),ex=Math.min(x+pw,segs[gi].x1);if(ox<ex&&segs[gi].h>y)y=segs[gi].h;}
+    for(gi=0;gi<segs.length;gi++){var ox=Math.max(x,segs[gi].x0),ex=Math.min(x+pw,segs[gi].x1);if(ox<ex)waste+=(y-segs[gi].h)*(ex-ox);}
+    if(y<by||(y===by&&waste<bw)){by=y;bw=waste;bx=x;}
+  }
+  if(by===Infinity){var mh=0;for(gi=0;gi<segs.length;gi++)if(segs[gi].h>mh)mh=segs[gi].h;by=mh;bx=0;}
+  return{bx:bx,by:by};
+}
+
+function buildStrips(flat){
+  var ySet={},ys=[],strips=[];
+  for(var i=0;i<flat.length;i++)ySet[flat[i].y]=true;
+  for(var y in ySet)ys.push(parseFloat(y));
+  ys.sort(function(a,b){return a-b;});
+  for(var i=0;i<ys.length;i++){
+    var y=ys[i],items=[],mb=0;
+    for(var j=0;j<flat.length;j++)if(flat[j].y===y)items.push(flat[j]);
+    for(var j=0;j<items.length;j++)if(items[j].y+items[j].pH>mb)mb=items[j].y+items[j].pH;
+    strips.push({y:y,height:mb-y,slots:items});
+  }
+  return strips;
+}
+
+// ── 무늬있음: 방향 고정 Skyline ──────────────────────────────
+function packFixed(pieces,fw){
   var sorts=[
     function(a,b){return b.pW*b.pH-a.pW*a.pH;},
     function(a,b){return b.pH-a.pH;},
@@ -208,49 +424,73 @@ function pack(pieces,fw){
   var bestTotal=Infinity,bestFlat=null;
   for(var si=0;si<sorts.length;si++){
     var sp=pieces.slice().sort(sorts[si]);
-    var segs=[{x0:0,x1:fw,h:0}];
-    var placed=[];
+    var segs=[{x0:0,x1:fw,h:0}],placed=[],gi;
     for(var pi=0;pi<sp.length;pi++){
-      var p=sp[pi],xs=[],gi,ni;
-      for(gi=0;gi<segs.length;gi++){
-        var x0=segs[gi].x0;
-        if(x0+p.pW<=fw){var f=false;for(var xi=0;xi<xs.length;xi++)if(xs[xi]===x0){f=true;break;}if(!f)xs.push(x0);}
-      }
-      if(!xs.length)xs.push(0);
-      var bx=0,by=Infinity,bw=Infinity;
-      for(var xi=0;xi<xs.length;xi++){
-        var x=xs[xi],y=0,waste=0;
-        for(gi=0;gi<segs.length;gi++){var ox=Math.max(x,segs[gi].x0),ex=Math.min(x+p.pW,segs[gi].x1);if(ox<ex&&segs[gi].h>y)y=segs[gi].h;}
-        for(gi=0;gi<segs.length;gi++){var ox=Math.max(x,segs[gi].x0),ex=Math.min(x+p.pW,segs[gi].x1);if(ox<ex)waste+=(y-segs[gi].h)*(ex-ox);}
-        if(y<by||(y===by&&waste<bw)){by=y;bw=waste;bx=x;}
-      }
-      if(by===Infinity){var mh=0;for(gi=0;gi<segs.length;gi++)if(segs[gi].h>mh)mh=segs[gi].h;by=mh;bx=0;}
-      placed.push({label:p.label,cat:p.cat,pW:p.pW,pH:p.pH,x:bx,y:by});
-      var nx=[];
-      for(gi=0;gi<segs.length;gi++){
-        var s=segs[gi],ox=Math.max(bx,s.x0),ex=Math.min(bx+p.pW,s.x1);
-        if(ox>=ex){nx.push({x0:s.x0,x1:s.x1,h:s.h});}
-        else{if(s.x0<ox)nx.push({x0:s.x0,x1:ox,h:s.h});nx.push({x0:ox,x1:ex,h:by+p.pH});if(ex<s.x1)nx.push({x0:ex,x1:s.x1,h:s.h});}
-      }
-      nx.sort(function(a,b){return a.x0-b.x0;});
-      var mg=[];
-      for(ni=0;ni<nx.length;ni++){if(mg.length&&mg[mg.length-1].x1===nx[ni].x0&&mg[mg.length-1].h===nx[ni].h)mg[mg.length-1].x1=nx[ni].x1;else mg.push({x0:nx[ni].x0,x1:nx[ni].x1,h:nx[ni].h});}
-      segs=mg;
+      var p=sp[pi];
+      var pos=getBestPos(segs,p.pW,fw);
+      placed.push({label:p.label,cat:p.cat,pW:p.pW,pH:p.pH,x:pos.bx,y:pos.by,rotated:false});
+      segs=updateSegs(segs,pos.bx,p.pW,pos.by,p.pH);
     }
     var mh=0;for(gi=0;gi<segs.length;gi++)if(segs[gi].h>mh)mh=segs[gi].h;
     if(mh<bestTotal){bestTotal=mh;bestFlat=placed.slice();}
   }
-  var ySet={},ys=[],strips=[];
-  for(var i=0;i<bestFlat.length;i++)ySet[bestFlat[i].y]=true;
-  for(var y in ySet)ys.push(parseFloat(y));
-  ys.sort(function(a,b){return a-b;});
-  for(var i=0;i<ys.length;i++){
-    var y=ys[i],items=[],mb=0;
-    for(var j=0;j<bestFlat.length;j++)if(bestFlat[j].y===y)items.push(bestFlat[j]);
-    for(var j=0;j<items.length;j++)if(items[j].y+items[j].pH>mb)mb=items[j].y+items[j].pH;
-    strips.push({y:y,height:mb-y,slots:items});
+  return{flat:bestFlat,total:bestTotal,strips:buildStrips(bestFlat)};
+}
+
+// ── 무늬없음: 회전 허용 Skyline ──────────────────────────────
+function packRotatable(pieces,fw){
+  var sorts=[
+    function(a,b){return b.pW*b.pH-a.pW*a.pH;},
+    function(a,b){return b.pH-a.pH;},
+    function(a,b){return b.pW-a.pW;},
+    function(a,b){return(b.pW+b.pH)-(a.pW+a.pH);},
+    function(a,b){return Math.max(b.pW,b.pH)-Math.max(a.pW,a.pH);},
+    function(a,b){return Math.min(b.pW,b.pH)-Math.min(a.pW,a.pH);}
+  ];
+  var bestTotal=Infinity,bestFlat=null;
+
+  for(var si=0;si<sorts.length;si++){
+    var sp=pieces.slice().sort(sorts[si]);
+    var n=sp.length;
+
+    // 전략1: 모두 원본, 전략2: greedy 방향선택, 전략3: 모두 회전
+    for(var strat=0;strat<3;strat++){
+      var segs=[{x0:0,x1:fw,h:0}],placed=[],gi;
+      for(var pi=0;pi<n;pi++){
+        var p=sp[pi];
+        var canRot=(p.pH<=fw && p.pW!==p.pH);
+        var useRot=false;
+        if(canRot){
+          if(strat===1){
+            // greedy: 더 낮은 y를 주는 방향 선택
+            var pos0=getBestPos(segs,p.pW,fw);
+            var pos1=getBestPos(segs,p.pH,fw);
+            useRot=(pos1.by<pos0.by)||(pos1.by===pos0.by&&p.pH<p.pW);
+          } else if(strat===2){
+            useRot=true;
+          }
+        }
+        var pw=useRot?p.pH:p.pW;
+        var ph=useRot?p.pW:p.pH;
+        if(pw>fw){pw=p.pW;ph=p.pH;useRot=false;}
+        var pos=getBestPos(segs,pw,fw);
+        placed.push({label:p.label,cat:p.cat,pW:pw,pH:ph,x:pos.bx,y:pos.by,rotated:useRot});
+        segs=updateSegs(segs,pos.bx,pw,pos.by,ph);
+      }
+      var mh=0;for(gi=0;gi<segs.length;gi++)if(segs[gi].h>mh)mh=segs[gi].h;
+      if(mh<bestTotal){bestTotal=mh;bestFlat=placed.slice();}
+    }
   }
-  return{flat:bestFlat,total:bestTotal,strips:strips};
+  return{flat:bestFlat,total:bestTotal,strips:buildStrips(bestFlat)};
+}
+
+// ── 메인 pack 함수 (무늬 여부에 따라 분기) ───────────────────
+function pack(pieces,fw){
+  if(hasPattern){
+    return packFixed(pieces,fw);
+  } else {
+    return packRotatable(pieces,fw);
+  }
 }
 
 function calculate(){
@@ -258,7 +498,7 @@ function calculate(){
   if(!items.length){alert("항목을 먼저 추가하세요.");return;}
   var fw=parseFloat(document.getElementById("fw").value)||1220;
   var fl=(parseFloat(document.getElementById("fl").value)||0)*1000;
-  var al=parseFloat(document.getElementById("al").value)||0;
+  var al=0;
   var pieces=[];
   for(var i=0;i<items.length;i++){
     var it=items[i];
@@ -271,12 +511,18 @@ function calculate(){
   var res=pack(pieces,fw);
   var ua=0;for(var i=0;i<pieces.length;i++)ua+=pieces[i].pW*pieces[i].pH;
   var eff=(ua/(fw*res.total)*100).toFixed(1);
-  renderResult(res.flat,res.strips,res.total,eff,fl>0&&res.total>fl,fw,fl,al);
+  renderResult(res.flat,res.strips,res.total,eff,fl>0&&res.total>fl,fw,fl,isFlame);
+  var siteName=document.getElementById("siteName").value.trim()||"현장명 없음";
+  var clientName=document.getElementById("clientName").value.trim();
+  var clientPhone=document.getElementById("clientPhone").value.trim();
+  var brand=getSelectedBrand();
+  var modelName=document.getElementById("modelName").value.trim();
+  saveHistory(siteName,clientName,clientPhone,brand,modelName,items,res.flat,res.total,eff,fw,fl,isFlame,hasPattern);
 }
 
 var dS=1,dB=1,dD=null,zI=false;
 
-function renderResult(flat,strips,total,eff,ovl,fw,fl,al){
+function renderResult(flat,strips,total,eff,ovl,fw,fl,flame){
   zI=false;
   var col=document.getElementById("rcol");
   col.innerHTML="";
@@ -311,7 +557,7 @@ function renderResult(flat,strips,total,eff,ovl,fw,fl,al){
     ur.innerHTML="<span class='ulbl'>필름 사용</span><div class='ubg'><div class='ufill"+(ovl?" ov":"")+"' style='width:"+Math.min(total/fl*100,100).toFixed(1)+"%'></div></div><span class='uval'>"+((total/fl*100).toFixed(1))+"%</span>";
     pb1.appendChild(ur);
   }
-  var info=el("div","info");info.textContent="필름: "+fw+"mm × "+(fl?fl.toLocaleString()+"mm":"미설정")+" | 여유분: "+al+"mm";pb1.appendChild(info);
+  var info=el("div","info");info.textContent="필름: "+fw+"mm × "+(fl?fl.toLocaleString()+"mm":"미설정")+" | "+(isFlame?"방염":"비방염");pb1.appendChild(info);
   col.appendChild(p1);
 
   // 배치도
@@ -425,6 +671,304 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.register('./sw.js').catch(function(){});
 }
 
+// ── 브랜드 선택 ───────────────────────────────────────────────
+function selectBrand(btn){
+  var btns=document.getElementById("brandGrid").querySelectorAll(".brand-btn");
+  for(var i=0;i<btns.length;i++) btns[i].className="brand-btn";
+  if(btn.className.indexOf("on")===-1) btn.className="brand-btn on";
+  // 버튼 선택 시 직접입력 초기화
+  document.getElementById("brandCustom").value="";
+}
+function getSelectedBrand(){
+  var custom=document.getElementById("brandCustom").value.trim();
+  if(custom) return custom;
+  var on=document.getElementById("brandGrid").querySelector(".brand-btn.on");
+  return on?on.getAttribute("data-brand"):"";
+}
+function setSelectedBrand(brand){
+  // 버튼 목록에 있으면 버튼 선택, 없으면 직접입력칸에
+  var btns=document.getElementById("brandGrid").querySelectorAll(".brand-btn");
+  var found=false;
+  for(var i=0;i<btns.length;i++){
+    if(btns[i].getAttribute("data-brand")===brand){
+      btns[i].className="brand-btn on"; found=true;
+    } else {
+      btns[i].className="brand-btn";
+    }
+  }
+  if(!found){
+    document.getElementById("brandCustom").value=brand||"";
+  } else {
+    document.getElementById("brandCustom").value="";
+  }
+}
+function clearBrandBtn(){
+  // 직접입력 시 버튼 선택 해제
+  var btns=document.getElementById("brandGrid").querySelectorAll(".brand-btn");
+  for(var i=0;i<btns.length;i++) btns[i].className="brand-btn";
+}
+
+// ── 방염 선택 ────────────────────────────────────────────────
+var isFlame = false;
+function setFlame(val){
+  isFlame = val;
+  var yes = document.getElementById("btn-flameyes");
+  var no  = document.getElementById("btn-flameno");
+  if(val){
+    yes.style.background="#e8c14a"; yes.style.color="#1a1814"; yes.style.borderColor="#e8c14a";
+    no.style.background="rgba(255,255,255,.1)"; no.style.color="rgba(255,255,255,.6)"; no.style.borderColor="rgba(255,255,255,.25)";
+  } else {
+    no.style.background="#e8c14a"; no.style.color="#1a1814"; no.style.borderColor="#e8c14a";
+    yes.style.background="rgba(255,255,255,.1)"; yes.style.color="rgba(255,255,255,.6)"; yes.style.borderColor="rgba(255,255,255,.25)";
+  }
+}
+
+// ── 무늬 유무 ────────────────────────────────────────────────
+var hasPattern = false;
+function setPattern(val){
+  hasPattern = val;
+  var yes=document.getElementById("btn-patternyes");
+  var no =document.getElementById("btn-patternno");
+  if(val){
+    yes.style.background="#e8c14a";yes.style.color="#1a1814";yes.style.borderColor="#e8c14a";
+    no.style.background="rgba(255,255,255,.1)";no.style.color="rgba(255,255,255,.6)";no.style.borderColor="rgba(255,255,255,.25)";
+  } else {
+    no.style.background="#e8c14a";no.style.color="#1a1814";no.style.borderColor="#e8c14a";
+    yes.style.background="rgba(255,255,255,.1)";yes.style.color="rgba(255,255,255,.6)";yes.style.borderColor="rgba(255,255,255,.25)";
+  }
+}
+
+// ── 커스텀 확인 모달 ─────────────────────────────────────────
+function showConfirm(title, msg, onConfirm){
+  var overlay=document.getElementById("confirmModal");
+  document.getElementById("modalTitle").textContent=title;
+  document.getElementById("modalMsg").textContent=msg;
+  overlay.style.display="flex";
+
+  var confirmBtn=document.getElementById("modalConfirm");
+  var cancelBtn=document.getElementById("modalCancel");
+
+  // 이전 이벤트 제거
+  var newConfirm=confirmBtn.cloneNode(true);
+  var newCancel=cancelBtn.cloneNode(true);
+  confirmBtn.parentNode.replaceChild(newConfirm,confirmBtn);
+  cancelBtn.parentNode.replaceChild(newCancel,cancelBtn);
+
+  document.getElementById("modalConfirm").onclick=function(){
+    overlay.style.display="none";
+    onConfirm();
+  };
+  document.getElementById("modalCancel").onclick=function(){
+    overlay.style.display="none";
+  };
+  // 오버레이 클릭시 닫기
+  overlay.onclick=function(e){
+    if(e.target===overlay) overlay.style.display="none";
+  };
+}
+
+// ── 탭 전환 ───────────────────────────────────────────────────
+function showTab(tab){
+  document.getElementById("page-calc").className="page"+(tab==="calc"?" on":"");
+  document.getElementById("page-hist").className="page"+(tab==="hist"?" on":"");
+  document.getElementById("tab-calc").className="tab"+(tab==="calc"?" on":"");
+  document.getElementById("tab-hist").className="tab"+(tab==="hist"?" on":"");
+  if(tab==="hist") renderHistory();
+}
+
+// ── 저장 ──────────────────────────────────────────────────────
+function saveHistory(siteName,clientName,clientPhone,brand,modelName,items,flat,total,eff,fw,fl,flame,pattern){
+  try{
+    var now=new Date();
+    var dateStr=now.getFullYear()+"."+(now.getMonth()+1)+"."+(("0"+now.getDate()).slice(-2))+" "+(("0"+now.getHours()).slice(-2))+":"+(("0"+now.getMinutes()).slice(-2));
+    var record={
+      id: now.getTime(),
+      date: dateStr,
+      siteName: siteName,
+      clientName: clientName,
+      clientPhone: clientPhone,
+      brand: brand,
+      modelName: modelName,
+      items: items,
+      flat: flat,
+      total: total,
+      eff: eff,
+      fw: fw,
+      fl: fl,
+      flame: flame,
+      pattern: pattern
+    };
+    var saved=[];
+    try{saved=JSON.parse(localStorage.getItem("filmHistory")||"[]");}catch(e){}
+    saved.unshift(record);
+    if(saved.length>50) saved=saved.slice(0,50);
+    localStorage.setItem("filmHistory",JSON.stringify(saved));
+    showToast();
+  }catch(e){}
+}
+
+function showToast(){
+  var t=document.getElementById("toast");
+  t.className="save-toast show";
+  setTimeout(function(){t.className="save-toast";},2000);
+}
+
+// ── 기록 불러오기 ─────────────────────────────────────────────
+function getHistory(){
+  try{return JSON.parse(localStorage.getItem("filmHistory")||"[]");}catch(e){return [];}
+}
+
+function renderHistory(){
+  var list=document.getElementById("hist-list");
+  if(!list)return;
+  list.innerHTML="";
+  var keyword=(document.getElementById("searchBox")?document.getElementById("searchBox").value.trim().toLowerCase():"");
+  var all=getHistory();
+  var records=keyword?all.filter(function(r){return (r.siteName||"").toLowerCase().indexOf(keyword)>=0;}):all;
+  if(!records.length){
+    var e=document.createElement("div");e.className="hist-empty";
+    e.innerHTML="<div style='font-size:36px;margin-bottom:10px'>📋</div>아직 저장된 기록이 없어요<br>계산하면 자동으로 저장됩니다";
+    list.appendChild(e);return;
+  }
+  for(var i=0;i<records.length;i++){
+    (function(rec){
+      var card=document.createElement("div");card.className="hcard";
+      // 헤더
+      var hd=document.createElement("div");hd.className="hcard-head";
+      var left=document.createElement("div");left.style.flex="1";
+      var dt=document.createElement("div");dt.className="hcard-date";dt.textContent=rec.date;
+      var tl=document.createElement("div");tl.className="hcard-title";
+      tl.textContent=rec.siteName||"현장명 없음";
+      var sub=document.createElement("div");
+      sub.style.cssText="font-size:11px;color:#5a5650;margin-top:2px;";
+      sub.textContent=rec.items.length+"개 항목 · "+(rec.total/1000).toFixed(2)+"M · "+rec.eff+"% 사용률";
+      var meta=document.createElement("div");
+      meta.style.cssText="font-size:11px;color:#9a9590;margin-top:3px;display:flex;flex-wrap:wrap;gap:6px;";
+      if(rec.clientName){var s=document.createElement("span");s.textContent="👤 "+rec.clientName;meta.appendChild(s);}
+      if(rec.clientPhone){var s=document.createElement("span");s.textContent="📞 "+rec.clientPhone;meta.appendChild(s);}
+      if(rec.brand||rec.modelName){var s=document.createElement("span");s.textContent="🎨 "+(rec.brand||"")+(rec.modelName?" "+rec.modelName:"");meta.appendChild(s);}
+      var sf=document.createElement("span");sf.textContent=rec.flame?"🔥 방염":"비방염";meta.appendChild(sf);
+      var sp=document.createElement("span");sp.textContent=rec.pattern?"🌲 무늬있음":"무늬없음";meta.appendChild(sp);
+      var badges=document.createElement("div");badges.className="hcard-badges";
+      // 카테고리별 항목 요약
+      var catMap={};
+      for(var j=0;j<rec.items.length;j++){
+        var nm=cl(rec.items[j].cat);
+        catMap[nm]=(catMap[nm]||0)+rec.items[j].qty;
+      }
+      for(var nm in catMap){
+        var b=document.createElement("span");b.className="badge";
+        b.textContent=nm+" "+catMap[nm]+"개";badges.appendChild(b);
+      }
+      left.appendChild(dt);left.appendChild(tl);left.appendChild(sub);left.appendChild(meta);left.appendChild(badges);
+      hd.appendChild(left);
+      card.appendChild(hd);
+      // 바디
+      var bd=document.createElement("div");bd.className="hcard-body";
+      var info=document.createElement("div");
+      info.style.cssText="font-size:11px;color:#9a9590;margin-bottom:8px;";
+      info.textContent="필름: "+rec.fw+"mm × "+(rec.fl?rec.fl.toLocaleString()+"mm":"미설정")+" | "+(rec.flame?"방염":"비방염");
+      bd.appendChild(info);
+      // 버튼
+      var btns=document.createElement("div");btns.className="hcard-btns";
+      var lb=document.createElement("button");lb.className="load-btn";lb.textContent="불러오기";
+      lb.onclick=function(){loadRecord(rec);};
+      var db=document.createElement("button");db.className="del-btn2";db.textContent="삭제";
+      db.onclick=function(){
+        showConfirm("기록 삭제", "이 기록을 삭제할까요?\n삭제 후 복구할 수 없습니다.", function(){
+          var saved=getHistory();
+          saved=saved.filter(function(r){return r.id!==rec.id;});
+          localStorage.setItem("filmHistory",JSON.stringify(saved));
+          renderHistory();
+        });
+      };
+      btns.appendChild(lb);btns.appendChild(db);
+      bd.appendChild(btns);
+      card.appendChild(bd);
+      list.appendChild(card);
+    })(records[i]);
+  }
+}
+
+function loadRecord(rec){
+  // 항목 초기화
+  IDS=[];seq=0;
+  document.getElementById("ilist").innerHTML="";
+  document.getElementById("icnt").textContent="0개";
+  // 필름 설정 복원
+  document.getElementById("fw").value=rec.fw;
+  document.getElementById("fl").value=rec.fl?rec.fl/1000:0;
+  document.getElementById("siteName").value=rec.siteName||"";
+  document.getElementById("clientName").value=rec.clientName||"";
+  document.getElementById("clientPhone").value=rec.clientPhone||"";
+  document.getElementById("modelName").value=rec.modelName||"";
+  setSelectedBrand(rec.brand||"");
+  setFlame(rec.flame||false);
+  isFlame=rec.flame||false;
+  setPattern(rec.pattern||false);
+  hasPattern=rec.pattern||false;
+  // 항목 복원
+  for(var i=0;i<rec.items.length;i++){
+    var it=rec.items[i];
+    addItemData(it.cat,it.pW,it.pL,it.name,it.qty);
+  }
+  // 탭 전환 후 계산 결과 표시
+  showTab("calc");
+  // 결과 다시 렌더링
+  setTimeout(function(){
+    renderResult(rec.flat,[],rec.total,rec.eff,rec.fl>0&&rec.total>rec.fl,rec.fw,rec.fl,rec.flame||false);
+  },100);
+  alert("불러왔어요! 항목을 확인하고 다시 계산할 수 있어요.");
+}
+
+function addItemData(cat,pW,pL,name,qty){
+  seq++;
+  var id="item"+seq;
+  IDS.push(id);
+  var card=document.createElement("div");card.className="icard";card.id=id;
+  var head=document.createElement("div");head.className="ich";
+  var num=document.createElement("div");num.className="inum";num.style.background=cc(cat);num.textContent=IDS.length;
+  var ni=document.createElement("input");ni.className="iname";ni.type="text";ni.placeholder="이름 입력";ni.value=name||"";
+  var db=document.createElement("button");db.className="dbtn";db.textContent="X";
+  db.setAttribute("data-id",id);
+  db.addEventListener("click",function(){delItem(this.getAttribute("data-id"));});
+  head.appendChild(num);head.appendChild(ni);head.appendChild(db);
+  var body=document.createElement("div");body.className="icb";
+  var cg=document.createElement("div");cg.className="cgrid";
+  for(var i=0;i<CATS.length;i++){
+    (function(c,cg,num){
+      var b=document.createElement("button");
+      b.className="cb"+(c.id===cat?" on":"");
+      b.textContent=c.lb;b.setAttribute("data-c",c.id);
+      b.addEventListener("click",function(){
+        var bs=cg.querySelectorAll(".cb");
+        for(var j=0;j<bs.length;j++)bs[j].className="cb";
+        this.className="cb on";
+        num.style.background=cc(this.getAttribute("data-c"));
+      });
+      cg.appendChild(b);
+    })(CATS[i],cg,num);
+  }
+  var dr=document.createElement("div");dr.className="drow";
+  function mk(lbl,cls,val,def){
+    var w=document.createElement("div");w.className="dw";
+    var l=document.createElement("label");l.textContent=lbl;
+    var inp=document.createElement("input");inp.type="number";inp.className=cls;inp.value=val;
+    var dv=String(def);
+    inp.addEventListener("focus",function(){if(this.value===dv)this.value="";});
+    inp.addEventListener("blur",function(){if(this.value==="")this.value=dv;});
+    var u=document.createElement("div");u.className="du";u.textContent=cls==="iq"?"개":"mm";
+    w.appendChild(l);w.appendChild(inp);w.appendChild(u);return w;
+  }
+  dr.appendChild(mk("폭 (W)","iw",pW,0));
+  dr.appendChild(mk("길이 (L)","il",pL,0));
+  dr.appendChild(mk("수량","iq",qty||1,1));
+  body.appendChild(cg);body.appendChild(dr);
+  card.appendChild(head);card.appendChild(body);
+  document.getElementById("ilist").appendChild(card);
+  document.getElementById("icnt").textContent=IDS.length+"개";
+}
+
 function init(){
   document.getElementById("addBtn").onclick=addItem;
   document.getElementById("calcBtn").onclick=calculate;
@@ -434,9 +978,7 @@ function init(){
   var fl=document.getElementById("fl");
   fl.onfocus=function(){if(this.value==="0")this.value="";};
   fl.onblur=function(){if(this.value==="")this.value="0";};
-  var al=document.getElementById("al");
-  al.onfocus=function(){if(this.value==="0")this.value="";};
-  al.onblur=function(){if(this.value==="")this.value="0";};
+
   addItem();
 }
 if(document.readyState==="loading"){

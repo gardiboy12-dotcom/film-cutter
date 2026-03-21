@@ -1,10 +1,10 @@
 {
-  "name": "필름 재단 최적화 계산기",
-  "short_name": "필름재단",
+  "name": "재단왕",
+  "short_name": "재단왕",
   "description": "인테리어 필름 재단 최적화 계산기",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#1a1814",
+  "background_color": "#ffffff",
   "theme_color": "#1a1814",
   "orientation": "any",
   "lang": "ko",
