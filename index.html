@@ -13,7 +13,7 @@
 <link rel="manifest" href="manifest.json">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-body{background:#f4f1ec;color:#1a1814;font-family:sans-serif;min-height:100vh;padding-bottom:60px;}
+body{background:#faf7f2;color:#2a2420;font-family:sans-serif;min-height:100vh;padding-bottom:60px;}
 .hdr{background:#1a1814;color:#fff;padding:14px 18px;display:flex;align-items:center;gap:12px;}
 .hdr h1{font-size:17px;font-weight:900;}
 .hdr h1 span{color:#e8c14a;}
@@ -27,59 +27,59 @@ body{background:#f4f1ec;color:#1a1814;font-family:sans-serif;min-height:100vh;pa
 .allow-g label{font-size:10px;color:rgba(255,255,255,.5);}
 .wrap{max-width:1200px;margin:0 auto;padding:14px 12px;display:grid;grid-template-columns:1fr;gap:14px;}
 @media(min-width:900px){.wrap{grid-template-columns:400px 1fr;align-items:start;}}
-.panel{background:#fff;border:1px solid #e2ddd7;border-radius:10px;margin-bottom:12px;overflow:hidden;}
+.panel{background:#ffffff;border:1px solid #d8d0c4;border-radius:10px;margin-bottom:12px;overflow:hidden;}
 .panel:last-child{margin-bottom:0;}
-.ph{padding:10px 14px;border-bottom:1px solid #e2ddd7;background:#f9f7f4;display:flex;align-items:center;justify-content:space-between;}
-.ph-t{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#9a9590;}
+.ph{padding:10px 14px;border-bottom:1px solid #d8d0c4;background:#ede8de;display:flex;align-items:center;justify-content:space-between;}
+.ph-t{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#9a8f84;}
 .pb{padding:14px;}
-.icard{border:1px solid #e2ddd7;border-radius:8px;margin-bottom:10px;overflow:hidden;}
+.icard{border:1px solid #d8d0c4;border-radius:8px;margin-bottom:10px;overflow:hidden;}
 .icard:last-child{margin-bottom:0;}
-.ich{display:flex;align-items:center;gap:8px;padding:8px 11px;background:#f9f7f4;border-bottom:1px solid #e2ddd7;}
+.ich{display:flex;align-items:center;gap:8px;padding:8px 11px;background:#ede8de;border-bottom:1px solid #d8d0c4;}
 .inum{width:20px;height:20px;border-radius:50%;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;}
-.iname{border:none;background:transparent;font-size:12px;font-weight:700;color:#1a1814;flex:1;min-width:0;}
+.iname{border:none;background:transparent;font-size:12px;font-weight:700;color:#2a2420;flex:1;min-width:0;}
 .iname:focus{outline:none;}
-.dbtn{background:none;border:none;cursor:pointer;color:#9a9590;font-size:15px;padding:0 3px;line-height:1;}
+.dbtn{background:none;border:none;cursor:pointer;color:#9a8f84;font-size:15px;padding:0 3px;line-height:1;}
 .icb{padding:10px;}
 .cgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;margin-bottom:10px;}
-.cb{padding:5px 3px;border:1.5px solid #e2ddd7;border-radius:5px;background:#fff;color:#9a9590;font-size:11px;cursor:pointer;text-align:center;line-height:1.3;}
+.cb{padding:5px 3px;border:1.5px solid #d8d0c4;border-radius:5px;background:#faf7f2;color:#9a8f84;font-size:11px;cursor:pointer;text-align:center;line-height:1.3;}
 .cb.on{font-weight:700;border-color:#2c5f8a;background:#eef4fa;color:#2c5f8a;}
 .drow{display:grid;grid-template-columns:1fr 1fr 68px;gap:6px;}
 .dw{display:flex;flex-direction:column;gap:3px;}
-.dw label{font-size:9px;color:#9a9590;text-transform:uppercase;letter-spacing:1px;}
-.dw input{background:#f9f7f4;border:1px solid #e2ddd7;border-radius:5px;color:#1a1814;font-size:14px;font-weight:600;padding:7px 7px;width:100%;}
+.dw label{font-size:9px;color:#9a8f84;text-transform:uppercase;letter-spacing:1px;}
+.dw input{background:#e6ddd0;border:1px solid #d0c8bc;border-radius:5px;color:#2a2420;font-size:14px;font-weight:600;padding:7px 7px;width:100%;}
 .dw input:focus{outline:none;border-color:#1a5c8a;}
-.du{font-size:9px;color:#9a9590;text-align:right;margin-top:1px;}
-.add-btn{width:100%;padding:10px;background:#fff;border:1.5px dashed #ccc8c0;border-radius:7px;color:#9a9590;font-size:12px;cursor:pointer;margin-bottom:8px;display:block;}
+.du{font-size:9px;color:#9a8f84;text-align:right;margin-top:1px;}
+.add-btn{width:100%;padding:10px;background:#faf7f2;border:1.5px dashed #c4b8a8;border-radius:7px;color:#9a8f84;font-size:12px;cursor:pointer;margin-bottom:8px;display:block;}
 .go-btn{width:100%;padding:13px;background:#1a1814;color:#e8c14a;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;}
 .sg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
-.sb{background:#f9f7f4;border:1px solid #e2ddd7;border-radius:8px;padding:12px 8px;text-align:center;}
+.sb{background:#ede8de;border:1px solid #d8d0c4;border-radius:8px;padding:12px 8px;text-align:center;}
 .sv{font-size:18px;font-weight:700;color:#c0392b;line-height:1;margin-bottom:4px;}
-.sl{font-size:10px;color:#9a9590;}
+.sl{font-size:10px;color:#9a8f84;}
 .urow{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:11px;}
-.ulbl{width:56px;color:#9a9590;flex-shrink:0;}
-.ubg{flex:1;height:8px;background:#e2ddd7;border-radius:4px;overflow:hidden;}
+.ulbl{width:56px;color:#9a8f84;flex-shrink:0;}
+.ubg{flex:1;height:8px;background:#d8d0c4;border-radius:4px;overflow:hidden;}
 .ufill{height:100%;border-radius:4px;background:#1a5c8a;}
 .ufill.ov{background:#c0392b;}
-.uval{font-size:11px;font-weight:600;width:46px;text-align:right;color:#5a5650;}
+.uval{font-size:11px;font-weight:600;width:46px;text-align:right;color:#6a5f58;}
 .warn{background:#fff8e6;border:1px solid #f0c040;border-radius:7px;padding:10px 14px;font-size:12px;color:#8a6500;margin-bottom:12px;}
 .dbox{background:#111;border-radius:8px;padding:10px;overflow:auto;max-height:600px;}
 .zctrl{display:flex;align-items:center;gap:4px;}
-.zb{background:#fff;border:1px solid #ccc8c0;border-radius:5px;color:#5a5650;font-size:14px;width:28px;height:26px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.zb{background:#fff;border:1px solid #c4b8a8;border-radius:5px;color:#6a5f58;font-size:14px;width:28px;height:26px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
 .zr{width:auto;padding:0 8px;font-size:11px;}
-.zl{font-size:11px;color:#9a9590;min-width:36px;text-align:center;}
+.zl{font-size:11px;color:#9a8f84;min-width:36px;text-align:center;}
 .leg{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;align-items:center;}
-.li{display:flex;align-items:center;gap:5px;font-size:11px;color:#5a5650;}
+.li{display:flex;align-items:center;gap:5px;font-size:11px;color:#6a5f58;}
 .ld{width:11px;height:11px;border-radius:2px;flex-shrink:0;}
 .tw{overflow-x:auto;}
 table{width:100%;border-collapse:collapse;font-size:12px;}
-th{text-align:left;padding:8px 10px;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:#9a9590;border-bottom:2px solid #e2ddd7;white-space:nowrap;}
-td{padding:7px 10px;border-bottom:1px solid #e2ddd7;font-size:11px;white-space:nowrap;}
+th{text-align:left;padding:8px 10px;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:#9a8f84;border-bottom:2px solid #d8d0c4;white-space:nowrap;}
+td{padding:7px 10px;border-bottom:1px solid #d8d0c4;font-size:11px;white-space:nowrap;}
 tr:last-child td{border-bottom:none;}
-tr:hover td{background:#f9f7f4;}
+tr:hover td{background:#ede8de;}
 .tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;border:1px solid;}
-.empty{padding:50px 20px;text-align:center;color:#9a9590;font-size:13px;line-height:2;}
+.empty{padding:50px 20px;text-align:center;color:#9a8f84;font-size:13px;line-height:2;}
 .ei{font-size:36px;margin-bottom:10px;}
-.info{font-size:11px;color:#9a9590;text-align:right;margin-top:6px;}
+.info{font-size:11px;color:#9a8f84;text-align:right;margin-top:6px;}
 /* 탭바 */
 .tabbar{position:fixed;bottom:0;left:0;right:0;background:#1a1814;display:flex;border-top:1px solid #333;z-index:100;}
 .tab{flex:1;padding:10px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;border:none;background:none;color:rgba(255,255,255,.45);font-size:9px;letter-spacing:.5px;}
@@ -89,47 +89,70 @@ tr:hover td{background:#f9f7f4;}
 .page{display:none;}
 .page.on{display:block;}
 /* 기록 카드 */
-.hcard{background:#fff;border:1px solid #e2ddd7;border-radius:10px;margin-bottom:12px;overflow:hidden;}
-.hcard-head{padding:12px 14px;border-bottom:1px solid #e2ddd7;background:#f9f7f4;display:flex;align-items:center;justify-content:space-between;gap:8px;}
-.hcard-date{font-size:11px;color:#9a9590;}
-.hcard-title{font-size:13px;font-weight:700;color:#1a1814;flex:1;}
+.hcard{background:#fff;border:1px solid #d8d0c4;border-radius:10px;margin-bottom:12px;overflow:hidden;}
+.hcard-head{padding:12px 14px;border-bottom:1px solid #d8d0c4;background:#ede8de;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.hcard-date{font-size:11px;color:#9a8f84;}
+.hcard-title{font-size:13px;font-weight:700;color:#2a2420;flex:1;}
 .hcard-badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;}
-.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#f0ede8;color:#5a5650;}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#f0ede8;color:#6a5f58;}
 .hcard-body{padding:12px 14px;}
 .hcard-btns{display:flex;gap:8px;margin-top:10px;}
 .load-btn{flex:1;padding:9px;background:#1a1814;color:#e8c14a;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;}
-.del-btn2{padding:9px 14px;background:#fff;color:#c0392b;border:1px solid #e2ddd7;border-radius:7px;font-size:12px;cursor:pointer;}
-.hist-empty{padding:40px 20px;text-align:center;color:#9a9590;font-size:13px;line-height:2;}
+.del-btn2{padding:9px 14px;background:#fff;color:#c0392b;border:1px solid #d8d0c4;border-radius:7px;font-size:12px;cursor:pointer;}
+.hist-empty{padding:40px 20px;text-align:center;color:#9a8f84;font-size:13px;line-height:2;}
 .save-toast{position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#27ae60;color:#fff;padding:8px 20px;border-radius:20px;font-size:13px;font-weight:700;z-index:200;opacity:0;transition:opacity .3s;pointer-events:none;}
 .save-toast.show{opacity:1;}
+/* 입력 팝업 모달 */
+.input-modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.45);z-index:600;display:flex;align-items:center;justify-content:center;padding:20px;}
+.input-modal-box{background:#faf7f2;border-radius:16px;padding:24px 20px;width:100%;max-width:380px;box-shadow:0 12px 40px rgba(0,0,0,0.2);animation:popIn .2s ease;}
+@keyframes popIn{from{opacity:0;transform:scale(0.92);}to{opacity:1;transform:scale(1);}}
+.input-modal-label{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#9a8f84;margin-bottom:8px;}
+.input-modal-field{width:100%;background:#e6ddd0;border:1.5px solid #d0c8bc;border-radius:8px;color:#2a2420;font-size:16px;font-weight:600;padding:12px 14px;margin-bottom:16px;font-family:sans-serif;}
+.input-modal-field:focus{outline:none;border-color:#1a5c8a;}
+.input-modal-btns{display:flex;gap:8px;}
+.input-modal-cancel{flex:1;padding:12px;background:#ede8de;color:#6a5f58;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:sans-serif;}
+.input-modal-confirm{flex:1;padding:12px;background:#1a1814;color:#e8c14a;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:sans-serif;}
+
 /* 커스텀 확인 모달 */
 .modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:500;display:flex;align-items:center;justify-content:center;}
 .modal-box{background:#fff;border-radius:14px;padding:24px 20px;width:80%;max-width:320px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.2);}
-.modal-title{font-size:15px;font-weight:700;color:#1a1814;margin-bottom:8px;}
-.modal-msg{font-size:13px;color:#5a5650;margin-bottom:20px;line-height:1.6;}
+.modal-title{font-size:15px;font-weight:700;color:#2a2420;margin-bottom:8px;}
+.modal-msg{font-size:13px;color:#6a5f58;margin-bottom:20px;line-height:1.6;}
 .modal-btns{display:flex;gap:8px;}
-.modal-cancel{flex:1;padding:11px;background:#f4f1ec;color:#5a5650;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;}
+.modal-cancel{flex:1;padding:11px;background:#faf7f2;color:#6a5f58;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;}
 .modal-confirm{flex:1;padding:11px;background:#c0392b;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;}
 /* 현장정보 폼 */
 .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
 .info-grid.full{grid-template-columns:1fr;}
 .info-row{display:flex;flex-direction:column;gap:3px;}
-.info-row label{font-size:9px;color:#9a9590;text-transform:uppercase;letter-spacing:1px;font-weight:700;}
-.info-input{background:#f9f7f4;border:1px solid #e2ddd7;border-radius:5px;color:#1a1814;font-size:13px;font-weight:600;padding:8px 10px;width:100%;}
+.info-row label{font-size:9px;color:#9a8f84;text-transform:uppercase;letter-spacing:1px;font-weight:700;}
+.info-input{background:#ede8de;border:1px solid #d8d0c4;border-radius:5px;color:#2a2420;font-size:13px;font-weight:600;padding:8px 10px;width:100%;}
 .info-input:focus{outline:none;border-color:#1a5c8a;}
-.section-divider{font-size:9px;color:#9a9590;text-transform:uppercase;letter-spacing:2px;font-weight:700;padding:10px 0 6px;border-bottom:1px solid #e2ddd7;margin-bottom:8px;}
+.section-divider{font-size:9px;color:#9a8f84;text-transform:uppercase;letter-spacing:2px;font-weight:700;padding:10px 0 6px;border-bottom:1px solid #d8d0c4;margin-bottom:8px;}
 /* 브랜드 선택 */
 .brand-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:4px;}
-.brand-btn{padding:7px 4px;border:1.5px solid #e2ddd7;border-radius:6px;background:#fff;color:#5a5650;font-size:12px;font-weight:600;cursor:pointer;text-align:center;transition:all .15s;}
+.brand-btn{padding:7px 4px;border:1.5px solid #d8d0c4;border-radius:6px;background:#fff;color:#6a5f58;font-size:12px;font-weight:600;cursor:pointer;text-align:center;transition:all .15s;}
 .brand-btn:hover{border-color:#1a5c8a;color:#1a5c8a;}
 .brand-btn.on{border-color:#1a5c8a;background:#eef4fa;color:#1a5c8a;font-weight:700;}
 /* 모델명 입력 - lang 속성으로 영문 키패드 */
-.model-input{background:#f9f7f4;border:1px solid #e2ddd7;border-radius:5px;color:#1a1814;font-size:13px;font-weight:600;padding:8px 10px;width:100%;ime-mode:disabled;}
+.model-input{background:#ede8de;border:1px solid #d8d0c4;border-radius:5px;color:#2a2420;font-size:13px;font-weight:600;padding:8px 10px;width:100%;ime-mode:disabled;}
 .model-input:focus{outline:none;border-color:#1a5c8a;}
 </style>
 </head>
 <body>
 <div class="save-toast" id="toast">저장됐어요!</div>
+
+<!-- 입력 팝업 모달 -->
+<div class="input-modal-overlay" id="inputModal" style="display:none;">
+  <div class="input-modal-box">
+    <div class="input-modal-label" id="inputModalLabel">입력</div>
+    <input type="text" class="input-modal-field" id="inputModalField" autocomplete="off">
+    <div class="input-modal-btns">
+      <button class="input-modal-cancel" id="inputModalCancel">취소</button>
+      <button class="input-modal-confirm" id="inputModalConfirm">확인</button>
+    </div>
+  </div>
+</div>
 
 <!-- 커스텀 확인 모달 -->
 <div class="modal-overlay" id="confirmModal" style="display:none;">
@@ -151,10 +174,10 @@ tr:hover td{background:#f9f7f4;}
 </div>
 <div class="fbar">
   <span class="flbl">필름 폭</span>
-  <input id="fw" type="number" value="1220">
+  <input id="fw" type="number" value="1220" readonly style="cursor:pointer;" onclick="showInputModal('필름 폭 (mm)', this.value==='1220'?'':	his.value, 'number', function(v){var el=document.getElementById('fw');el.value=v===''?'1220':v;})">
   <span class="funit">mm</span>
   <span class="flbl">필름 길이</span>
-  <input id="fl" type="number" value="0">
+  <input id="fl" type="number" value="0" readonly style="cursor:pointer;" onclick="showInputModal('필름 길이 (m)', this.value==='0'?'':	his.value, 'number', function(v){var el=document.getElementById('fl');el.value=v===''?'0':v;})">
   <span class="funit">m</span>
   <div class="allow-g">
     <label>방염</label>
@@ -185,7 +208,7 @@ tr:hover td{background:#f9f7f4;}
         <div class="info-grid full" style="margin-bottom:8px;">
           <div class="info-row">
             <label>현장명</label>
-            <input type="text" id="siteName" class="info-input" placeholder="예) 강남 아파트 101호">
+            <input type="text" id="siteName" class="info-input" placeholder="예) 강남 아파트 101호" readonly onclick="showInputModal('현장명', this.value, 'text', function(v){document.getElementById('siteName').value=v;})">
           </div>
         </div>
 
@@ -193,11 +216,11 @@ tr:hover td{background:#f9f7f4;}
         <div class="info-grid">
           <div class="info-row">
             <label>고객명</label>
-            <input type="text" id="clientName" class="info-input" placeholder="홍길동">
+            <input type="text" id="clientName" class="info-input" placeholder="홍길동" readonly onclick="showInputModal('고객명', this.value, 'text', function(v){document.getElementById('clientName').value=v;})">
           </div>
           <div class="info-row">
             <label>연락처</label>
-            <input type="tel" id="clientPhone" class="info-input" placeholder="010-0000-0000">
+            <input type="text" id="clientPhone" class="info-input" placeholder="010-0000-0000" readonly onclick="showInputModal('연락처', this.value, 'tel', function(v){document.getElementById('clientPhone').value=v;})">
           </div>
         </div>
 
@@ -221,19 +244,13 @@ tr:hover td{background:#f9f7f4;}
         <!-- 브랜드 직접입력 -->
         <div class="info-row" style="margin-bottom:8px;">
           <label>브랜드 직접입력</label>
-          <input type="text" id="brandCustom" class="info-input"
-            placeholder="직접 입력"
-            oninput="clearBrandBtn()">
+          <input type="text" id="brandCustom" class="info-input" placeholder="직접 입력" readonly onclick="showInputModal('브랜드 직접입력', this.value, 'text', function(v){document.getElementById('brandCustom').value=v;clearBrandBtn();})">
         </div>
 
         <!-- 모델명 -->
         <div class="info-row">
           <label>모델명</label>
-          <input type="text" id="modelName" class="model-input"
-            placeholder="예) EW20098-51"
-            lang="en" autocomplete="off" autocorrect="off"
-            autocapitalize="off" spellcheck="false"
-            inputmode="text">
+          <input type="text" id="modelName" class="model-input" placeholder="예) EW20098-51" readonly onclick="showInputModal('모델명', this.value, 'text', function(v){document.getElementById('modelName').value=v;})">
         </div>
 
       </div>
@@ -264,9 +281,11 @@ tr:hover td{background:#f9f7f4;}
   <h1>계산 <span>기록</span></h1>
 </div>
 <div style="max-width:800px;margin:0 auto;padding:14px 12px;">
-  <div style="margin-bottom:12px;">
-    <input type="text" id="searchBox" placeholder="🔍 현장명으로 검색" oninput="renderHistory()"
-      style="width:100%;padding:10px 14px;border:1px solid #e2ddd7;border-radius:8px;font-size:14px;background:#fff;color:#1a1814;">
+  <div style="margin-bottom:12px;position:relative;">
+    <input type="text" id="searchBox" placeholder="🔍 현장명으로 검색" readonly
+      onclick="openSearchModal()"
+      style="width:100%;padding:10px 14px;border:1px solid #d8d0c4;border-radius:8px;font-size:14px;background:#fff;color:#2a2420;cursor:pointer;">
+    <span id="searchClear" onclick="clearSearch()" style="display:none;position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:18px;color:#9a8f84;line-height:1;">✕</span>
   </div>
   <div id="hist-list"></div>
 </div>
@@ -295,7 +314,8 @@ function addItem(){
   var card=document.createElement("div");card.className="icard";card.id=id;
   var head=document.createElement("div");head.className="ich";
   var num=document.createElement("div");num.className="inum";num.style.background=cc(cat);num.textContent=IDS.length;
-  var ni=document.createElement("input");ni.className="iname";ni.type="text";ni.placeholder="이름 입력";
+  var ni=document.createElement("input");ni.className="iname";ni.type="text";ni.placeholder="이름 입력";ni.readOnly=true;
+  ni.addEventListener("click",function(){var self=this;showInputModal("항목 이름",self.value,"text",function(v){self.value=v;});});
   var db=document.createElement("button");db.className="dbtn";db.textContent="X";
   db.setAttribute("data-id",id);
   db.addEventListener("click",function(){delItem(this.getAttribute("data-id"));});
@@ -322,8 +342,14 @@ function addItem(){
     var l=document.createElement("label");l.textContent=lbl;
     var inp=document.createElement("input");inp.type="number";inp.className=cls;inp.value=def;
     var dv=String(def);
-    inp.addEventListener("focus",function(){if(this.value===dv)this.value="";});
-    inp.addEventListener("blur",function(){if(this.value==="")this.value=dv;});
+    inp.readOnly=true;
+    inp.style.cursor="pointer";
+    inp.addEventListener("click",function(){
+      var self=this;
+      showInputModal(lbl, self.value===dv?"":self.value, "number", function(v){
+        self.value=(v==="")?dv:v;
+      });
+    });
     var u=document.createElement("div");u.className="du";u.textContent=cls==="iq"?"개":"mm";
     w.appendChild(l);w.appendChild(inp);w.appendChild(u);return w;
   }
@@ -738,6 +764,41 @@ function setPattern(val){
   }
 }
 
+// ── 입력 팝업 모달 ───────────────────────────────────────────
+function showInputModal(label, currentVal, inputType, onConfirm){
+  var overlay=document.getElementById("inputModal");
+  var field=document.getElementById("inputModalField");
+  var lbl=document.getElementById("inputModalLabel");
+  lbl.textContent=label;
+  field.value=currentVal||"";
+  field.type=inputType||"text";
+  // 숫자 입력이면 0 초기화
+  if(inputType==="number" && field.value==="0") field.value="";
+  overlay.style.display="flex";
+  setTimeout(function(){field.focus();field.select();},100);
+
+  var confirmBtn=document.getElementById("inputModalConfirm");
+  var cancelBtn=document.getElementById("inputModalCancel");
+  var nc=confirmBtn.cloneNode(true);
+  var nca=cancelBtn.cloneNode(true);
+  confirmBtn.parentNode.replaceChild(nc,confirmBtn);
+  cancelBtn.parentNode.replaceChild(nca,cancelBtn);
+
+  function close(){ overlay.style.display="none"; }
+
+  document.getElementById("inputModalConfirm").onclick=function(){
+    var val=document.getElementById("inputModalField").value;
+    close(); onConfirm(val);
+  };
+  document.getElementById("inputModalCancel").onclick=close;
+  overlay.onclick=function(e){ if(e.target===overlay) close(); };
+
+  // 엔터키로 확인
+  document.getElementById("inputModalField").onkeydown=function(e){
+    if(e.key==="Enter"){ document.getElementById("inputModalConfirm").click(); }
+  };
+}
+
 // ── 커스텀 확인 모달 ─────────────────────────────────────────
 function showConfirm(title, msg, onConfirm){
   var overlay=document.getElementById("confirmModal");
@@ -765,6 +826,25 @@ function showConfirm(title, msg, onConfirm){
   overlay.onclick=function(e){
     if(e.target===overlay) overlay.style.display="none";
   };
+}
+
+// ── 검색 팝업 ────────────────────────────────────────────────
+function openSearchModal(){
+  var current = document.getElementById("searchBox").value;
+  showInputModal("현장명 검색", current, "text", function(v){
+    var box = document.getElementById("searchBox");
+    box.value = v;
+    var clear = document.getElementById("searchClear");
+    if(clear) clear.style.display = v ? "block" : "none";
+    renderHistory();
+  });
+}
+function clearSearch(){
+  var box = document.getElementById("searchBox");
+  box.value = "";
+  var clear = document.getElementById("searchClear");
+  if(clear) clear.style.display = "none";
+  renderHistory();
 }
 
 // ── 탭 전환 ───────────────────────────────────────────────────
@@ -928,7 +1008,8 @@ function addItemData(cat,pW,pL,name,qty){
   var card=document.createElement("div");card.className="icard";card.id=id;
   var head=document.createElement("div");head.className="ich";
   var num=document.createElement("div");num.className="inum";num.style.background=cc(cat);num.textContent=IDS.length;
-  var ni=document.createElement("input");ni.className="iname";ni.type="text";ni.placeholder="이름 입력";ni.value=name||"";
+  var ni=document.createElement("input");ni.className="iname";ni.type="text";ni.placeholder="이름 입력";ni.readOnly=true;
+  ni.addEventListener("click",function(){var self=this;showInputModal("항목 이름",self.value,"text",function(v){self.value=v;});});ni.value=name||"";
   var db=document.createElement("button");db.className="dbtn";db.textContent="X";
   db.setAttribute("data-id",id);
   db.addEventListener("click",function(){delItem(this.getAttribute("data-id"));});
@@ -972,12 +1053,7 @@ function addItemData(cat,pW,pL,name,qty){
 function init(){
   document.getElementById("addBtn").onclick=addItem;
   document.getElementById("calcBtn").onclick=calculate;
-  var fw=document.getElementById("fw");
-  fw.onfocus=function(){if(this.value==="1220")this.value="";};
-  fw.onblur=function(){if(this.value==="")this.value="1220";};
-  var fl=document.getElementById("fl");
-  fl.onfocus=function(){if(this.value==="0")this.value="";};
-  fl.onblur=function(){if(this.value==="")this.value="0";};
+  // fw, fl 은 팝업으로 입력 (focus/blur 불필요)
 
   addItem();
 }
