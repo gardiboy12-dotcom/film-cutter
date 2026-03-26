@@ -282,7 +282,7 @@ tr:hover td{background:#ede8de;}
 </div>
 <div style="max-width:800px;margin:0 auto;padding:14px 12px;">
   <div style="margin-bottom:12px;position:relative;">
-    <input type="text" id="searchBox" placeholder="🔍 현장명으로 검색" readonly
+    <input type="text" id="searchBox" placeholder="🔍 현장명 · 고객명 · 연락처 검색" readonly
       onclick="openSearchModal()"
       style="width:100%;padding:10px 14px;border:1px solid #d8d0c4;border-radius:8px;font-size:14px;background:#fff;color:#2a2420;cursor:pointer;">
     <span id="searchClear" onclick="clearSearch()" style="display:none;position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:18px;color:#9a8f84;line-height:1;">✕</span>
@@ -831,7 +831,7 @@ function showConfirm(title, msg, onConfirm){
 // ── 검색 팝업 ────────────────────────────────────────────────
 function openSearchModal(){
   var current = document.getElementById("searchBox").value;
-  showInputModal("현장명 검색", current, "text", function(v){
+  showInputModal("검색", current, "text", function(v){
     var box = document.getElementById("searchBox");
     box.value = v;
     var clear = document.getElementById("searchClear");
@@ -904,7 +904,11 @@ function renderHistory(){
   list.innerHTML="";
   var keyword=(document.getElementById("searchBox")?document.getElementById("searchBox").value.trim().toLowerCase():"");
   var all=getHistory();
-  var records=keyword?all.filter(function(r){return (r.siteName||"").toLowerCase().indexOf(keyword)>=0;}):all;
+  var records=keyword?all.filter(function(r){
+    return (r.siteName||"").toLowerCase().indexOf(keyword)>=0
+        || (r.clientName||"").toLowerCase().indexOf(keyword)>=0
+        || (r.clientPhone||"").toLowerCase().indexOf(keyword)>=0;
+  }):all;
   if(!records.length){
     var e=document.createElement("div");e.className="hist-empty";
     e.innerHTML="<div style='font-size:36px;margin-bottom:10px'>📋</div>아직 저장된 기록이 없어요<br>계산하면 자동으로 저장됩니다";
