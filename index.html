@@ -11,6 +11,50 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="필름재단">
 <link rel="manifest" href="manifest.json">
+<!-- Firebase SDK (compat) -->
+<script>
+(function(){
+  var scripts = [
+    'https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js',
+    'https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js'
+  ];
+  var loaded = 0;
+  function onLoaded(){
+    loaded++;
+    if(loaded === scripts.length) initFirebase();
+  }
+  function initFirebase(){
+    try{
+      var firebaseConfig = {
+        apiKey: "AIzaSyCwCIERZXx-Tci1aJKHvV0V1ea5Z7-x25g",
+        authDomain: "jaedanwang-90577.firebaseapp.com",
+        projectId: "jaedanwang-90577",
+        storageBucket: "jaedanwang-90577.firebasestorage.app",
+        messagingSenderId: "245185517288",
+        appId: "1:245185517288:web:ae0655944c7c78dd3d1b5d"
+      };
+      if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+      var _auth = firebase.auth();
+      var _googleProvider = new firebase.auth.GoogleAuthProvider();
+      window._fbSignUp = function(email,pw){ return _auth.createUserWithEmailAndPassword(email,pw); };
+      window._fbSignIn = function(email,pw){ return _auth.signInWithEmailAndPassword(email,pw); };
+      window._fbSignOut = function(){ return _auth.signOut(); };
+      window._fbGoogleLogin = function(){ return _auth.signInWithPopup(_googleProvider); };
+      window._fbResetPw = function(email){ return _auth.sendPasswordResetEmail(email); };
+      window._fbOnAuth = function(cb){ return _auth.onAuthStateChanged(cb); };
+      window._fbReady = true;
+      if(window._fbReadyCallback) window._fbReadyCallback();
+    }catch(e){ console.error('Firebase init error:', e); }
+  }
+  for(var i=0;i<scripts.length;i++){
+    var s = document.createElement('script');
+    s.src = scripts[i];
+    s.onload = onLoaded;
+    s.onerror = function(){ console.error('Firebase CDN 로드 실패 - 인터넷 연결 확인'); };
+    document.head.appendChild(s);
+  }
+})();
+</script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:#faf7f2;color:#2a2420;font-family:sans-serif;min-height:100vh;padding-bottom:60px;}
@@ -102,6 +146,35 @@ tr:hover td{background:#ede8de;}
 .hist-empty{padding:40px 20px;text-align:center;color:#9a8f84;font-size:13px;line-height:2;}
 .save-toast{position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#27ae60;color:#fff;padding:8px 20px;border-radius:20px;font-size:13px;font-weight:700;z-index:200;opacity:0;transition:opacity .3s;pointer-events:none;}
 .save-toast.show{opacity:1;}
+/* 로그인/회원가입 화면 */
+.auth-page{position:fixed;top:0;left:0;right:0;bottom:0;background:#faf7f2;z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;}
+.auth-logo{margin-bottom:32px;text-align:center;}
+.auth-logo h1{font-size:36px;font-weight:900;color:#1a1814;}
+.auth-logo h1 span{color:#e8c14a;}
+.auth-logo p{font-size:12px;color:#9a8f84;letter-spacing:2px;margin-top:4px;}
+.auth-box{background:#fff;border-radius:16px;padding:28px 24px;width:100%;max-width:380px;box-shadow:0 4px 24px rgba(0,0,0,0.08);}
+.auth-tab{display:flex;margin-bottom:24px;background:#ede8de;border-radius:8px;padding:3px;}
+.auth-tab-btn{flex:1;padding:8px;border:none;background:transparent;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;color:#9a8f84;transition:all .2s;}
+.auth-tab-btn.on{background:#fff;color:#1a1814;box-shadow:0 1px 4px rgba(0,0,0,0.1);}
+.auth-field{margin-bottom:14px;}
+.auth-field label{font-size:10px;font-weight:700;letter-spacing:1px;color:#9a8f84;text-transform:uppercase;display:block;margin-bottom:5px;}
+.auth-field input{width:100%;padding:12px 14px;background:#faf7f2;border:1.5px solid #d8d0c4;border-radius:8px;font-size:14px;color:#1a1814;font-family:sans-serif;}
+.auth-field input:focus{outline:none;border-color:#1a5c8a;}
+.auth-submit{width:100%;padding:14px;background:#1a1814;color:#e8c14a;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;margin-top:4px;font-family:sans-serif;}
+.auth-submit:active{opacity:.85;}
+.auth-divider{text-align:center;margin:16px 0;font-size:12px;color:#9a8f84;position:relative;}
+.auth-divider::before,.auth-divider::after{content:"";position:absolute;top:50%;width:40%;height:1px;background:#d8d0c4;}
+.auth-divider::before{left:0;}
+.auth-divider::after{right:0;}
+.auth-google{width:100%;padding:12px;background:#fff;border:1.5px solid #d8d0c4;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;color:#1a1814;font-family:sans-serif;}
+.auth-google:active{background:#f5f5f5;}
+.auth-forgot{text-align:center;margin-top:14px;font-size:12px;color:#1a5c8a;cursor:pointer;}
+.auth-error{background:#fff0f0;border:1px solid #ffcccc;border-radius:7px;padding:10px 14px;font-size:12px;color:#c0392b;margin-bottom:12px;display:none;}
+/* 상단 유저 정보 */
+.user-bar{display:flex;align-items:center;gap:8px;margin-left:auto;}
+.user-email{font-size:10px;color:rgba(255,255,255,.5);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.logout-btn{font-size:10px;color:rgba(255,255,255,.6);background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:4px;padding:3px 8px;cursor:pointer;}
+
 /* 입력 팝업 모달 */
 .input-modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.45);z-index:600;display:flex;align-items:center;justify-content:center;padding:20px;}
 .input-modal-box{background:#faf7f2;border-radius:16px;padding:24px 20px;width:100%;max-width:380px;box-shadow:0 12px 40px rgba(0,0,0,0.2);animation:popIn .2s ease;}
@@ -140,6 +213,48 @@ tr:hover td{background:#ede8de;}
 </style>
 </head>
 <body>
+<!-- 로그인/회원가입 화면 -->
+<div class="auth-page" id="authPage">
+  <div class="auth-logo">
+    <h1>재단<span>왕</span></h1>
+    <p>INTERIOR FILM PRO</p>
+  </div>
+  <div class="auth-box">
+    <div id="authError" class="auth-error"></div>
+    <!-- 탭 -->
+    <div class="auth-tab">
+      <button class="auth-tab-btn on" id="tabLogin" onclick="switchAuthTab('login')">로그인</button>
+      <button class="auth-tab-btn" id="tabSignup" onclick="switchAuthTab('signup')">회원가입</button>
+    </div>
+    <!-- 이메일 -->
+    <div class="auth-field">
+      <label>이메일</label>
+      <input type="email" id="authEmail" placeholder="example@email.com">
+    </div>
+    <!-- 비밀번호 -->
+    <div class="auth-field">
+      <label>비밀번호</label>
+      <input type="password" id="authPw" placeholder="6자리 이상">
+    </div>
+    <!-- 비밀번호 확인 (회원가입만) -->
+    <div class="auth-field" id="authPwConfirmField" style="display:none;">
+      <label>비밀번호 확인</label>
+      <input type="password" id="authPwConfirm" placeholder="비밀번호 재입력">
+    </div>
+    <!-- 제출 버튼 -->
+    <button class="auth-submit" id="authSubmitBtn" onclick="authSubmit()">로그인</button>
+    <!-- 구분선 -->
+    <div class="auth-divider">또는</div>
+    <!-- 구글 로그인 -->
+    <button class="auth-google" onclick="authGoogle()">
+      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      Google로 계속하기
+    </button>
+    <!-- 비밀번호 찾기 -->
+    <div class="auth-forgot" id="authForgot" onclick="authResetPw()">비밀번호를 잊으셨나요?</div>
+  </div>
+</div>
+
 <div class="save-toast" id="toast">저장됐어요!</div>
 
 <!-- 입력 팝업 모달 -->
@@ -171,6 +286,10 @@ tr:hover td{background:#ede8de;}
 <div class="hdr">
   <h1>재단<span>왕</span></h1>
   <span class="hdr-sub">INTERIOR FILM PRO</span>
+  <div class="user-bar">
+    <span class="user-email" id="userEmail"></span>
+    <button class="logout-btn" onclick="doLogout()">로그아웃</button>
+  </div>
 </div>
 <div class="fbar">
   <span class="flbl">필름 폭</span>
@@ -695,6 +814,112 @@ function iZ(){
 
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('./sw.js').catch(function(){});
+}
+
+// ── Firebase Auth ─────────────────────────────────────────────
+var currentUser = null;
+var authMode = 'login';
+
+function switchAuthTab(mode){
+  authMode = mode;
+  document.getElementById('tabLogin').className='auth-tab-btn'+(mode==='login'?' on':'');
+  document.getElementById('tabSignup').className='auth-tab-btn'+(mode==='signup'?' on':'');
+  document.getElementById('authSubmitBtn').textContent=mode==='login'?'로그인':'회원가입';
+  document.getElementById('authPwConfirmField').style.display=mode==='signup'?'block':'none';
+  document.getElementById('authForgot').style.display=mode==='login'?'block':'none';
+  document.getElementById('authError').style.display='none';
+}
+
+function showAuthError(msg){
+  var el=document.getElementById('authError');
+  el.textContent=msg; el.style.display='block';
+}
+
+function authSubmit(){
+  var email=document.getElementById('authEmail').value.trim();
+  var pw=document.getElementById('authPw').value;
+  var pwc=document.getElementById('authPwConfirm').value;
+  document.getElementById('authError').style.display='none';
+
+  if(typeof window._fbSignUp !== 'function'){
+    showAuthError('앱을 초기화하는 중입니다. 잠시 후 다시 시도해주세요.');return;
+  }
+  if(!email||!pw){ showAuthError('이메일과 비밀번호를 입력해주세요.'); return; }
+  if(authMode==='signup'){
+    if(pw.length<6){ showAuthError('비밀번호는 6자리 이상이어야 합니다.'); return; }
+    if(pw!==pwc){ showAuthError('비밀번호가 일치하지 않습니다.'); return; }
+    window._fbSignUp(email,pw).then(function(){
+      enterApp();
+    }).catch(function(e){
+      if(e.code==='auth/email-already-in-use') showAuthError('이미 사용 중인 이메일입니다.');
+      else showAuthError('회원가입 실패: '+e.message);
+    });
+  } else {
+    window._fbSignIn(email,pw).then(function(){
+      enterApp();
+    }).catch(function(e){
+      if(e.code==='auth/user-not-found'||e.code==='auth/wrong-password'||e.code==='auth/invalid-credential')
+        showAuthError('이메일 또는 비밀번호가 올바르지 않습니다.');
+      else showAuthError('로그인 실패: '+e.message);
+    });
+  }
+}
+
+function authGoogle(){
+  window._fbGoogleLogin().then(function(){
+    enterApp();
+  }).catch(function(e){
+    if(e.code!=='auth/popup-closed-by-user') showAuthError('Google 로그인 실패: '+e.message);
+  });
+}
+
+function authResetPw(){
+  var email=document.getElementById('authEmail').value.trim();
+  if(!email){ showAuthError('이메일을 입력한 후 비밀번호 찾기를 눌러주세요.'); return; }
+  window._fbResetPw(email).then(function(){
+    showAuthError('비밀번호 재설정 이메일을 보냈습니다. 이메일을 확인해주세요.');
+    document.getElementById('authError').style.background='#f0fff0';
+    document.getElementById('authError').style.borderColor='#90EE90';
+    document.getElementById('authError').style.color='#1a7a1a';
+    document.getElementById('authError').style.display='block';
+  }).catch(function(e){
+    showAuthError('이메일 전송 실패: '+e.message);
+  });
+}
+
+function enterApp(){
+  document.getElementById('authPage').style.display='none';
+  if(currentUser){
+    document.getElementById('userEmail').textContent=currentUser.email||'';
+  }
+}
+
+function doLogout(){
+  showConfirm('로그아웃', '로그아웃 하시겠습니까?', function(){
+    window._fbSignOut().then(function(){
+      document.getElementById('authPage').style.display='flex';
+      document.getElementById('userEmail').textContent='';
+    });
+  });
+}
+
+// Auth 상태 감지
+function startAuthListener(){
+  window._fbOnAuth(function(user){
+    currentUser=user;
+    if(user){
+      enterApp();
+    } else {
+      document.getElementById('authPage').style.display='flex';
+    }
+  });
+}
+
+// Firebase 로드 완료 후 실행
+if(window._fbReady){
+  startAuthListener();
+} else {
+  window._fbReadyCallback = startAuthListener;
 }
 
 // ── 브랜드 선택 ───────────────────────────────────────────────
