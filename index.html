@@ -3,72 +3,46 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>필름 재단 최적화</title>
+<title>재단왕</title>
 <meta name="description" content="인테리어 필름 재단 최적화 계산기">
 <meta name="theme-color" content="#1a1814">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="필름재단">
+<meta name="apple-mobile-web-app-title" content="재단왕">
 <link rel="manifest" href="manifest.json">
-
-<!-- ══ Firebase SDK (compat) ══ -->
 <script>
 (function(){
-  var scripts = [
+  var scripts=[
     'https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js',
     'https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js',
     'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js'
   ];
-  var loaded = 0;
-  function onLoaded(){
-    loaded++;
-    if(loaded === scripts.length) initFirebase();
-  }
-  function initFirebase(){
+  var loaded=0;
+  function onLoaded(){loaded++;if(loaded===scripts.length)initFB();}
+  function initFB(){
     try{
-      var firebaseConfig = {
-        apiKey: "AIzaSyCwCIERZXx-Tci1aJKHvV0V1ea5Z7-x25g",
-        authDomain: "jaedanwang-90577.firebaseapp.com",
-        projectId: "jaedanwang-90577",
-        storageBucket: "jaedanwang-90577.firebasestorage.app",
-        messagingSenderId: "245185517288",
-        appId: "1:245185517288:web:ae0655944c7c78dd3d1b5d",
-        measurementId: "G-3JVZD3X45E"
-      };
-      if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-      var _auth = firebase.auth();
-      var _googleProvider = new firebase.auth.GoogleAuthProvider();
-      window._fbAuth    = _auth;
-      window._fbSignUp  = function(email,pw){ return _auth.createUserWithEmailAndPassword(email,pw); };
-      window._fbSignIn  = function(email,pw){ return _auth.signInWithEmailAndPassword(email,pw); };
-      window._fbSignOut = function(){ return _auth.signOut(); };
-      window._fbGoogleLogin = function(){ return _auth.signInWithPopup(_googleProvider); };
-      window._fbResetPw = function(email){ return _auth.sendPasswordResetEmail(email); };
-      window._fbOnAuth  = function(cb){ return _auth.onAuthStateChanged(cb); };
-      /* Firestore */
-      var _db = firebase.firestore();
-      window._fbCheckPhone = function(e164){
-        return _db.collection('users').where('phone','==',e164).limit(1).get()
-          .then(function(snap){ return !snap.empty; });
-      };
-      window._fbSaveUser = function(uid, data){
-        return _db.collection('users').doc(uid).set(data, {merge:true});
-      };
-      window._fbReady = true;
-      if(window._fbReadyCallback) window._fbReadyCallback();
-    }catch(e){ console.error('Firebase init error:', e); }
+      var cfg={apiKey:"AIzaSyCwCIERZXx-Tci1aJKHvV0V1ea5Z7-x25g",authDomain:"jaedanwang-90577.firebaseapp.com",projectId:"jaedanwang-90577",storageBucket:"jaedanwang-90577.firebasestorage.app",messagingSenderId:"245185517288",appId:"1:245185517288:web:ae0655944c7c78dd3d1b5d"};
+      if(!firebase.apps.length)firebase.initializeApp(cfg);
+      var auth=firebase.auth();
+      var gp=new firebase.auth.GoogleAuthProvider();
+      var db=firebase.firestore();
+      window._fbAuth=auth;
+      window._fbSignIn=function(e,p){return auth.signInWithEmailAndPassword(e,p);};
+      window._fbSignOut=function(){return auth.signOut();};
+      window._fbGoogleLogin=function(){return auth.signInWithPopup(gp);};
+      window._fbResetPw=function(e){return auth.sendPasswordResetEmail(e);};
+      window._fbOnAuth=function(cb){return auth.onAuthStateChanged(cb);};
+      window._fbCheckPhone=function(e164){return db.collection('users').where('phone','==',e164).limit(1).get().then(function(s){return !s.empty;});};
+      window._fbSaveUser=function(uid,data){return db.collection('users').doc(uid).set(data,{merge:true});};
+      window._fbReady=true;
+      if(window._fbReadyCallback)window._fbReadyCallback();
+    }catch(e){console.error('FB init error:',e);}
   }
   for(var i=0;i<scripts.length;i++){
-    var s = document.createElement('script');
-    s.src = scripts[i];
-    s.onload = onLoaded;
-    s.onerror = function(){ console.error('Firebase CDN 로드 실패'); };
-    document.head.appendChild(s);
+    var s=document.createElement('script');s.src=scripts[i];s.onload=onLoaded;s.onerror=function(){console.error('FB CDN 실패');};document.head.appendChild(s);
   }
 })();
 </script>
-
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:#faf7f2;color:#2a2420;font-family:sans-serif;min-height:100vh;padding-bottom:60px;}
@@ -78,14 +52,13 @@ body{background:#faf7f2;color:#2a2420;font-family:sans-serif;min-height:100vh;pa
 .hdr-sub{font-size:10px;color:rgba(255,255,255,.35);letter-spacing:1px;margin-left:4px;}
 .fbar{background:#262218;padding:10px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
 .flbl{font-size:10px;color:rgba(255,255,255,.5);white-space:nowrap;}
-.fbar input{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:5px;color:#fff;font-size:14px;font-weight:600;padding:5px 8px;text-align:center;width:75px;}
-.fbar input:focus{outline:none;border-color:#e8c14a;}
+.fbar input{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:5px;color:#fff;font-size:14px;font-weight:600;padding:5px 8px;text-align:center;width:75px;cursor:pointer;}
 .funit{font-size:11px;color:rgba(255,255,255,.4);}
 .allow-g{margin-left:auto;display:flex;align-items:center;gap:6px;}
 .allow-g label{font-size:10px;color:rgba(255,255,255,.5);}
 .wrap{max-width:1200px;margin:0 auto;padding:14px 12px;display:grid;grid-template-columns:1fr;gap:14px;}
 @media(min-width:900px){.wrap{grid-template-columns:400px 1fr;align-items:start;}}
-.panel{background:#ffffff;border:1px solid #d8d0c4;border-radius:10px;margin-bottom:12px;overflow:hidden;}
+.panel{background:#fff;border:1px solid #d8d0c4;border-radius:10px;margin-bottom:12px;overflow:hidden;}
 .panel:last-child{margin-bottom:0;}
 .ph{padding:10px 14px;border-bottom:1px solid #d8d0c4;background:#ede8de;display:flex;align-items:center;justify-content:space-between;}
 .ph-t{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#9a8f84;}
@@ -94,9 +67,8 @@ body{background:#faf7f2;color:#2a2420;font-family:sans-serif;min-height:100vh;pa
 .icard:last-child{margin-bottom:0;}
 .ich{display:flex;align-items:center;gap:8px;padding:8px 11px;background:#ede8de;border-bottom:1px solid #d8d0c4;}
 .inum{width:20px;height:20px;border-radius:50%;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;}
-.iname{border:none;background:transparent;font-size:12px;font-weight:700;color:#2a2420;flex:1;min-width:0;}
-.iname:focus{outline:none;}
-.dbtn{background:none;border:none;cursor:pointer;color:#9a8f84;font-size:15px;padding:0 3px;line-height:1;}
+.iname{border:none;background:transparent;font-size:12px;font-weight:700;color:#2a2420;flex:1;min-width:0;cursor:pointer;}
+.dbtn{background:none;border:none;cursor:pointer;color:#9a8f84;font-size:15px;padding:0 3px;}
 .icb{padding:10px;}
 .cgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;margin-bottom:10px;}
 .cb{padding:5px 3px;border:1.5px solid #d8d0c4;border-radius:5px;background:#faf7f2;color:#9a8f84;font-size:11px;cursor:pointer;text-align:center;line-height:1.3;}
@@ -104,8 +76,7 @@ body{background:#faf7f2;color:#2a2420;font-family:sans-serif;min-height:100vh;pa
 .drow{display:grid;grid-template-columns:1fr 1fr 68px;gap:6px;}
 .dw{display:flex;flex-direction:column;gap:3px;}
 .dw label{font-size:9px;color:#9a8f84;text-transform:uppercase;letter-spacing:1px;}
-.dw input{background:#e6ddd0;border:1px solid #d0c8bc;border-radius:5px;color:#2a2420;font-size:14px;font-weight:600;padding:7px 7px;width:100%;}
-.dw input:focus{outline:none;border-color:#1a5c8a;}
+.dw input{background:#e6ddd0;border:1px solid #d0c8bc;border-radius:5px;color:#2a2420;font-size:14px;font-weight:600;padding:7px;width:100%;cursor:pointer;}
 .du{font-size:9px;color:#9a8f84;text-align:right;margin-top:1px;}
 .add-btn{width:100%;padding:10px;background:#faf7f2;border:1.5px dashed #c4b8a8;border-radius:7px;color:#9a8f84;font-size:12px;cursor:pointer;margin-bottom:8px;display:block;}
 .go-btn{width:100%;padding:13px;background:#1a1814;color:#e8c14a;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;}
@@ -145,7 +116,7 @@ tr:hover td{background:#ede8de;}
 .page{display:none;}
 .page.on{display:block;}
 .hcard{background:#fff;border:1px solid #d8d0c4;border-radius:10px;margin-bottom:12px;overflow:hidden;}
-.hcard-head{padding:12px 14px;border-bottom:1px solid #d8d0c4;background:#ede8de;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.hcard-head{padding:12px 14px;border-bottom:1px solid #d8d0c4;background:#ede8de;display:flex;align-items:center;gap:8px;}
 .hcard-date{font-size:11px;color:#9a8f84;}
 .hcard-title{font-size:13px;font-weight:700;color:#2a2420;flex:1;}
 .hcard-badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;}
@@ -157,245 +128,202 @@ tr:hover td{background:#ede8de;}
 .hist-empty{padding:40px 20px;text-align:center;color:#9a8f84;font-size:13px;line-height:2;}
 .save-toast{position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#27ae60;color:#fff;padding:8px 20px;border-radius:20px;font-size:13px;font-weight:700;z-index:200;opacity:0;transition:opacity .3s;pointer-events:none;}
 .save-toast.show{opacity:1;}
-
-/* ══ 로그인/회원가입 ══ */
-.auth-page{position:fixed;top:0;left:0;right:0;bottom:0;background:#faf7f2;z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;overflow-y:auto;}
-.auth-logo{margin-bottom:28px;text-align:center;flex-shrink:0;}
-.auth-logo h1{font-size:36px;font-weight:900;color:#1a1814;}
+/* 인증 */
+.auth-page{position:fixed;top:0;left:0;right:0;bottom:0;background:#faf7f2;z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;overflow-y:auto;}
+.auth-logo{margin-bottom:24px;text-align:center;}
+.auth-logo h1{font-size:34px;font-weight:900;color:#1a1814;}
 .auth-logo h1 span{color:#e8c14a;}
 .auth-logo p{font-size:12px;color:#9a8f84;letter-spacing:2px;margin-top:4px;}
-.auth-box{background:#fff;border-radius:16px;padding:28px 24px;width:100%;max-width:380px;box-shadow:0 4px 24px rgba(0,0,0,0.08);}
-.auth-tab{display:flex;margin-bottom:20px;background:#ede8de;border-radius:8px;padding:3px;}
-.auth-tab-btn{flex:1;padding:8px;border:none;background:transparent;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;color:#9a8f84;transition:all .2s;}
+.auth-box{background:#fff;border-radius:16px;padding:24px 20px;width:100%;max-width:380px;box-shadow:0 4px 24px rgba(0,0,0,0.08);}
+.auth-tab{display:flex;margin-bottom:18px;background:#ede8de;border-radius:8px;padding:3px;}
+.auth-tab-btn{flex:1;padding:8px;border:none;background:transparent;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;color:#9a8f84;}
 .auth-tab-btn.on{background:#fff;color:#1a1814;box-shadow:0 1px 4px rgba(0,0,0,0.1);}
-.auth-field{margin-bottom:14px;}
+.auth-field{margin-bottom:12px;}
 .auth-field label{font-size:10px;font-weight:700;letter-spacing:1px;color:#9a8f84;text-transform:uppercase;display:block;margin-bottom:5px;}
-.auth-field input{width:100%;padding:12px 14px;background:#faf7f2;border:1.5px solid #d8d0c4;border-radius:8px;font-size:14px;color:#1a1814;font-family:sans-serif;}
+.auth-field input{width:100%;padding:11px 14px;background:#faf7f2;border:1.5px solid #d8d0c4;border-radius:8px;font-size:14px;color:#1a1814;font-family:sans-serif;}
 .auth-field input:focus{outline:none;border-color:#1a5c8a;}
-.auth-submit{width:100%;padding:14px;background:#1a1814;color:#e8c14a;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;margin-top:4px;font-family:sans-serif;transition:opacity .2s;}
-.auth-submit:active{opacity:.85;}
+.auth-submit{width:100%;padding:13px;background:#1a1814;color:#e8c14a;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;margin-top:4px;font-family:sans-serif;}
 .auth-submit:disabled{opacity:.45;cursor:not-allowed;}
-.auth-divider{text-align:center;margin:16px 0;font-size:12px;color:#9a8f84;position:relative;}
-.auth-divider::before,.auth-divider::after{content:"";position:absolute;top:50%;width:40%;height:1px;background:#d8d0c4;}
+.auth-divider{text-align:center;margin:14px 0;font-size:12px;color:#9a8f84;position:relative;}
+.auth-divider::before,.auth-divider::after{content:"";position:absolute;top:50%;width:38%;height:1px;background:#d8d0c4;}
 .auth-divider::before{left:0;}
 .auth-divider::after{right:0;}
-.auth-google{width:100%;padding:12px;background:#fff;border:1.5px solid #d8d0c4;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;color:#1a1814;font-family:sans-serif;}
-.auth-google:active{background:#f5f5f5;}
-.auth-forgot{text-align:center;margin-top:14px;font-size:12px;color:#1a5c8a;cursor:pointer;}
-.auth-error{border-radius:7px;padding:10px 14px;font-size:12px;margin-bottom:12px;display:none;line-height:1.5;}
-
-/* 회원가입 단계 */
+.auth-google{width:100%;padding:11px;background:#fff;border:1.5px solid #d8d0c4;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;color:#1a1814;font-family:sans-serif;}
+.auth-forgot{text-align:center;margin-top:12px;font-size:12px;color:#1a5c8a;cursor:pointer;}
+.auth-msg{border-radius:7px;padding:10px 14px;font-size:12px;margin-bottom:12px;display:none;line-height:1.5;}
 .signup-step{display:none;}
 .signup-step.active{display:block;}
-
-/* 단계 인디케이터 */
-.step-indicator{display:flex;align-items:center;justify-content:center;margin-bottom:20px;}
-.step-dot{width:30px;height:30px;border-radius:50%;border:2px solid #d8d0c4;background:#fff;font-size:12px;font-weight:700;color:#9a8f84;display:flex;align-items:center;justify-content:center;transition:all .3s;flex-shrink:0;}
+.step-bar{display:flex;align-items:center;justify-content:center;margin-bottom:10px;}
+.step-dot{width:26px;height:26px;border-radius:50%;border:2px solid #d8d0c4;background:#fff;font-size:11px;font-weight:700;color:#9a8f84;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .step-dot.done{background:#27ae60;border-color:#27ae60;color:#fff;}
 .step-dot.active{background:#1a1814;border-color:#1a1814;color:#e8c14a;}
-.step-line{flex:1;height:2px;background:#d8d0c4;max-width:40px;transition:background .3s;}
+.step-line{flex:1;height:2px;background:#d8d0c4;max-width:36px;}
 .step-line.done{background:#27ae60;}
-.step-labels{display:flex;justify-content:space-between;margin-top:5px;margin-bottom:16px;}
-.step-label{font-size:9px;color:#9a8f84;text-align:center;width:30px;}
-.step-label.active{color:#1a1814;font-weight:700;}
-
-/* 전화번호 입력 */
-.phone-input-group{display:flex;gap:8px;}
-.phone-country{padding:12px 10px;background:#ede8de;border:1.5px solid #d8d0c4;border-radius:8px;font-size:13px;color:#6a5f58;font-weight:600;white-space:nowrap;flex-shrink:0;}
-.phone-number-input{flex:1;padding:12px 14px;background:#faf7f2;border:1.5px solid #d8d0c4;border-radius:8px;font-size:15px;color:#1a1814;font-family:sans-serif;font-weight:600;}
-.phone-number-input:focus{outline:none;border-color:#1a5c8a;}
-.phone-hint{font-size:11px;color:#9a8f84;margin-top:6px;line-height:1.5;}
-
-/* OTP */
-.otp-sent-box{background:#f0f8f0;border:1px solid #b8e0c0;border-radius:8px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:#2a7a3a;line-height:1.6;}
-.otp-input{width:100%;padding:14px;background:#faf7f2;border:1.5px solid #d8d0c4;border-radius:8px;font-size:24px;font-weight:700;color:#1a1814;letter-spacing:10px;text-align:center;font-family:monospace;}
-.otp-input:focus{outline:none;border-color:#1a5c8a;}
-.otp-resend{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:12px;font-size:12px;color:#9a8f84;}
-.otp-resend-btn{color:#1a5c8a;cursor:pointer;font-weight:600;}
-.otp-resend-btn.disabled{color:#9a8f84;cursor:default;}
+.step-lbls{display:flex;justify-content:space-between;margin-bottom:14px;}
+.step-lbl{font-size:9px;color:#9a8f84;text-align:center;width:26px;}
+.step-lbl.active{color:#1a1814;font-weight:700;}
+.phone-grp{display:flex;gap:8px;}
+.phone-cc{padding:11px 10px;background:#ede8de;border:1.5px solid #d8d0c4;border-radius:8px;font-size:13px;color:#6a5f58;font-weight:600;white-space:nowrap;flex-shrink:0;}
+.phone-inp{flex:1;padding:11px 14px;background:#faf7f2;border:1.5px solid #d8d0c4;border-radius:8px;font-size:15px;color:#1a1814;font-family:sans-serif;font-weight:600;}
+.phone-inp:focus{outline:none;border-color:#1a5c8a;}
+.phone-inp.readonly{background:#ede8de;color:#6a5f58;}
+.phone-hint{font-size:11px;color:#9a8f84;margin-top:5px;line-height:1.5;}
+.otp-box{background:#f0f8f0;border:1px solid #b8e0c0;border-radius:8px;padding:11px 14px;margin-bottom:12px;font-size:12px;color:#2a7a3a;line-height:1.6;}
+.otp-inp{width:100%;padding:12px;background:#faf7f2;border:1.5px solid #d8d0c4;border-radius:8px;font-size:22px;font-weight:700;color:#1a1814;letter-spacing:8px;text-align:center;font-family:monospace;}
+.otp-inp:focus{outline:none;border-color:#1a5c8a;}
+.otp-resend{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:10px;font-size:12px;color:#9a8f84;}
+.resend-btn{color:#1a5c8a;cursor:pointer;font-weight:600;}
+.resend-btn.off{color:#9a8f84;cursor:default;}
 .otp-timer{color:#c0392b;font-weight:700;min-width:36px;}
-.back-link{text-align:center;margin-top:12px;}
-.back-link span{font-size:12px;color:#9a8f84;cursor:pointer;}
-
-/* 유저바 */
+.back-lnk{text-align:center;margin-top:10px;font-size:12px;color:#9a8f84;cursor:pointer;}
 .user-bar{display:flex;align-items:center;gap:8px;margin-left:auto;}
 .user-email{font-size:10px;color:rgba(255,255,255,.5);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .logout-btn{font-size:10px;color:rgba(255,255,255,.6);background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:4px;padding:3px 8px;cursor:pointer;}
-
-/* 입력 팝업 모달 */
-.input-modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.45);z-index:600;display:flex;align-items:center;justify-content:center;padding:20px;}
-.input-modal-box{background:#faf7f2;border-radius:16px;padding:24px 20px;width:100%;max-width:380px;box-shadow:0 12px 40px rgba(0,0,0,0.2);animation:popIn .2s ease;}
-@keyframes popIn{from{opacity:0;transform:scale(0.92);}to{opacity:1;transform:scale(1);}}
-.input-modal-label{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#9a8f84;margin-bottom:8px;}
-.input-modal-field{width:100%;background:#e6ddd0;border:1.5px solid #d0c8bc;border-radius:8px;color:#2a2420;font-size:16px;font-weight:600;padding:12px 14px;margin-bottom:16px;font-family:sans-serif;}
-.input-modal-field:focus{outline:none;border-color:#1a5c8a;}
-.input-modal-btns{display:flex;gap:8px;}
-.input-modal-cancel{flex:1;padding:12px;background:#ede8de;color:#6a5f58;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:sans-serif;}
-.input-modal-confirm{flex:1;padding:12px;background:#1a1814;color:#e8c14a;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:sans-serif;}
-.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:500;display:flex;align-items:center;justify-content:center;}
-.modal-box{background:#fff;border-radius:14px;padding:24px 20px;width:80%;max-width:320px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.2);}
-.modal-title{font-size:15px;font-weight:700;color:#2a2420;margin-bottom:8px;}
-.modal-msg{font-size:13px;color:#6a5f58;margin-bottom:20px;line-height:1.6;}
-.modal-btns{display:flex;gap:8px;}
-.modal-cancel{flex:1;padding:11px;background:#faf7f2;color:#6a5f58;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;}
-.modal-confirm{flex:1;padding:11px;background:#c0392b;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;}
+.input-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.45);z-index:600;display:flex;align-items:center;justify-content:center;padding:20px;}
+.input-box{background:#faf7f2;border-radius:16px;padding:22px 18px;width:100%;max-width:360px;box-shadow:0 12px 40px rgba(0,0,0,0.2);animation:popIn .18s ease;}
+@keyframes popIn{from{opacity:0;transform:scale(0.93);}to{opacity:1;transform:scale(1);}}
+.input-lbl{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#9a8f84;margin-bottom:8px;}
+.input-fld{width:100%;background:#e6ddd0;border:1.5px solid #d0c8bc;border-radius:8px;color:#2a2420;font-size:16px;font-weight:600;padding:12px 14px;margin-bottom:14px;font-family:sans-serif;}
+.input-fld:focus{outline:none;border-color:#1a5c8a;}
+.input-btns{display:flex;gap:8px;}
+.input-cancel{flex:1;padding:11px;background:#ede8de;color:#6a5f58;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:sans-serif;}
+.input-ok{flex:1;padding:11px;background:#1a1814;color:#e8c14a;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:sans-serif;}
+.cfm-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:500;display:flex;align-items:center;justify-content:center;}
+.cfm-box{background:#fff;border-radius:14px;padding:22px 18px;width:80%;max-width:300px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.2);}
+.cfm-title{font-size:15px;font-weight:700;color:#2a2420;margin-bottom:8px;}
+.cfm-msg{font-size:13px;color:#6a5f58;margin-bottom:18px;line-height:1.6;white-space:pre-line;}
+.cfm-btns{display:flex;gap:8px;}
+.cfm-no{flex:1;padding:11px;background:#faf7f2;color:#6a5f58;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;}
+.cfm-yes{flex:1;padding:11px;background:#c0392b;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;}
 .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
 .info-grid.full{grid-template-columns:1fr;}
 .info-row{display:flex;flex-direction:column;gap:3px;}
 .info-row label{font-size:9px;color:#9a8f84;text-transform:uppercase;letter-spacing:1px;font-weight:700;}
-.info-input{background:#ede8de;border:1px solid #d8d0c4;border-radius:5px;color:#2a2420;font-size:13px;font-weight:600;padding:8px 10px;width:100%;}
-.info-input:focus{outline:none;border-color:#1a5c8a;}
-.section-divider{font-size:9px;color:#9a8f84;text-transform:uppercase;letter-spacing:2px;font-weight:700;padding:10px 0 6px;border-bottom:1px solid #d8d0c4;margin-bottom:8px;}
+.info-inp{background:#ede8de;border:1px solid #d8d0c4;border-radius:5px;color:#2a2420;font-size:13px;font-weight:600;padding:8px 10px;width:100%;cursor:pointer;}
+.sec-div{font-size:9px;color:#9a8f84;text-transform:uppercase;letter-spacing:2px;font-weight:700;padding:10px 0 6px;border-bottom:1px solid #d8d0c4;margin-bottom:8px;}
 .brand-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:4px;}
-.brand-btn{padding:7px 4px;border:1.5px solid #d8d0c4;border-radius:6px;background:#fff;color:#6a5f58;font-size:12px;font-weight:600;cursor:pointer;text-align:center;transition:all .15s;}
-.brand-btn:hover{border-color:#1a5c8a;color:#1a5c8a;}
+.brand-btn{padding:7px 4px;border:1.5px solid #d8d0c4;border-radius:6px;background:#fff;color:#6a5f58;font-size:12px;font-weight:600;cursor:pointer;text-align:center;}
 .brand-btn.on{border-color:#1a5c8a;background:#eef4fa;color:#1a5c8a;font-weight:700;}
-.model-input{background:#ede8de;border:1px solid #d8d0c4;border-radius:5px;color:#2a2420;font-size:13px;font-weight:600;padding:8px 10px;width:100%;}
-.model-input:focus{outline:none;border-color:#1a5c8a;}
+.model-inp{background:#ede8de;border:1px solid #d8d0c4;border-radius:5px;color:#2a2420;font-size:13px;font-weight:600;padding:8px 10px;width:100%;cursor:pointer;}
 </style>
 </head>
 <body>
 
-<!-- ══ 로그인 / 회원가입 화면 ══ -->
+<!-- ══ 로그인/회원가입 ══ -->
 <div class="auth-page" id="authPage">
-  <div class="auth-logo">
-    <h1>재단<span>왕</span></h1>
-    <p>INTERIOR FILM PRO</p>
-  </div>
+  <div class="auth-logo"><h1>재단<span>왕</span></h1><p>INTERIOR FILM PRO</p></div>
   <div class="auth-box">
-    <div id="authError" class="auth-error"></div>
-
-    <!-- 탭 -->
+    <div id="authMsg" class="auth-msg"></div>
     <div class="auth-tab">
-      <button class="auth-tab-btn on" id="tabLogin" onclick="switchAuthTab('login')">로그인</button>
-      <button class="auth-tab-btn" id="tabSignup" onclick="switchAuthTab('signup')">회원가입</button>
+      <button class="auth-tab-btn on" id="tabLogin" onclick="switchTab('login')">로그인</button>
+      <button class="auth-tab-btn" id="tabSignup" onclick="switchTab('signup')">회원가입</button>
     </div>
 
-    <!-- ══ 로그인 폼 ══ -->
+    <!-- 로그인 폼 -->
     <div id="loginForm">
-      <div class="auth-field">
-        <label>이메일</label>
-        <input type="email" id="authEmail" placeholder="example@email.com">
-      </div>
-      <div class="auth-field">
-        <label>비밀번호</label>
-        <input type="password" id="authPw" placeholder="6자리 이상">
-      </div>
+      <div class="auth-field"><label>이메일</label><input type="email" id="loginEmail" placeholder="example@email.com"></div>
+      <div class="auth-field"><label>비밀번호</label><input type="password" id="loginPw" placeholder="6자리 이상"></div>
       <button class="auth-submit" onclick="doLogin()">로그인</button>
       <div class="auth-divider">또는</div>
-      <button class="auth-google" onclick="authGoogle()">
+      <button class="auth-google" onclick="doGoogle()">
         <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
         Google로 계속하기
       </button>
-      <div class="auth-forgot" onclick="authResetPw()">비밀번호를 잊으셨나요?</div>
+      <div class="auth-forgot" onclick="doResetPw()">비밀번호를 잊으셨나요?</div>
     </div>
 
-    <!-- ══ 회원가입 폼 (3단계) ══ -->
+    <!-- 회원가입 폼 -->
     <div id="signupForm" style="display:none;">
-
-      <!-- 단계 인디케이터 -->
-      <div class="step-indicator">
-        <div class="step-dot active" id="sdot1">1</div>
-        <div class="step-line" id="sline1"></div>
-        <div class="step-dot" id="sdot2">2</div>
-        <div class="step-line" id="sline2"></div>
-        <div class="step-dot" id="sdot3">✓</div>
+      <div class="step-bar">
+        <div class="step-dot active" id="sd1">1</div>
+        <div class="step-line" id="sl1"></div>
+        <div class="step-dot" id="sd2">2</div>
+        <div class="step-line" id="sl2"></div>
+        <div class="step-dot" id="sd3">✓</div>
       </div>
-      <div class="step-labels">
-        <span class="step-label active" id="slbl1">계정 정보</span>
-        <span class="step-label" id="slbl2">본인 인증</span>
-        <span class="step-label" id="slbl3">완료</span>
+      <div class="step-lbls">
+        <span class="step-lbl active" id="slb1">계정</span>
+        <span class="step-lbl" id="slb2">인증</span>
+        <span class="step-lbl" id="slb3">완료</span>
       </div>
 
-      <!-- STEP 1: 이름 + 이메일 + 비밀번호 -->
-      <div class="signup-step active" id="signupStep1">
-        <div class="auth-field">
-          <label>이름</label>
-          <input type="text" id="signupName" placeholder="홍길동">
-        </div>
-        <div class="auth-field">
-          <label>이메일</label>
-          <input type="email" id="signupEmail" placeholder="example@email.com">
-        </div>
-        <div class="auth-field">
-          <label>비밀번호</label>
-          <input type="password" id="signupPw" placeholder="6자리 이상">
-        </div>
-        <div class="auth-field">
-          <label>비밀번호 확인</label>
-          <input type="password" id="signupPwConfirm" placeholder="비밀번호 재입력">
-        </div>
-        <button class="auth-submit" onclick="goStep2()">다음 → 핸드폰 인증</button>
-      </div>
-
-      <!-- STEP 2: 핸드폰 번호 입력 -->
-      <div class="signup-step" id="signupStep2">
+      <!-- STEP 1: 계정 정보 + 전화번호 -->
+      <div class="signup-step active" id="sStep1">
+        <div class="auth-field"><label>이름</label><input type="text" id="suName" placeholder="홍길동"></div>
+        <div class="auth-field"><label>이메일</label><input type="email" id="suEmail" placeholder="example@email.com"></div>
+        <div class="auth-field"><label>비밀번호</label><input type="password" id="suPw" placeholder="6자리 이상"></div>
+        <div class="auth-field"><label>비밀번호 확인</label><input type="password" id="suPwC" placeholder="비밀번호 재입력"></div>
         <div class="auth-field">
           <label>핸드폰 번호</label>
-          <div class="phone-input-group">
-            <div class="phone-country">🇰🇷 +82</div>
-            <input type="tel" class="phone-number-input" id="signupPhone"
-              placeholder="010-0000-0000" maxlength="13"
-              oninput="formatPhone(this)">
+          <div class="phone-grp">
+            <div class="phone-cc">🇰🇷 +82</div>
+            <input type="tel" class="phone-inp" id="suPhone" placeholder="010-0000-0000" maxlength="13" oninput="fmtPhone(this)">
           </div>
           <div class="phone-hint">📋 핸드폰 번호 1개당 계정 1개만 가입 가능합니다.</div>
         </div>
-        <!-- invisible reCAPTCHA -->
+        <button class="auth-submit" id="nextBtn" onclick="goStep2()">다음 → 핸드폰 인증</button>
+      </div>
+
+      <!-- STEP 2: 인증번호 발송 -->
+      <div class="signup-step" id="sStep2">
+        <div class="auth-field">
+          <label>인증할 핸드폰 번호</label>
+          <div class="phone-grp">
+            <div class="phone-cc">🇰🇷 +82</div>
+            <input type="tel" class="phone-inp readonly" id="suPhoneDisp" readonly>
+          </div>
+        </div>
         <div id="recaptcha-container"></div>
         <button class="auth-submit" id="sendOtpBtn" onclick="sendOtp()">📱 인증번호 받기</button>
-        <div class="back-link"><span onclick="goStep1()">← 이전으로</span></div>
+        <div class="back-lnk" onclick="goStep1()">← 이전으로</div>
       </div>
 
       <!-- STEP 3: OTP 입력 -->
-      <div class="signup-step" id="signupStep3">
-        <div class="otp-sent-box">
-          📱 <strong id="otpPhoneDisplay"></strong><br>위 번호로 6자리 인증번호를 보냈습니다.
-        </div>
+      <div class="signup-step" id="sStep3">
+        <div class="otp-box">📱 <strong id="otpDisp"></strong><br>위 번호로 6자리 인증번호를 보냈습니다.</div>
         <div class="auth-field">
           <label>인증번호 6자리</label>
-          <input type="tel" class="otp-input" id="otpInput"
-            placeholder="000000" maxlength="6">
+          <input type="tel" class="otp-inp" id="otpInp" placeholder="000000" maxlength="6">
         </div>
-        <button class="auth-submit" id="verifyOtpBtn" onclick="verifyAndSignup()">가입 완료</button>
+        <button class="auth-submit" id="verifyBtn" onclick="verifyAndJoin()">가입 완료</button>
         <div class="otp-resend">
           인증번호 미수신?
-          <span class="otp-resend-btn disabled" id="resendBtn" onclick="handleResend()">재전송</span>
+          <span class="resend-btn off" id="resendBtn" onclick="handleResend()">재전송</span>
           <span class="otp-timer" id="otpTimer"></span>
         </div>
-        <div class="back-link"><span onclick="goStep2()">← 번호 다시 입력</span></div>
+        <div class="back-lnk" onclick="goStep2back()">← 번호 다시 입력</div>
       </div>
-
-    </div><!-- /signupForm -->
+    </div>
   </div>
 </div>
 
 <div class="save-toast" id="toast">저장됐어요!</div>
 
-<!-- 입력 팝업 모달 -->
-<div class="input-modal-overlay" id="inputModal" style="display:none;">
-  <div class="input-modal-box">
-    <div class="input-modal-label" id="inputModalLabel">입력</div>
-    <input type="text" class="input-modal-field" id="inputModalField" autocomplete="off">
-    <div class="input-modal-btns">
-      <button class="input-modal-cancel" id="inputModalCancel">취소</button>
-      <button class="input-modal-confirm" id="inputModalConfirm">확인</button>
+<!-- 입력 팝업 -->
+<div class="input-overlay" id="inputModal" style="display:none;">
+  <div class="input-box">
+    <div class="input-lbl" id="inputLbl">입력</div>
+    <input type="text" class="input-fld" id="inputFld" autocomplete="off">
+    <div class="input-btns">
+      <button class="input-cancel" id="inputCancel">취소</button>
+      <button class="input-ok" id="inputOk">확인</button>
     </div>
   </div>
 </div>
 
-<!-- 커스텀 확인 모달 -->
-<div class="modal-overlay" id="confirmModal" style="display:none;">
-  <div class="modal-box">
-    <div class="modal-title" id="modalTitle">확인</div>
-    <div class="modal-msg" id="modalMsg"></div>
-    <div class="modal-btns">
-      <button class="modal-cancel" id="modalCancel">취소</button>
-      <button class="modal-confirm" id="modalConfirm">삭제</button>
+<!-- 확인 모달 -->
+<div class="cfm-overlay" id="cfmModal" style="display:none;">
+  <div class="cfm-box">
+    <div class="cfm-title" id="cfmTitle">확인</div>
+    <div class="cfm-msg" id="cfmMsg"></div>
+    <div class="cfm-btns">
+      <button class="cfm-no" id="cfmNo">취소</button>
+      <button class="cfm-yes" id="cfmYes">확인</button>
     </div>
   </div>
 </div>
 
-<!-- ══ 계산 페이지 ══ -->
+<!-- 계산 페이지 -->
 <div class="page on" id="page-calc">
 <div class="hdr">
   <h1>재단<span>왕</span></h1>
@@ -407,10 +335,10 @@ tr:hover td{background:#ede8de;}
 </div>
 <div class="fbar">
   <span class="flbl">필름 폭</span>
-  <input id="fw" type="number" value="1220" readonly style="cursor:pointer;" onclick="showInputModal('필름 폭 (mm)', this.value==='1220'?'':this.value, 'number', function(v){var el=document.getElementById('fw');el.value=v===''?'1220':v;})">
+  <input id="fw" type="number" value="1220" readonly onclick="showIM('필름 폭 (mm)',this.value==='1220'?'':this.value,'number',function(v){document.getElementById('fw').value=v===''?'1220':v;})">
   <span class="funit">mm</span>
   <span class="flbl">필름 길이</span>
-  <input id="fl" type="number" value="0" readonly style="cursor:pointer;" onclick="showInputModal('필름 길이 (m)', this.value==='0'?'':this.value, 'number', function(v){var el=document.getElementById('fl');el.value=v===''?'0':v;})">
+  <input id="fl" type="number" value="0" readonly onclick="showIM('필름 길이 (m)',this.value==='0'?'':this.value,'number',function(v){document.getElementById('fl').value=v===''?'0':v;})">
   <span class="funit">m</span>
   <div class="allow-g">
     <label>방염</label>
@@ -433,49 +361,31 @@ tr:hover td{background:#ede8de;}
       <div class="ph"><span class="ph-t">현장 정보</span></div>
       <div class="pb" style="padding:12px 14px;">
         <div class="info-grid full" style="margin-bottom:8px;">
-          <div class="info-row">
-            <label>현장명</label>
-            <input type="text" id="siteName" class="info-input" placeholder="예) 강남 아파트 101호" readonly onclick="showInputModal('현장명', this.value, 'text', function(v){document.getElementById('siteName').value=v;})">
-          </div>
+          <div class="info-row"><label>현장명</label><input type="text" id="siteName" class="info-inp" placeholder="예) 강남 아파트 101호" readonly onclick="showIM('현장명',this.value,'text',function(v){document.getElementById('siteName').value=v;})"></div>
         </div>
         <div class="info-grid">
-          <div class="info-row">
-            <label>고객명</label>
-            <input type="text" id="clientName" class="info-input" placeholder="홍길동" readonly onclick="showInputModal('고객명', this.value, 'text', function(v){document.getElementById('clientName').value=v;})">
-          </div>
-          <div class="info-row">
-            <label>연락처</label>
-            <input type="text" id="clientPhone" class="info-input" placeholder="010-0000-0000" readonly onclick="showInputModal('연락처', this.value, 'tel', function(v){document.getElementById('clientPhone').value=v;})">
-          </div>
+          <div class="info-row"><label>고객명</label><input type="text" id="clientName" class="info-inp" placeholder="홍길동" readonly onclick="showIM('고객명',this.value,'text',function(v){document.getElementById('clientName').value=v;})"></div>
+          <div class="info-row"><label>연락처</label><input type="text" id="clientPhone" class="info-inp" placeholder="010-0000-0000" readonly onclick="showIM('연락처',this.value,'tel',function(v){document.getElementById('clientPhone').value=v;})"></div>
         </div>
-        <div class="section-divider">원단 정보</div>
+        <div class="sec-div">원단 정보</div>
         <div class="info-row" style="margin-bottom:8px;">
           <label>브랜드</label>
           <div class="brand-grid" id="brandGrid">
-            <button class="brand-btn" data-brand="LX" onclick="selectBrand(this)">LX</button>
-            <button class="brand-btn" data-brand="현대보닥" onclick="selectBrand(this)">현대보닥</button>
-            <button class="brand-btn" data-brand="KCC" onclick="selectBrand(this)">KCC</button>
-            <button class="brand-btn" data-brand="영림" onclick="selectBrand(this)">영림</button>
-            <button class="brand-btn" data-brand="예림" onclick="selectBrand(this)">예림</button>
-            <button class="brand-btn" data-brand="3M" onclick="selectBrand(this)">3M</button>
-            <button class="brand-btn" data-brand="삼성" onclick="selectBrand(this)">삼성</button>
+            <button class="brand-btn" data-brand="LX" onclick="selBrand(this)">LX</button>
+            <button class="brand-btn" data-brand="현대보닥" onclick="selBrand(this)">현대보닥</button>
+            <button class="brand-btn" data-brand="KCC" onclick="selBrand(this)">KCC</button>
+            <button class="brand-btn" data-brand="영림" onclick="selBrand(this)">영림</button>
+            <button class="brand-btn" data-brand="예림" onclick="selBrand(this)">예림</button>
+            <button class="brand-btn" data-brand="3M" onclick="selBrand(this)">3M</button>
+            <button class="brand-btn" data-brand="삼성" onclick="selBrand(this)">삼성</button>
           </div>
         </div>
-        <div class="info-row" style="margin-bottom:8px;">
-          <label>브랜드 직접입력</label>
-          <input type="text" id="brandCustom" class="info-input" placeholder="직접 입력" readonly onclick="showInputModal('브랜드 직접입력', this.value, 'text', function(v){document.getElementById('brandCustom').value=v;clearBrandBtn();})">
-        </div>
-        <div class="info-row">
-          <label>모델명</label>
-          <input type="text" id="modelName" class="model-input" placeholder="예) EW20098-51" readonly onclick="showInputModal('모델명', this.value, 'text', function(v){document.getElementById('modelName').value=v;})">
-        </div>
+        <div class="info-row" style="margin-bottom:8px;"><label>브랜드 직접입력</label><input type="text" id="brandCustom" class="info-inp" placeholder="직접 입력" readonly onclick="showIM('브랜드 직접입력',this.value,'text',function(v){document.getElementById('brandCustom').value=v;clrBrand();})"></div>
+        <div class="info-row"><label>모델명</label><input type="text" id="modelName" class="model-inp" placeholder="예) EW20098-51" readonly onclick="showIM('모델명',this.value,'text',function(v){document.getElementById('modelName').value=v;})"></div>
       </div>
     </div>
     <div class="panel">
-      <div class="ph">
-        <span class="ph-t">재단 항목 목록</span>
-        <span id="icnt" style="font-size:11px;color:#9a9590;">0개</span>
-      </div>
+      <div class="ph"><span class="ph-t">재단 항목 목록</span><span id="icnt" style="font-size:11px;color:#9a9590;">0개</span></div>
       <div class="pb">
         <div id="ilist"></div>
         <button class="add-btn" id="addBtn">+ 항목 추가</button>
@@ -484,20 +394,18 @@ tr:hover td{background:#ede8de;}
     </div>
   </div>
   <div id="rcol">
-    <div class="panel"><div class="pb">
-      <div class="empty"><div class="ei">✂</div>항목을 추가하고<br><strong>최적 재단 계산하기</strong>를 눌러주세요</div>
-    </div></div>
+    <div class="panel"><div class="pb"><div class="empty"><div class="ei">✂</div>항목을 추가하고<br><strong>최적 재단 계산하기</strong>를 눌러주세요</div></div></div>
   </div>
 </div>
 </div>
 
-<!-- ══ 기록 페이지 ══ -->
+<!-- 기록 페이지 -->
 <div class="page" id="page-hist">
 <div class="hdr"><h1>계산 <span>기록</span></h1></div>
 <div style="max-width:800px;margin:0 auto;padding:14px 12px;">
   <div style="margin-bottom:12px;position:relative;">
-    <input type="text" id="searchBox" placeholder="🔍 현장명 · 고객명 · 연락처 검색" readonly onclick="openSearchModal()" style="width:100%;padding:10px 14px;border:1px solid #d8d0c4;border-radius:8px;font-size:14px;background:#fff;color:#2a2420;cursor:pointer;">
-    <span id="searchClear" onclick="clearSearch()" style="display:none;position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:18px;color:#9a8f84;line-height:1;">✕</span>
+    <input type="text" id="searchBox" placeholder="🔍 현장명 · 고객명 · 연락처 검색" readonly onclick="openSearch()" style="width:100%;padding:10px 14px;border:1px solid #d8d0c4;border-radius:8px;font-size:14px;background:#fff;color:#2a2420;cursor:pointer;">
+    <span id="searchClear" onclick="clrSearch()" style="display:none;position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:18px;color:#9a8f84;">✕</span>
   </div>
   <div id="hist-list"></div>
 </div>
@@ -507,28 +415,25 @@ tr:hover td{background:#ede8de;}
   <button class="tab on" id="tab-calc" onclick="showTab('calc')"><span class="tab-icon">✂</span>재단 계산</button>
   <button class="tab" id="tab-hist" onclick="showTab('hist')"><span class="tab-icon">📋</span>계산 기록</button>
 </div>
-
 <script>
-/* ══════════════════════════════════════════════
-   재단 계산 핵심 로직
-══════════════════════════════════════════════ */
+/* ══ 재단 계산 로직 ══ */
 var CATS=[{id:"1",lb:"문"},{id:"1-1",lb:"문틀"},{id:"2",lb:"창"},{id:"2-1",lb:"창틀"},{id:"3",lb:"싱크대 문"},{id:"3-1",lb:"싱크대 틀"},{id:"4",lb:"알판"},{id:"5",lb:"몰딩"},{id:"6",lb:"기타"}];
 var CC={"1":"#2c7be5","1-1":"#74b3fa","2":"#27ae60","2-1":"#82e0aa","3":"#e67e22","3-1":"#f0b27a","4":"#8e44ad","5":"#c0392b","6":"#7f8c8d"};
 function cc(c){return CC[c]||"#7f8c8d";}
 function cl(c){for(var i=0;i<CATS.length;i++)if(CATS[i].id===c)return CATS[i].lb;return c;}
 var seq=0,IDS=[];
-function addItem(){seq++;var id="item"+seq,cat="1";IDS.push(id);var card=document.createElement("div");card.className="icard";card.id=id;var head=document.createElement("div");head.className="ich";var num=document.createElement("div");num.className="inum";num.style.background=cc(cat);num.textContent=IDS.length;var ni=document.createElement("input");ni.className="iname";ni.type="text";ni.placeholder="이름 입력";ni.readOnly=true;ni.addEventListener("click",function(){var self=this;showInputModal("항목 이름",self.value,"text",function(v){self.value=v;});});var db=document.createElement("button");db.className="dbtn";db.textContent="X";db.setAttribute("data-id",id);db.addEventListener("click",function(){delItem(this.getAttribute("data-id"));});head.appendChild(num);head.appendChild(ni);head.appendChild(db);var body=document.createElement("div");body.className="icb";var cg=document.createElement("div");cg.className="cgrid";for(var i=0;i<CATS.length;i++){(function(c,cg,num){var b=document.createElement("button");b.className="cb"+(c.id===cat?" on":"");b.textContent=c.lb;b.setAttribute("data-c",c.id);b.addEventListener("click",function(){var bs=cg.querySelectorAll(".cb");for(var j=0;j<bs.length;j++)bs[j].className="cb";this.className="cb on";num.style.background=cc(this.getAttribute("data-c"));});cg.appendChild(b);})(CATS[i],cg,num);}var dr=document.createElement("div");dr.className="drow";function mk(lbl,cls,def){var w=document.createElement("div");w.className="dw";var l=document.createElement("label");l.textContent=lbl;var inp=document.createElement("input");inp.type="number";inp.className=cls;inp.value=def;var dv=String(def);inp.readOnly=true;inp.style.cursor="pointer";inp.addEventListener("click",function(){var self=this;showInputModal(lbl,self.value===dv?"":self.value,"number",function(v){self.value=(v==="")?dv:v;});});var u=document.createElement("div");u.className="du";u.textContent=cls==="iq"?"개":"mm";w.appendChild(l);w.appendChild(inp);w.appendChild(u);return w;}dr.appendChild(mk("폭 (W)","iw",0));dr.appendChild(mk("길이 (L)","il",0));dr.appendChild(mk("수량","iq",1));body.appendChild(cg);body.appendChild(dr);card.appendChild(head);card.appendChild(body);document.getElementById("ilist").appendChild(card);document.getElementById("icnt").textContent=IDS.length+"개";}
+function addItem(){seq++;var id="item"+seq,cat="1";IDS.push(id);var card=document.createElement("div");card.className="icard";card.id=id;var head=document.createElement("div");head.className="ich";var num=document.createElement("div");num.className="inum";num.style.background=cc(cat);num.textContent=IDS.length;var ni=document.createElement("input");ni.className="iname";ni.type="text";ni.placeholder="이름 입력";ni.readOnly=true;ni.addEventListener("click",function(){var self=this;showIM("항목 이름",self.value,"text",function(v){self.value=v;});});var db=document.createElement("button");db.className="dbtn";db.textContent="X";db.setAttribute("data-id",id);db.addEventListener("click",function(){delItem(this.getAttribute("data-id"));});head.appendChild(num);head.appendChild(ni);head.appendChild(db);var body=document.createElement("div");body.className="icb";var cg=document.createElement("div");cg.className="cgrid";for(var i=0;i<CATS.length;i++){(function(c,cg,num){var b=document.createElement("button");b.className="cb"+(c.id===cat?" on":"");b.textContent=c.lb;b.setAttribute("data-c",c.id);b.addEventListener("click",function(){var bs=cg.querySelectorAll(".cb");for(var j=0;j<bs.length;j++)bs[j].className="cb";this.className="cb on";num.style.background=cc(this.getAttribute("data-c"));});cg.appendChild(b);})(CATS[i],cg,num);}var dr=document.createElement("div");dr.className="drow";function mk(lbl,cls,def){var w=document.createElement("div");w.className="dw";var l=document.createElement("label");l.textContent=lbl;var inp=document.createElement("input");inp.type="number";inp.className=cls;inp.value=def;var dv=String(def);inp.readOnly=true;inp.addEventListener("click",function(){var self=this;showIM(lbl,self.value===dv?"":self.value,"number",function(v){self.value=(v==="")?dv:v;});});var u=document.createElement("div");u.className="du";u.textContent=cls==="iq"?"개":"mm";w.appendChild(l);w.appendChild(inp);w.appendChild(u);return w;}dr.appendChild(mk("폭 (W)","iw",0));dr.appendChild(mk("길이 (L)","il",0));dr.appendChild(mk("수량","iq",1));body.appendChild(cg);body.appendChild(dr);card.appendChild(head);card.appendChild(body);document.getElementById("ilist").appendChild(card);document.getElementById("icnt").textContent=IDS.length+"개";}
 function delItem(id){var i=IDS.indexOf(id);if(i>-1)IDS.splice(i,1);var el=document.getElementById(id);if(el)el.parentNode.removeChild(el);document.getElementById("icnt").textContent=IDS.length+"개";var ns=document.querySelectorAll(".inum");for(var i=0;i<ns.length;i++)ns[i].textContent=i+1;}
 function getItems(){var res=[];for(var i=0;i<IDS.length;i++){var el=document.getElementById(IDS[i]);if(!el)continue;var on=el.querySelector(".cb.on");var cat=on?on.getAttribute("data-c"):"6";var nm=el.querySelector(".iname").value.trim()||cl(cat);var pW=parseFloat(el.querySelector(".iw").value)||0;var pL=parseFloat(el.querySelector(".il").value)||0;var qty=Math.max(1,parseInt(el.querySelector(".iq").value)||1);res.push({idx:i,cat:cat,name:nm,pW:pW,pL:pL,qty:qty});}return res;}
-function updateSegs(segs,bx,pw,by,ph){var nx=[];for(var gi=0;gi<segs.length;gi++){var s=segs[gi],ox=Math.max(bx,s.x0),ex=Math.min(bx+pw,s.x1);if(ox>=ex){nx.push({x0:s.x0,x1:s.x1,h:s.h});}else{if(s.x0<ox)nx.push({x0:s.x0,x1:ox,h:s.h});nx.push({x0:ox,x1:ex,h:by+ph});if(ex<s.x1)nx.push({x0:ex,x1:s.x1,h:s.h});}}nx.sort(function(a,b){return a.x0-b.x0;});var mg=[];for(var ni=0;ni<nx.length;ni++){if(mg.length&&mg[mg.length-1].x1===nx[ni].x0&&mg[mg.length-1].h===nx[ni].h)mg[mg.length-1].x1=nx[ni].x1;else mg.push({x0:nx[ni].x0,x1:nx[ni].x1,h:nx[ni].h});}return mg;}
-function getBestPos(segs,pw,fw){var xs=[],gi;for(gi=0;gi<segs.length;gi++){var x0=segs[gi].x0;if(x0+pw<=fw){var f=false;for(var xi=0;xi<xs.length;xi++)if(xs[xi]===x0){f=true;break;}if(!f)xs.push(x0);}}if(!xs.length)xs.push(0);var bx=0,by=Infinity,bw=Infinity;for(var xi=0;xi<xs.length;xi++){var x=xs[xi],y=0,waste=0;for(gi=0;gi<segs.length;gi++){var ox=Math.max(x,segs[gi].x0),ex=Math.min(x+pw,segs[gi].x1);if(ox<ex&&segs[gi].h>y)y=segs[gi].h;}for(gi=0;gi<segs.length;gi++){var ox=Math.max(x,segs[gi].x0),ex=Math.min(x+pw,segs[gi].x1);if(ox<ex)waste+=(y-segs[gi].h)*(ex-ox);}if(y<by||(y===by&&waste<bw)){by=y;bw=waste;bx=x;}}if(by===Infinity){var mh=0;for(gi=0;gi<segs.length;gi++)if(segs[gi].h>mh)mh=segs[gi].h;by=mh;bx=0;}return{bx:bx,by:by};}
-function buildStrips(flat){var ySet={},ys=[],strips=[];for(var i=0;i<flat.length;i++)ySet[flat[i].y]=true;for(var y in ySet)ys.push(parseFloat(y));ys.sort(function(a,b){return a-b;});for(var i=0;i<ys.length;i++){var y=ys[i],items=[],mb=0;for(var j=0;j<flat.length;j++)if(flat[j].y===y)items.push(flat[j]);for(var j=0;j<items.length;j++)if(items[j].y+items[j].pH>mb)mb=items[j].y+items[j].pH;strips.push({y:y,height:mb-y,slots:items});}return strips;}
-function packFixed(pieces,fw){var sorts=[function(a,b){return b.pW*b.pH-a.pW*a.pH;},function(a,b){return b.pH-a.pH;},function(a,b){return b.pW-a.pW;},function(a,b){return(b.pW+b.pH)-(a.pW+a.pH);}];var bestTotal=Infinity,bestFlat=null;for(var si=0;si<sorts.length;si++){var sp=pieces.slice().sort(sorts[si]);var segs=[{x0:0,x1:fw,h:0}],placed=[],gi;for(var pi=0;pi<sp.length;pi++){var p=sp[pi];var pos=getBestPos(segs,p.pW,fw);placed.push({label:p.label,cat:p.cat,pW:p.pW,pH:p.pH,x:pos.bx,y:pos.by,rotated:false});segs=updateSegs(segs,pos.bx,p.pW,pos.by,p.pH);}var mh=0;for(gi=0;gi<segs.length;gi++)if(segs[gi].h>mh)mh=segs[gi].h;if(mh<bestTotal){bestTotal=mh;bestFlat=placed.slice();}}return{flat:bestFlat,total:bestTotal,strips:buildStrips(bestFlat)};}
-function packRotatable(pieces,fw){var sorts=[function(a,b){return b.pW*b.pH-a.pW*a.pH;},function(a,b){return b.pH-a.pH;},function(a,b){return b.pW-a.pW;},function(a,b){return(b.pW+b.pH)-(a.pW+a.pH);},function(a,b){return Math.max(b.pW,b.pH)-Math.max(a.pW,a.pH);},function(a,b){return Math.min(b.pW,b.pH)-Math.min(a.pW,a.pH);}];var bestTotal=Infinity,bestFlat=null;for(var si=0;si<sorts.length;si++){var sp=pieces.slice().sort(sorts[si]);var n=sp.length;for(var strat=0;strat<3;strat++){var segs=[{x0:0,x1:fw,h:0}],placed=[],gi;for(var pi=0;pi<n;pi++){var p=sp[pi];var canRot=(p.pH<=fw&&p.pW!==p.pH);var useRot=false;if(canRot){if(strat===1){var pos0=getBestPos(segs,p.pW,fw);var pos1=getBestPos(segs,p.pH,fw);useRot=(pos1.by<pos0.by)||(pos1.by===pos0.by&&p.pH<p.pW);}else if(strat===2){useRot=true;}}var pw=useRot?p.pH:p.pW;var ph=useRot?p.pW:p.pH;if(pw>fw){pw=p.pW;ph=p.pH;useRot=false;}var pos=getBestPos(segs,pw,fw);placed.push({label:p.label,cat:p.cat,pW:pw,pH:ph,x:pos.bx,y:pos.by,rotated:useRot});segs=updateSegs(segs,pos.bx,pw,pos.by,ph);}var mh=0;for(gi=0;gi<segs.length;gi++)if(segs[gi].h>mh)mh=segs[gi].h;if(mh<bestTotal){bestTotal=mh;bestFlat=placed.slice();}}}return{flat:bestFlat,total:bestTotal,strips:buildStrips(bestFlat)};}
-function pack(pieces,fw){return hasPattern?packFixed(pieces,fw):packRotatable(pieces,fw);}
-function calculate(){var items=getItems();if(!items.length){alert("항목을 먼저 추가하세요.");return;}var fw=parseFloat(document.getElementById("fw").value)||1220;var fl=(parseFloat(document.getElementById("fl").value)||0)*1000;var al=0;var pieces=[];for(var i=0;i<items.length;i++){var it=items[i];for(var q=0;q<it.qty;q++)pieces.push({label:it.qty>1?it.name+"("+(q+1)+"/"+it.qty+")":it.name,cat:it.cat,pW:it.pW+al*2,pH:it.pL+al*2});}var over=[];for(var i=0;i<pieces.length;i++)if(pieces[i].pW>fw)over.push(pieces[i]);if(over.length){var msg="필름 폭 초과:\n";for(var i=0;i<over.length;i++)msg+="- "+over[i].label+": "+over[i].pW+"mm\n";alert(msg);return;}var res=pack(pieces,fw);var ua=0;for(var i=0;i<pieces.length;i++)ua+=pieces[i].pW*pieces[i].pH;var eff=(ua/(fw*res.total)*100).toFixed(1);renderResult(res.flat,res.strips,res.total,eff,fl>0&&res.total>fl,fw,fl,isFlame);var siteName=document.getElementById("siteName").value.trim()||"현장명 없음";var clientName=document.getElementById("clientName").value.trim();var clientPhone=document.getElementById("clientPhone").value.trim();var brand=getSelectedBrand();var modelName=document.getElementById("modelName").value.trim();saveHistory(siteName,clientName,clientPhone,brand,modelName,items,res.flat,res.total,eff,fw,fl,isFlame,hasPattern);}
+function updSegs(segs,bx,pw,by,ph){var nx=[];for(var gi=0;gi<segs.length;gi++){var s=segs[gi],ox=Math.max(bx,s.x0),ex=Math.min(bx+pw,s.x1);if(ox>=ex){nx.push({x0:s.x0,x1:s.x1,h:s.h});}else{if(s.x0<ox)nx.push({x0:s.x0,x1:ox,h:s.h});nx.push({x0:ox,x1:ex,h:by+ph});if(ex<s.x1)nx.push({x0:ex,x1:s.x1,h:s.h});}}nx.sort(function(a,b){return a.x0-b.x0;});var mg=[];for(var ni=0;ni<nx.length;ni++){if(mg.length&&mg[mg.length-1].x1===nx[ni].x0&&mg[mg.length-1].h===nx[ni].h)mg[mg.length-1].x1=nx[ni].x1;else mg.push({x0:nx[ni].x0,x1:nx[ni].x1,h:nx[ni].h});}return mg;}
+function bestPos(segs,pw,fw){var xs=[],gi;for(gi=0;gi<segs.length;gi++){var x0=segs[gi].x0;if(x0+pw<=fw){var f=false;for(var xi=0;xi<xs.length;xi++)if(xs[xi]===x0){f=true;break;}if(!f)xs.push(x0);}}if(!xs.length)xs.push(0);var bx=0,by=Infinity,bw=Infinity;for(var xi=0;xi<xs.length;xi++){var x=xs[xi],y=0,waste=0;for(gi=0;gi<segs.length;gi++){var ox=Math.max(x,segs[gi].x0),ex=Math.min(x+pw,segs[gi].x1);if(ox<ex&&segs[gi].h>y)y=segs[gi].h;}for(gi=0;gi<segs.length;gi++){var ox=Math.max(x,segs[gi].x0),ex=Math.min(x+pw,segs[gi].x1);if(ox<ex)waste+=(y-segs[gi].h)*(ex-ox);}if(y<by||(y===by&&waste<bw)){by=y;bw=waste;bx=x;}}if(by===Infinity){var mh=0;for(gi=0;gi<segs.length;gi++)if(segs[gi].h>mh)mh=segs[gi].h;by=mh;bx=0;}return{bx:bx,by:by};}
+function mkStrips(flat){var ySet={},ys=[],strips=[];for(var i=0;i<flat.length;i++)ySet[flat[i].y]=true;for(var y in ySet)ys.push(parseFloat(y));ys.sort(function(a,b){return a-b;});for(var i=0;i<ys.length;i++){var y=ys[i],items=[],mb=0;for(var j=0;j<flat.length;j++)if(flat[j].y===y)items.push(flat[j]);for(var j=0;j<items.length;j++)if(items[j].y+items[j].pH>mb)mb=items[j].y+items[j].pH;strips.push({y:y,height:mb-y,slots:items});}return strips;}
+function packFixed(pieces,fw){var sorts=[function(a,b){return b.pW*b.pH-a.pW*a.pH;},function(a,b){return b.pH-a.pH;},function(a,b){return b.pW-a.pW;},function(a,b){return(b.pW+b.pH)-(a.pW+a.pH);}];var bt=Infinity,bf=null;for(var si=0;si<sorts.length;si++){var sp=pieces.slice().sort(sorts[si]);var segs=[{x0:0,x1:fw,h:0}],placed=[],gi;for(var pi=0;pi<sp.length;pi++){var p=sp[pi];var pos=bestPos(segs,p.pW,fw);placed.push({label:p.label,cat:p.cat,pW:p.pW,pH:p.pH,x:pos.bx,y:pos.by,rotated:false});segs=updSegs(segs,pos.bx,p.pW,pos.by,p.pH);}var mh=0;for(gi=0;gi<segs.length;gi++)if(segs[gi].h>mh)mh=segs[gi].h;if(mh<bt){bt=mh;bf=placed.slice();}}return{flat:bf,total:bt,strips:mkStrips(bf)};}
+function packRot(pieces,fw){var sorts=[function(a,b){return b.pW*b.pH-a.pW*a.pH;},function(a,b){return b.pH-a.pH;},function(a,b){return b.pW-a.pW;},function(a,b){return(b.pW+b.pH)-(a.pW+a.pH);},function(a,b){return Math.max(b.pW,b.pH)-Math.max(a.pW,a.pH);},function(a,b){return Math.min(b.pW,b.pH)-Math.min(a.pW,a.pH);}];var bt=Infinity,bf=null;for(var si=0;si<sorts.length;si++){var sp=pieces.slice().sort(sorts[si]);var n=sp.length;for(var strat=0;strat<3;strat++){var segs=[{x0:0,x1:fw,h:0}],placed=[],gi;for(var pi=0;pi<n;pi++){var p=sp[pi];var canR=(p.pH<=fw&&p.pW!==p.pH);var useR=false;if(canR){if(strat===1){var p0=bestPos(segs,p.pW,fw);var p1=bestPos(segs,p.pH,fw);useR=(p1.by<p0.by)||(p1.by===p0.by&&p.pH<p.pW);}else if(strat===2){useR=true;}}var pw=useR?p.pH:p.pW;var ph=useR?p.pW:p.pH;if(pw>fw){pw=p.pW;ph=p.pH;useR=false;}var pos=bestPos(segs,pw,fw);placed.push({label:p.label,cat:p.cat,pW:pw,pH:ph,x:pos.bx,y:pos.by,rotated:useR});segs=updSegs(segs,pos.bx,pw,pos.by,ph);}var mh=0;for(gi=0;gi<segs.length;gi++)if(segs[gi].h>mh)mh=segs[gi].h;if(mh<bt){bt=mh;bf=placed.slice();}}}return{flat:bf,total:bt,strips:mkStrips(bf)};}
+function pack(pieces,fw){return hasPattern?packFixed(pieces,fw):packRot(pieces,fw);}
+function calculate(){var items=getItems();if(!items.length){alert("항목을 먼저 추가하세요.");return;}var fw=parseFloat(document.getElementById("fw").value)||1220;var fl=(parseFloat(document.getElementById("fl").value)||0)*1000;var pieces=[];for(var i=0;i<items.length;i++){var it=items[i];for(var q=0;q<it.qty;q++)pieces.push({label:it.qty>1?it.name+"("+(q+1)+"/"+it.qty+")":it.name,cat:it.cat,pW:it.pW,pH:it.pL});}var over=[];for(var i=0;i<pieces.length;i++)if(pieces[i].pW>fw)over.push(pieces[i]);if(over.length){var msg="필름 폭 초과:\n";for(var i=0;i<over.length;i++)msg+="- "+over[i].label+": "+over[i].pW+"mm\n";alert(msg);return;}var res=pack(pieces,fw);var ua=0;for(var i=0;i<pieces.length;i++)ua+=pieces[i].pW*pieces[i].pH;var eff=(ua/(fw*res.total)*100).toFixed(1);renderResult(res.flat,res.strips,res.total,eff,fl>0&&res.total>fl,fw,fl,isFlame);var sN=document.getElementById("siteName").value.trim()||"현장명 없음";var cN=document.getElementById("clientName").value.trim();var cP=document.getElementById("clientPhone").value.trim();var br=getBrand();var mn=document.getElementById("modelName").value.trim();saveHist(sN,cN,cP,br,mn,items,res.flat,res.total,eff,fw,fl,isFlame,hasPattern);}
 var dS=1,dB=1,dD=null,zI=false;
-function renderResult(flat,strips,total,eff,ovl,fw,fl,flame){zI=false;var col=document.getElementById("rcol");col.innerHTML="";function mkP(title){var p=document.createElement("div");p.className="panel";var ph=document.createElement("div");ph.className="ph";var pt=document.createElement("span");pt.className="ph-t";pt.textContent=title;var ps=document.createElement("span");ps.style.cssText="font-size:11px;color:#9a9590;";ph.appendChild(pt);ph.appendChild(ps);var pb=document.createElement("div");pb.className="pb";p.appendChild(ph);p.appendChild(pb);return p;}function mkSb(v,l){var sb=document.createElement("div");sb.className="sb";var sv=document.createElement("div");sv.className="sv";sv.textContent=v;var sl=document.createElement("div");sl.className="sl";sl.textContent=l;sb.appendChild(sv);sb.appendChild(sl);return sb;}function el(tag,cls,txt){var e=document.createElement(tag);if(cls)e.className=cls;if(txt)e.textContent=txt;return e;}var p1=mkP("결과 요약"),pb1=p1.querySelector(".pb");var sg=el("div","sg");sg.appendChild(mkSb((total/1000).toFixed(2)+"M","필요 필름 길이"));sg.appendChild(mkSb(total.toLocaleString()+"mm","필요 길이"));sg.appendChild(mkSb(eff+"%","필름 사용률"));pb1.appendChild(sg);if(ovl){var w=el("div","warn");w.textContent="⚠ 필요 길이("+total.toLocaleString()+"mm)가 필름 길이("+fl.toLocaleString()+"mm)를 초과합니다.";pb1.appendChild(w);}if(fl>0){var ur=el("div","urow");ur.innerHTML="<span class='ulbl'>필름 사용</span><div class='ubg'><div class='ufill"+(ovl?" ov":"")+"' style='width:"+Math.min(total/fl*100,100).toFixed(1)+"%'></div></div><span class='uval'>"+((total/fl*100).toFixed(1))+"%</span>";pb1.appendChild(ur);}var info=el("div","info");info.textContent="필름: "+fw+"mm × "+(fl?fl.toLocaleString()+"mm":"미설정")+" | "+(isFlame?"방염":"비방염");pb1.appendChild(info);col.appendChild(p1);var p2=mkP("재단 배치도"),ph2=p2.querySelector(".ph"),pb2=p2.querySelector(".pb");var zc=el("div","zctrl");var zm=el("button","zb");zm.textContent="-";zm.addEventListener("click",function(){zD(0.7);});var zl=el("span","zl");zl.id="zlbl";zl.textContent="100%";var zp=el("button","zb");zp.textContent="+";zp.addEventListener("click",function(){zD(1.4);});var zr=el("button","zb zr");zr.textContent="맞춤";zr.addEventListener("click",function(){rZ();});zc.appendChild(zm);zc.appendChild(zl);zc.appendChild(zp);zc.appendChild(zr);ph2.appendChild(zc);var dbox=el("div","dbox");dbox.id="dscroll";var cv=document.createElement("canvas");cv.id="dcv";dbox.appendChild(cv);var lg=el("div","leg");lg.id="dleg";var cd={};for(var i=0;i<flat.length;i++){if(!cd[flat[i].cat]){cd[flat[i].cat]=true;var c=cc(flat[i].cat);var li=el("div","li");var ld=el("div","ld");ld.style.background=c+"88";ld.style.border="1.5px solid "+c;var ls=el("span");ls.textContent=cl(flat[i].cat);ls.style.color=c;ls.style.fontWeight="700";li.appendChild(ld);li.appendChild(ls);lg.appendChild(li);}}var li2=el("span");li2.style.cssText="margin-left:auto;font-size:10px;color:#9a9590;";li2.textContent=fw+"x"+total+"mm";lg.appendChild(li2);pb2.appendChild(dbox);pb2.appendChild(lg);col.appendChild(p2);var p3=mkP("재단 조각 목록"),pb3=p3.querySelector(".pb");p3.querySelector(".ph").lastChild.textContent=flat.length+"개";var tw=el("div","tw"),tbl=document.createElement("table");var thead=document.createElement("thead"),htr=document.createElement("tr");["#","항목명","카테고리","재단폭mm","재단길이mm","Y위치mm","X위치mm"].forEach(function(h){var th=el("th");th.textContent=h;htr.appendChild(th);});thead.appendChild(htr);tbl.appendChild(thead);var tbody=document.createElement("tbody");for(var i=0;i<flat.length;i++){var p=flat[i],c=cc(p.cat),tr=document.createElement("tr");var td0=el("td");var dot=el("span");dot.style.cssText="display:inline-block;width:9px;height:9px;border-radius:2px;background:"+c+";margin-right:4px;vertical-align:middle;";td0.appendChild(dot);td0.appendChild(document.createTextNode(i+1));var td1=el("td");td1.textContent=p.label;var td2=el("td");var tag=el("span","tag");tag.style.cssText="background:"+c+"18;color:"+c+";border-color:"+c+"44;";tag.textContent=cl(p.cat);td2.appendChild(tag);[td0,td1,td2,el("td",null,String(p.pW)),el("td",null,String(p.pH)),el("td",null,String(p.y)),el("td",null,String(p.x))].forEach(function(t){tr.appendChild(t);});tbody.appendChild(tr);}tbl.appendChild(tbody);tw.appendChild(tbl);pb3.style.padding="0";pb3.appendChild(tw);col.appendChild(p3);dD={flat:flat,strips:strips,total:total,fw:fw};setTimeout(function(){var box=document.getElementById("dscroll");if(!box)return;dB=Math.min(box.clientWidth-4,960)/fw;dS=dB;drw();uzl();iZ();},50);}
+function renderResult(flat,strips,total,eff,ovl,fw,fl,flame){zI=false;var col=document.getElementById("rcol");col.innerHTML="";function mkP(t){var p=document.createElement("div");p.className="panel";var ph=document.createElement("div");ph.className="ph";var pt=document.createElement("span");pt.className="ph-t";pt.textContent=t;var ps=document.createElement("span");ps.style.cssText="font-size:11px;color:#9a9590;";ph.appendChild(pt);ph.appendChild(ps);var pb=document.createElement("div");pb.className="pb";p.appendChild(ph);p.appendChild(pb);return p;}function mkSb(v,l){var sb=document.createElement("div");sb.className="sb";var sv=document.createElement("div");sv.className="sv";sv.textContent=v;var sl=document.createElement("div");sl.className="sl";sl.textContent=l;sb.appendChild(sv);sb.appendChild(sl);return sb;}function el(tag,cls,txt){var e=document.createElement(tag);if(cls)e.className=cls;if(txt)e.textContent=txt;return e;}var p1=mkP("결과 요약"),pb1=p1.querySelector(".pb");var sg=el("div","sg");sg.appendChild(mkSb((total/1000).toFixed(2)+"M","필요 필름 길이"));sg.appendChild(mkSb(total.toLocaleString()+"mm","필요 길이"));sg.appendChild(mkSb(eff+"%","필름 사용률"));pb1.appendChild(sg);if(ovl){var w=el("div","warn");w.textContent="⚠ 필요 길이("+total.toLocaleString()+"mm)가 필름 길이("+fl.toLocaleString()+"mm)를 초과합니다.";pb1.appendChild(w);}if(fl>0){var ur=el("div","urow");ur.innerHTML="<span class='ulbl'>필름 사용</span><div class='ubg'><div class='ufill"+(ovl?" ov":"")+"' style='width:"+Math.min(total/fl*100,100).toFixed(1)+"%'></div></div><span class='uval'>"+((total/fl*100).toFixed(1))+"%</span>";pb1.appendChild(ur);}var info=el("div","info");info.textContent="필름: "+fw+"mm x "+(fl?fl.toLocaleString()+"mm":"미설정")+" | "+(isFlame?"방염":"비방염");pb1.appendChild(info);col.appendChild(p1);var p2=mkP("재단 배치도"),ph2=p2.querySelector(".ph"),pb2=p2.querySelector(".pb");var zc=el("div","zctrl");var zm=el("button","zb");zm.textContent="-";zm.addEventListener("click",function(){zD(0.7);});var zl=el("span","zl");zl.id="zlbl";zl.textContent="100%";var zp=el("button","zb");zp.textContent="+";zp.addEventListener("click",function(){zD(1.4);});var zr=el("button","zb zr");zr.textContent="맞춤";zr.addEventListener("click",function(){rZ();});zc.appendChild(zm);zc.appendChild(zl);zc.appendChild(zp);zc.appendChild(zr);ph2.appendChild(zc);var dbox=el("div","dbox");dbox.id="dscroll";var cv=document.createElement("canvas");cv.id="dcv";dbox.appendChild(cv);var lg=el("div","leg");var cd={};for(var i=0;i<flat.length;i++){if(!cd[flat[i].cat]){cd[flat[i].cat]=true;var c=cc(flat[i].cat);var li=el("div","li");var ld=el("div","ld");ld.style.background=c+"88";ld.style.border="1.5px solid "+c;var ls=el("span");ls.textContent=cl(flat[i].cat);ls.style.color=c;ls.style.fontWeight="700";li.appendChild(ld);li.appendChild(ls);lg.appendChild(li);}}var li2=el("span");li2.style.cssText="margin-left:auto;font-size:10px;color:#9a9590;";li2.textContent=fw+"x"+total+"mm";lg.appendChild(li2);pb2.appendChild(dbox);pb2.appendChild(lg);col.appendChild(p2);var p3=mkP("재단 조각 목록"),pb3=p3.querySelector(".pb");p3.querySelector(".ph").lastChild.textContent=flat.length+"개";var tw=el("div","tw"),tbl=document.createElement("table");var thead=document.createElement("thead"),htr=document.createElement("tr");["#","항목명","카테고리","재단폭mm","재단길이mm","Y위치mm","X위치mm"].forEach(function(h){var th=el("th");th.textContent=h;htr.appendChild(th);});thead.appendChild(htr);tbl.appendChild(thead);var tbody=document.createElement("tbody");for(var i=0;i<flat.length;i++){var p=flat[i],c=cc(p.cat),tr=document.createElement("tr");var td0=el("td");var dot=el("span");dot.style.cssText="display:inline-block;width:9px;height:9px;border-radius:2px;background:"+c+";margin-right:4px;vertical-align:middle;";td0.appendChild(dot);td0.appendChild(document.createTextNode(i+1));var td1=el("td");td1.textContent=p.label;var td2=el("td");var tag=el("span","tag");tag.style.cssText="background:"+c+"18;color:"+c+";border-color:"+c+"44;";tag.textContent=cl(p.cat);td2.appendChild(tag);[td0,td1,td2,el("td",null,String(p.pW)),el("td",null,String(p.pH)),el("td",null,String(p.y)),el("td",null,String(p.x))].forEach(function(t){tr.appendChild(t);});tbody.appendChild(tr);}tbl.appendChild(tbody);tw.appendChild(tbl);pb3.style.padding="0";pb3.appendChild(tw);col.appendChild(p3);dD={flat:flat,strips:strips,total:total,fw:fw};setTimeout(function(){var box=document.getElementById("dscroll");if(!box)return;dB=Math.min(box.clientWidth-4,960)/fw;dS=dB;drw();uzl();iZ();},50);}
 function drw(){if(!dD)return;var flat=dD.flat,strips=dD.strips,total=dD.total,fw=dD.fw;var cv=document.getElementById("dcv");if(!cv)return;var sc=dS,W=Math.round(fw*sc),H=Math.round(total*sc);cv.width=W;cv.height=H;cv.style.width=W+"px";cv.style.height=H+"px";var ctx=cv.getContext("2d");ctx.fillStyle="#141414";ctx.fillRect(0,0,W,H);ctx.strokeStyle="rgba(255,255,255,0.04)";ctx.lineWidth=1;for(var m=100;m<total;m+=100){ctx.beginPath();ctx.moveTo(0,m*sc);ctx.lineTo(W,m*sc);ctx.stroke();}for(var m=100;m<fw;m+=100){ctx.beginPath();ctx.moveTo(m*sc,0);ctx.lineTo(m*sc,H);ctx.stroke();}for(var i=0;i<strips.length;i++){if(strips[i].y>0){var sy=strips[i].y*sc;ctx.strokeStyle="rgba(255,255,255,0.12)";ctx.lineWidth=1;ctx.setLineDash([5,4]);ctx.beginPath();ctx.moveTo(0,sy);ctx.lineTo(W,sy);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle="rgba(255,255,255,0.3)";ctx.font="9px sans-serif";ctx.textAlign="left";ctx.textBaseline="top";ctx.fillText(strips[i].y.toLocaleString()+"mm",3,sy+2);}}var ey=H-1;ctx.strokeStyle="rgba(232,193,74,0.6)";ctx.lineWidth=1.5;ctx.setLineDash([6,4]);ctx.beginPath();ctx.moveTo(0,ey);ctx.lineTo(W,ey);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle="rgba(232,193,74,0.85)";ctx.font="bold 9px sans-serif";ctx.textAlign="left";ctx.textBaseline="bottom";ctx.fillText("▲ "+total.toLocaleString()+"mm",3,ey-2);for(var i=0;i<flat.length;i++){var p=flat[i],c=cc(p.cat);var r=parseInt(c.slice(1,3),16),g=parseInt(c.slice(3,5),16),b=parseInt(c.slice(5,7),16);var x=p.x*sc,y=p.y*sc,w=p.pW*sc,h=p.pH*sc;ctx.fillStyle="rgba("+r+","+g+","+b+",0.28)";ctx.fillRect(x+1,y+1,w-2,h-2);ctx.strokeStyle="rgba("+r+","+g+","+b+",0.9)";ctx.lineWidth=1.5;ctx.strokeRect(x+1,y+1,w-2,h-2);if(w>22&&h>14){ctx.textAlign="center";ctx.textBaseline="middle";var fs=Math.max(7,Math.min(12,w*0.13,h*0.2));ctx.font="700 "+fs+"px sans-serif";ctx.fillStyle="rgba("+r+","+g+","+b+",1)";var sn=p.label.length>9?p.label.slice(0,8)+"…":p.label;ctx.fillText(sn,x+w/2,y+h/2+(h>fs*3?-fs*0.7:0));if(h>fs*3){ctx.font=Math.max(6,fs-1.5)+"px sans-serif";ctx.fillStyle="rgba(255,255,255,0.4)";ctx.fillText(p.pW+"x"+p.pH,x+w/2,y+h/2+fs*0.8);}}}ctx.strokeStyle="rgba(255,255,255,0.2)";ctx.lineWidth=2;ctx.strokeRect(1,1,W-2,H-2);ctx.fillStyle="rgba(232,193,74,0.7)";ctx.font="9px sans-serif";ctx.textAlign="center";ctx.textBaseline="top";ctx.fillText("< "+fw+"mm >",W/2,3);}
 function zD(d){dS=Math.min(Math.max(dB*0.3,dS*d),dB*10);drw();uzl();}
 function rZ(){dS=dB;drw();uzl();}
@@ -536,329 +441,269 @@ function uzl(){var e=document.getElementById("zlbl");if(e)e.textContent=Math.rou
 function iZ(){var box=document.getElementById("dscroll");if(!box||zI)return;zI=true;box.addEventListener("wheel",function(e){e.preventDefault();dS=Math.min(Math.max(dB*0.3,dS*(e.deltaY<0?1.1:0.9)),dB*10);drw();uzl();},{passive:false});var ld=null;box.addEventListener("touchstart",function(e){if(e.touches.length===2)ld=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);},{passive:true});box.addEventListener("touchmove",function(e){if(e.touches.length===2&&ld!==null){e.preventDefault();var d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);dS=Math.min(Math.max(dB*0.3,dS*(d/ld)),dB*10);ld=d;drw();uzl();}},{passive:false});box.addEventListener("touchend",function(){ld=null;},{passive:true});}
 if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(function(){});}
 
-/* ══════════════════════════════════════════════
-   Firebase Auth + 핸드폰 중복 방지 회원가입
-   ★ linkWithCredential 방식 사용:
-     전화 계정을 삭제하지 않고 이메일 credential을
-     연결(link)함으로써 Firebase Auth에 전화번호가
-     영구 유지되어 동일 번호로 재가입 불가.
-     Firestore 이중 체크까지 결합해 완전 차단.
-══════════════════════════════════════════════ */
-var currentUser = null;
-var pendingEmail = '', pendingPw = '', pendingPhone = '', pendingE164 = '', pendingName = '';
-var confirmationResult = null;
-var recaptchaVerifier = null;
-var otpTimerInterval = null;
+/* ══ Firebase Auth ══ */
+var curUser=null;
+var pName='',pEmail='',pPw='',pPhone='',pE164='';
+var cfmResult=null,rcpVerifier=null,timerIv=null;
 
-/* ── 에러/성공 메시지 ── */
-function showAuthError(msg){
-  var el=document.getElementById('authError');
-  el.style.cssText='background:#fff0f0;border:1px solid #ffcccc;color:#c0392b;display:block;border-radius:7px;padding:10px 14px;font-size:12px;margin-bottom:12px;line-height:1.5;';
-  el.textContent=msg;
-}
-function showAuthSuccess(msg){
-  var el=document.getElementById('authError');
-  el.style.cssText='background:#f0fff0;border:1px solid #90EE90;color:#1a7a1a;display:block;border-radius:7px;padding:10px 14px;font-size:12px;margin-bottom:12px;line-height:1.5;';
-  el.textContent=msg;
-}
-function hideAuthMsg(){
-  document.getElementById('authError').style.display='none';
-}
+function showErr(msg){var el=document.getElementById('authMsg');el.style.cssText='background:#fff0f0;border:1px solid #ffcccc;color:#c0392b;display:block;border-radius:7px;padding:10px 14px;font-size:12px;margin-bottom:12px;line-height:1.5;';el.textContent=msg;}
+function showOk(msg){var el=document.getElementById('authMsg');el.style.cssText='background:#f0fff0;border:1px solid #90EE90;color:#1a7a1a;display:block;border-radius:7px;padding:10px 14px;font-size:12px;margin-bottom:12px;line-height:1.5;';el.textContent=msg;}
+function hideMsg(){document.getElementById('authMsg').style.display='none';}
 
-/* ── 탭 전환 ── */
-function switchAuthTab(mode){
+function switchTab(mode){
   document.getElementById('tabLogin').className='auth-tab-btn'+(mode==='login'?' on':'');
   document.getElementById('tabSignup').className='auth-tab-btn'+(mode==='signup'?' on':'');
   document.getElementById('loginForm').style.display=mode==='login'?'block':'none';
   document.getElementById('signupForm').style.display=mode==='signup'?'block':'none';
-  hideAuthMsg();
-  if(mode==='signup') setStep(1);
+  hideMsg();if(mode==='signup')setStep(1);
 }
 
-/* ── 단계 UI 업데이트 ── */
-function setStep(step){
+function setStep(s){
   for(var i=1;i<=3;i++){
-    var s=document.getElementById('signupStep'+i);
-    if(s) s.className='signup-step'+(i===step?' active':'');
-    var dot=document.getElementById('sdot'+i);
-    if(dot){
-      if(i<step) dot.className='step-dot done';
-      else if(i===step) dot.className='step-dot active';
-      else dot.className='step-dot';
-    }
-    var lbl=document.getElementById('slbl'+i);
-    if(lbl) lbl.className='step-label'+(i===step?' active':'');
+    var el=document.getElementById('sStep'+i);if(el)el.className='signup-step'+(i===s?' active':'');
+    var d=document.getElementById('sd'+i);
+    if(d){if(i<s)d.className='step-dot done';else if(i===s)d.className='step-dot active';else d.className='step-dot';}
+    var lb=document.getElementById('slb'+i);if(lb)lb.className='step-lbl'+(i===s?' active':'');
   }
-  for(var i=1;i<=2;i++){
-    var line=document.getElementById('sline'+i);
-    if(line) line.className='step-line'+(i<step?' done':'');
-  }
-  hideAuthMsg();
+  for(var i=1;i<=2;i++){var ln=document.getElementById('sl'+i);if(ln)ln.className='step-line'+(i<s?' done':'');}
+  hideMsg();
 }
 
-/* ── 전화번호 자동 포맷 ── */
-function formatPhone(input){
-  var v=input.value.replace(/\D/g,'');
-  if(v.length<=3) input.value=v;
-  else if(v.length<=7) input.value=v.slice(0,3)+'-'+v.slice(3);
-  else input.value=v.slice(0,3)+'-'+v.slice(3,7)+'-'+v.slice(7,11);
+function fmtPhone(inp){
+  var v=inp.value.replace(/\D/g,'');
+  if(v.length<=3)inp.value=v;
+  else if(v.length<=7)inp.value=v.slice(0,3)+'-'+v.slice(3);
+  else inp.value=v.slice(0,3)+'-'+v.slice(3,7)+'-'+v.slice(7,11);
 }
 
-/* ── reCAPTCHA 초기화 ── */
-function initRecaptcha(){
-  if(recaptchaVerifier) return;
-  try{
-    recaptchaVerifier=new firebase.auth.RecaptchaVerifier('recaptcha-container',{
-      'size':'invisible',
-      'callback':function(){}
-    });
-  }catch(e){ console.error('Recaptcha init error:',e); }
-}
-
-/* ── STEP 1→2: 이름/이메일/비밀번호 검증 ── */
+/* ══ STEP1 → STEP2: 중복 체크 포함 ══ */
 function goStep2(){
-  var name=document.getElementById('signupName').value.trim();
-  var email=document.getElementById('signupEmail').value.trim();
-  var pw=document.getElementById('signupPw').value;
-  var pwc=document.getElementById('signupPwConfirm').value;
-  hideAuthMsg();
-  if(!name){showAuthError('이름을 입력해주세요.');return;}
-  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){showAuthError('올바른 이메일을 입력해주세요.');return;}
-  if(pw.length<6){showAuthError('비밀번호는 6자리 이상이어야 합니다.');return;}
-  if(pw!==pwc){showAuthError('비밀번호가 일치하지 않습니다.');return;}
-  pendingName=name; pendingEmail=email; pendingPw=pw;
-  setStep(2);
-  initRecaptcha();
-}
+  var name=document.getElementById('suName').value.trim();
+  var email=document.getElementById('suEmail').value.trim();
+  var pw=document.getElementById('suPw').value;
+  var pwc=document.getElementById('suPwC').value;
+  var rawPhone=document.getElementById('suPhone').value.replace(/\D/g,'');
+  hideMsg();
+  if(!name){showErr('이름을 입력해주세요.');return;}
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){showErr('올바른 이메일을 입력해주세요.');return;}
+  if(pw.length<6){showErr('비밀번호는 6자리 이상이어야 합니다.');return;}
+  if(pw!==pwc){showErr('비밀번호가 일치하지 않습니다.');return;}
+  if(rawPhone.length<10||rawPhone.length>11){showErr('올바른 핸드폰 번호를 입력해주세요.');return;}
 
-function goStep1(){ setStep(1); }
+  var e164='+82'+(rawPhone.startsWith('0')?rawPhone.slice(1):rawPhone);
+  var btn=document.getElementById('nextBtn');
+  btn.disabled=true;btn.textContent='확인 중...';
 
-/* ── STEP 2: Firestore 중복 체크 후 SMS 발송 ── */
-function sendOtp(){
-  var raw=document.getElementById('signupPhone').value.replace(/\D/g,'');
-  hideAuthMsg();
-  if(raw.length<10||raw.length>11){showAuthError('올바른 핸드폰 번호를 입력해주세요.');return;}
-  var e164='+82'+(raw.startsWith('0')?raw.slice(1):raw);
-  var btn=document.getElementById('sendOtpBtn');
-  btn.disabled=true; btn.textContent='확인 중...';
-
-  /* 1단계: Firestore에서 이미 가입된 번호인지 확인 */
+  /* 전화번호 중복 체크 (Firestore) */
   window._fbCheckPhone(e164)
     .then(function(exists){
       if(exists){
-        btn.disabled=false; btn.textContent='📱 인증번호 받기';
-        showAuthError('이미 가입된 핸드폰 번호입니다. 다른 번호를 사용하거나 로그인해주세요.');
-        return Promise.reject({handled:true});
+        btn.disabled=false;btn.textContent='다음 → 핸드폰 인증';
+        showErr('이미 가입된 핸드폰 번호입니다.\n다른 번호를 사용하거나 로그인해주세요.');
+        return;
       }
-      /* 2단계: 중복 없음 → SMS 발송 */
-      pendingPhone=raw; pendingE164=e164;
-      btn.textContent='발송 중...';
-      if(!recaptchaVerifier) initRecaptcha();
-      return window._fbAuth.signInWithPhoneNumber(e164, recaptchaVerifier);
-    })
-    .then(function(result){
-      confirmationResult=result;
-      var display=raw.replace(/(\d{3})(\d{3,4})(\d{4})/,'$1-$2-$3');
-      document.getElementById('otpPhoneDisplay').textContent=display;
-      setStep(3);
-      startTimer(180);
+      /* 중복 없음 → 정보 저장 후 STEP2 이동 */
+      pName=name;pEmail=email;pPw=pw;pPhone=rawPhone;pE164=e164;
+      /* STEP2 번호 표시 */
+      var disp=rawPhone.replace(/(\d{3})(\d{3,4})(\d{4})/,'$1-$2-$3');
+      document.getElementById('suPhoneDisp').value=disp;
+      btn.disabled=false;btn.textContent='다음 → 핸드폰 인증';
+      setStep(2);
+      initRcp();
     })
     .catch(function(e){
-      if(e && e.handled) return; /* Firestore 중복 감지로 이미 처리됨 */
-      btn.disabled=false; btn.textContent='📱 인증번호 받기';
-      if(recaptchaVerifier){try{recaptchaVerifier.clear();}catch(err){}recaptchaVerifier=null;}
-      if(e.code==='auth/invalid-phone-number') showAuthError('올바르지 않은 핸드폰 번호입니다.');
-      else if(e.code==='auth/too-many-requests') showAuthError('요청이 너무 많습니다. 잠시 후 다시 시도해주세요.');
-      else showAuthError('SMS 발송 실패: '+(e.message||e));
+      btn.disabled=false;btn.textContent='다음 → 핸드폰 인증';
+      showErr('확인 중 오류: '+e.message);
     });
 }
 
-/* ── OTP 타이머 ── */
+function goStep1(){setStep(1);}
+
+function initRcp(){
+  if(rcpVerifier)return;
+  try{rcpVerifier=new firebase.auth.RecaptchaVerifier('recaptcha-container',{'size':'invisible','callback':function(){}});}
+  catch(e){console.error('Rcp error:',e);}
+}
+
+/* STEP2: 인증번호 발송 (중복체크 이미 완료됨) */
+function sendOtp(){
+  hideMsg();
+  if(!pE164){showErr('전화번호 정보가 없습니다. 이전 단계로 돌아가주세요.');return;}
+  var btn=document.getElementById('sendOtpBtn');
+  btn.disabled=true;btn.textContent='발송 중...';
+  if(!rcpVerifier)initRcp();
+  window._fbAuth.signInWithPhoneNumber(pE164,rcpVerifier)
+    .then(function(result){
+      cfmResult=result;
+      var disp=pPhone.replace(/(\d{3})(\d{3,4})(\d{4})/,'$1-$2-$3');
+      document.getElementById('otpDisp').textContent=disp;
+      setStep(3);startTimer(180);
+    })
+    .catch(function(e){
+      btn.disabled=false;btn.textContent='📱 인증번호 받기';
+      if(rcpVerifier){try{rcpVerifier.clear();}catch(err){}rcpVerifier=null;}
+      if(e.code==='auth/invalid-phone-number')showErr('올바르지 않은 번호입니다.');
+      else if(e.code==='auth/too-many-requests')showErr('요청이 너무 많습니다. 잠시 후 다시 시도해주세요.');
+      else showErr('SMS 발송 실패: '+e.message);
+    });
+}
+
+function goStep2back(){
+  setStep(2);
+  var btn=document.getElementById('sendOtpBtn');
+  btn.disabled=false;btn.textContent='📱 인증번호 받기';
+}
+
 function startTimer(sec){
-  clearInterval(otpTimerInterval);
+  clearInterval(timerIv);
   var left=sec;
-  var timerEl=document.getElementById('otpTimer');
-  var resendEl=document.getElementById('resendBtn');
-  resendEl.className='otp-resend-btn disabled';
+  var tEl=document.getElementById('otpTimer');
+  var rBtn=document.getElementById('resendBtn');
+  rBtn.className='resend-btn off';
   function tick(){
     var m=Math.floor(left/60),s=left%60;
-    timerEl.textContent=(m>0?m+'분 ':'')+s+'초';
-    if(left<=0){
-      clearInterval(otpTimerInterval);
-      timerEl.textContent='';
-      resendEl.className='otp-resend-btn';
-    }
+    tEl.textContent=(m>0?m+'분 ':'')+s+'초';
+    if(left<=0){clearInterval(timerIv);tEl.textContent='';rBtn.className='resend-btn';}
     left--;
   }
-  tick();
-  otpTimerInterval=setInterval(tick,1000);
+  tick();timerIv=setInterval(tick,1000);
 }
 
 function handleResend(){
   var btn=document.getElementById('resendBtn');
-  if(btn.className.indexOf('disabled')>=0) return;
-  setStep(2);
-  recaptchaVerifier=null;
-  var sendBtn=document.getElementById('sendOtpBtn');
-  sendBtn.disabled=false; sendBtn.textContent='📱 인증번호 받기';
-  initRecaptcha();
+  if(btn.className.indexOf('off')>=0)return;
+  goStep2back();rcpVerifier=null;initRcp();
 }
 
-/* ── STEP 3: OTP 확인 후 linkWithCredential로 이메일 연결
-   ★ 핵심: 전화 계정을 삭제하지 않고 이메일 credential을 link.
-     → Firebase Auth에 전화번호가 영구 보존되어 재가입 시도 시
-       signInWithPhoneNumber 단계에서 자동으로 동일 번호 감지.
-     → Firestore 체크(sendOtp)와 이중으로 차단.
-── */
-function verifyAndSignup(){
-  var code=document.getElementById('otpInput').value.trim();
-  hideAuthMsg();
-  if(code.length!==6){showAuthError('6자리 인증번호를 입력해주세요.');return;}
-  if(!confirmationResult){showAuthError('인증이 만료됐습니다. 처음부터 다시 시도해주세요.');return;}
-  var btn=document.getElementById('verifyOtpBtn');
-  btn.disabled=true; btn.textContent='확인 중...';
+/* ══ STEP3: OTP 확인 후 가입 (linkWithCredential) ══ */
+function verifyAndJoin(){
+  var code=document.getElementById('otpInp').value.trim();
+  hideMsg();
+  if(code.length!==6){showErr('6자리 인증번호를 입력해주세요.');return;}
+  if(!cfmResult){showErr('인증이 만료됐습니다. 처음부터 다시 시도해주세요.');return;}
+  var btn=document.getElementById('verifyBtn');
+  btn.disabled=true;btn.textContent='확인 중...';
 
-  confirmationResult.confirm(code)
+  cfmResult.confirm(code)
     .then(function(result){
       var phoneUser=result.user;
-      /* 전화 계정에 이메일+비밀번호 credential을 연결(link)
-         → 전화 계정 자체는 삭제되지 않으므로 Firebase Auth에
-           전화번호가 계속 남아 있어 동일 번호 재가입 불가 */
-      var emailCred=firebase.auth.EmailAuthProvider.credential(pendingEmail, pendingPw);
+      /* 이메일 credential을 전화 계정에 link → 전화번호 Firebase Auth에 영구 유지 */
+      var emailCred=firebase.auth.EmailAuthProvider.credential(pEmail,pPw);
       return phoneUser.linkWithCredential(emailCred);
     })
-    .then(function(linkedResult){
-      var user=linkedResult.user;
-      return user.updateProfile({displayName: pendingName})
+    .then(function(linked){
+      var user=linked.user;
+      return user.updateProfile({displayName:pName})
         .then(function(){
-          var phoneDisplay=pendingPhone.replace(/(\d{3})(\d{3,4})(\d{4})/,'$1-$2-$3');
-          return window._fbSaveUser(user.uid, {
-            uid:          user.uid,
-            name:         pendingName,
-            email:        pendingEmail,
-            phone:        pendingE164,
-            phoneDisplay: phoneDisplay,
-            createdAt:    firebase.firestore.FieldValue.serverTimestamp()
+          var disp=pPhone.replace(/(\d{3})(\d{3,4})(\d{4})/,'$1-$2-$3');
+          return window._fbSaveUser(user.uid,{
+            uid:user.uid,name:pName,email:pEmail,
+            phone:pE164,phoneDisplay:disp,
+            createdAt:firebase.firestore.FieldValue.serverTimestamp()
           });
         });
     })
     .then(function(){
-      clearInterval(otpTimerInterval);
+      clearInterval(timerIv);
       enterApp();
     })
     .catch(function(e){
-      btn.disabled=false; btn.textContent='가입 완료';
-      if(e.code==='auth/invalid-verification-code') showAuthError('인증번호가 올바르지 않습니다.');
-      else if(e.code==='auth/code-expired') showAuthError('인증번호가 만료됐습니다. 재전송해주세요.');
-      else if(e.code==='auth/email-already-in-use') showAuthError('이미 사용 중인 이메일입니다.');
-      else if(e.code==='auth/credential-already-in-use') showAuthError('이미 사용 중인 이메일 또는 전화번호입니다.');
-      else if(e.code==='auth/provider-already-linked') showAuthError('이미 연결된 계정입니다.');
-      else showAuthError('가입 실패: '+e.message);
+      btn.disabled=false;btn.textContent='가입 완료';
+      if(e.code==='auth/invalid-verification-code')showErr('인증번호가 올바르지 않습니다.');
+      else if(e.code==='auth/code-expired')showErr('인증번호가 만료됐습니다. 재전송해주세요.');
+      else if(e.code==='auth/email-already-in-use')showErr('이미 사용 중인 이메일입니다.');
+      else if(e.code==='auth/credential-already-in-use')showErr('이미 사용 중인 이메일 또는 전화번호입니다.');
+      else showErr('가입 실패: '+e.message);
     });
 }
 
-/* ── 로그인 ── */
 function doLogin(){
-  var email=document.getElementById('authEmail').value.trim();
-  var pw=document.getElementById('authPw').value;
-  hideAuthMsg();
-  if(typeof window._fbSignIn!=='function'){showAuthError('앱을 초기화 중입니다. 잠시 후 다시 시도해주세요.');return;}
-  if(!email||!pw){showAuthError('이메일과 비밀번호를 입력해주세요.');return;}
-  window._fbSignIn(email,pw).then(function(){
-    enterApp();
-  }).catch(function(e){
+  var email=document.getElementById('loginEmail').value.trim();
+  var pw=document.getElementById('loginPw').value;
+  hideMsg();
+  if(!email||!pw){showErr('이메일과 비밀번호를 입력해주세요.');return;}
+  if(typeof window._fbSignIn!=='function'){showErr('앱 초기화 중입니다. 잠시 후 다시 시도해주세요.');return;}
+  window._fbSignIn(email,pw).then(function(){enterApp();}).catch(function(e){
     if(e.code==='auth/user-not-found'||e.code==='auth/wrong-password'||e.code==='auth/invalid-credential')
-      showAuthError('이메일 또는 비밀번호가 올바르지 않습니다.');
-    else showAuthError('로그인 실패: '+e.message);
+      showErr('이메일 또는 비밀번호가 올바르지 않습니다.');
+    else showErr('로그인 실패: '+e.message);
   });
 }
 
-/* ── Google 로그인 ── */
-function authGoogle(){
-  window._fbGoogleLogin().then(function(){
-    enterApp();
-  }).catch(function(e){
-    if(e.code!=='auth/popup-closed-by-user') showAuthError('Google 로그인 실패: '+e.message);
+function doGoogle(){
+  window._fbGoogleLogin().then(function(){enterApp();}).catch(function(e){
+    if(e.code!=='auth/popup-closed-by-user')showErr('Google 로그인 실패: '+e.message);
   });
 }
 
-/* ── 비밀번호 찾기 ── */
-function authResetPw(){
-  var email=document.getElementById('authEmail').value.trim();
-  if(!email){showAuthError('이메일을 먼저 입력해주세요.');return;}
-  window._fbResetPw(email).then(function(){
-    showAuthSuccess('비밀번호 재설정 이메일을 보냈습니다.');
-  }).catch(function(e){
-    showAuthError('이메일 전송 실패: '+e.message);
-  });
+function doResetPw(){
+  var email=document.getElementById('loginEmail').value.trim();
+  if(!email){showErr('이메일을 먼저 입력해주세요.');return;}
+  window._fbResetPw(email).then(function(){showOk('비밀번호 재설정 이메일을 보냈습니다.');}).catch(function(e){showErr('전송 실패: '+e.message);});
 }
 
-/* ── 앱 진입 ── */
 function enterApp(){
   document.getElementById('authPage').style.display='none';
-  if(currentUser){
-    var display=currentUser.displayName||currentUser.email||currentUser.phoneNumber||'';
-    document.getElementById('userEmail').textContent=display;
+  if(curUser){
+    var d=curUser.displayName||curUser.email||'';
+    document.getElementById('userEmail').textContent=d;
   }
 }
 
-/* ── 로그아웃 ── */
 function doLogout(){
-  showConfirm('로그아웃','로그아웃 하시겠습니까?',function(){
+  showCfm('로그아웃','로그아웃 하시겠습니까?',function(){
     window._fbSignOut().then(function(){
       document.getElementById('authPage').style.display='flex';
       document.getElementById('userEmail').textContent='';
-      switchAuthTab('login');
+      switchTab('login');
     });
   });
 }
 
-/* ── Auth 상태 감지 ── */
-function startAuthListener(){
+function startAuthListen(){
   window._fbOnAuth(function(user){
-    currentUser=user;
-    if(user) enterApp();
+    curUser=user;
+    if(user)enterApp();
     else document.getElementById('authPage').style.display='flex';
   });
 }
-if(window._fbReady) startAuthListener();
-else window._fbReadyCallback=startAuthListener;
+if(window._fbReady)startAuthListen();
+else window._fbReadyCallback=startAuthListen;
 
 /* ══ 브랜드 ══ */
-function selectBrand(btn){var btns=document.getElementById("brandGrid").querySelectorAll(".brand-btn");for(var i=0;i<btns.length;i++)btns[i].className="brand-btn";if(btn.className.indexOf("on")===-1)btn.className="brand-btn on";document.getElementById("brandCustom").value="";}
-function getSelectedBrand(){var custom=document.getElementById("brandCustom").value.trim();if(custom)return custom;var on=document.getElementById("brandGrid").querySelector(".brand-btn.on");return on?on.getAttribute("data-brand"):"";}
-function setSelectedBrand(brand){var btns=document.getElementById("brandGrid").querySelectorAll(".brand-btn");var found=false;for(var i=0;i<btns.length;i++){if(btns[i].getAttribute("data-brand")===brand){btns[i].className="brand-btn on";found=true;}else{btns[i].className="brand-btn";}}if(!found){document.getElementById("brandCustom").value=brand||"";}else{document.getElementById("brandCustom").value="";}}
-function clearBrandBtn(){var btns=document.getElementById("brandGrid").querySelectorAll(".brand-btn");for(var i=0;i<btns.length;i++)btns[i].className="brand-btn";}
+function selBrand(btn){var btns=document.getElementById("brandGrid").querySelectorAll(".brand-btn");for(var i=0;i<btns.length;i++)btns[i].className="brand-btn";if(btn.className.indexOf("on")===-1)btn.className="brand-btn on";document.getElementById("brandCustom").value="";}
+function getBrand(){var c=document.getElementById("brandCustom").value.trim();if(c)return c;var on=document.getElementById("brandGrid").querySelector(".brand-btn.on");return on?on.getAttribute("data-brand"):"";}
+function setBrand(brand){var btns=document.getElementById("brandGrid").querySelectorAll(".brand-btn");var f=false;for(var i=0;i<btns.length;i++){if(btns[i].getAttribute("data-brand")===brand){btns[i].className="brand-btn on";f=true;}else btns[i].className="brand-btn";}if(!f){document.getElementById("brandCustom").value=brand||"";}else document.getElementById("brandCustom").value="";}
+function clrBrand(){var btns=document.getElementById("brandGrid").querySelectorAll(".brand-btn");for(var i=0;i<btns.length;i++)btns[i].className="brand-btn";}
 
 /* ══ 방염/무늬 ══ */
-var isFlame=false;
-function setFlame(val){isFlame=val;var yes=document.getElementById("btn-flameyes"),no=document.getElementById("btn-flameno");if(val){yes.style.background="#e8c14a";yes.style.color="#1a1814";yes.style.borderColor="#e8c14a";no.style.background="rgba(255,255,255,.1)";no.style.color="rgba(255,255,255,.6)";no.style.borderColor="rgba(255,255,255,.25)";}else{no.style.background="#e8c14a";no.style.color="#1a1814";no.style.borderColor="#e8c14a";yes.style.background="rgba(255,255,255,.1)";yes.style.color="rgba(255,255,255,.6)";yes.style.borderColor="rgba(255,255,255,.25)";}}
-var hasPattern=false;
-function setPattern(val){hasPattern=val;var yes=document.getElementById("btn-patternyes"),no=document.getElementById("btn-patternno");if(val){yes.style.background="#e8c14a";yes.style.color="#1a1814";yes.style.borderColor="#e8c14a";no.style.background="rgba(255,255,255,.1)";no.style.color="rgba(255,255,255,.6)";no.style.borderColor="rgba(255,255,255,.25)";}else{no.style.background="#e8c14a";no.style.color="#1a1814";no.style.borderColor="#e8c14a";yes.style.background="rgba(255,255,255,.1)";yes.style.color="rgba(255,255,255,.6)";yes.style.borderColor="rgba(255,255,255,.25)";}}
+var isFlame=false,hasPattern=false;
+function setFlame(v){isFlame=v;var y=document.getElementById("btn-flameyes"),n=document.getElementById("btn-flameno");if(v){y.style.background="#e8c14a";y.style.color="#1a1814";y.style.borderColor="#e8c14a";n.style.background="rgba(255,255,255,.1)";n.style.color="rgba(255,255,255,.6)";n.style.borderColor="rgba(255,255,255,.25)";}else{n.style.background="#e8c14a";n.style.color="#1a1814";n.style.borderColor="#e8c14a";y.style.background="rgba(255,255,255,.1)";y.style.color="rgba(255,255,255,.6)";y.style.borderColor="rgba(255,255,255,.25)";}}
+function setPattern(v){hasPattern=v;var y=document.getElementById("btn-patternyes"),n=document.getElementById("btn-patternno");if(v){y.style.background="#e8c14a";y.style.color="#1a1814";y.style.borderColor="#e8c14a";n.style.background="rgba(255,255,255,.1)";n.style.color="rgba(255,255,255,.6)";n.style.borderColor="rgba(255,255,255,.25)";}else{n.style.background="#e8c14a";n.style.color="#1a1814";n.style.borderColor="#e8c14a";y.style.background="rgba(255,255,255,.1)";y.style.color="rgba(255,255,255,.6)";y.style.borderColor="rgba(255,255,255,.25)";}}
 
-/* ══ 입력 팝업 모달 ══ */
-function showInputModal(label,currentVal,inputType,onConfirm){var overlay=document.getElementById("inputModal");var field=document.getElementById("inputModalField");document.getElementById("inputModalLabel").textContent=label;field.value=currentVal||"";field.type=inputType||"text";if(inputType==="number"&&field.value==="0")field.value="";overlay.style.display="flex";setTimeout(function(){field.focus();field.select();},100);var nc=document.getElementById("inputModalConfirm").cloneNode(true);var nca=document.getElementById("inputModalCancel").cloneNode(true);document.getElementById("inputModalConfirm").parentNode.replaceChild(nc,document.getElementById("inputModalConfirm"));document.getElementById("inputModalCancel").parentNode.replaceChild(nca,document.getElementById("inputModalCancel"));function close(){overlay.style.display="none";}document.getElementById("inputModalConfirm").onclick=function(){var val=document.getElementById("inputModalField").value;close();onConfirm(val);};document.getElementById("inputModalCancel").onclick=close;overlay.onclick=function(e){if(e.target===overlay)close();};document.getElementById("inputModalField").onkeydown=function(e){if(e.key==="Enter")document.getElementById("inputModalConfirm").click();};}
+/* ══ 입력 팝업 ══ */
+function showIM(lbl,val,type,cb){var ov=document.getElementById("inputModal");var fld=document.getElementById("inputFld");document.getElementById("inputLbl").textContent=lbl;fld.value=val||"";fld.type=type||"text";if(type==="number"&&fld.value==="0")fld.value="";ov.style.display="flex";setTimeout(function(){fld.focus();fld.select();},100);var ok=document.getElementById("inputOk").cloneNode(true);var ca=document.getElementById("inputCancel").cloneNode(true);document.getElementById("inputOk").parentNode.replaceChild(ok,document.getElementById("inputOk"));document.getElementById("inputCancel").parentNode.replaceChild(ca,document.getElementById("inputCancel"));function close(){ov.style.display="none";}document.getElementById("inputOk").onclick=function(){var v=document.getElementById("inputFld").value;close();cb(v);};document.getElementById("inputCancel").onclick=close;ov.onclick=function(e){if(e.target===ov)close();};document.getElementById("inputFld").onkeydown=function(e){if(e.key==="Enter")document.getElementById("inputOk").click();};}
 
-/* ══ 커스텀 확인 모달 ══ */
-function showConfirm(title,msg,onConfirm){var overlay=document.getElementById("confirmModal");document.getElementById("modalTitle").textContent=title;document.getElementById("modalMsg").textContent=msg;overlay.style.display="flex";var nc=document.getElementById("modalConfirm").cloneNode(true);var nca=document.getElementById("modalCancel").cloneNode(true);document.getElementById("modalConfirm").parentNode.replaceChild(nc,document.getElementById("modalConfirm"));document.getElementById("modalCancel").parentNode.replaceChild(nca,document.getElementById("modalCancel"));document.getElementById("modalConfirm").onclick=function(){overlay.style.display="none";onConfirm();};document.getElementById("modalCancel").onclick=function(){overlay.style.display="none";};overlay.onclick=function(e){if(e.target===overlay)overlay.style.display="none";};}
+/* ══ 확인 모달 ══ */
+function showCfm(title,msg,cb){var ov=document.getElementById("cfmModal");document.getElementById("cfmTitle").textContent=title;document.getElementById("cfmMsg").textContent=msg;ov.style.display="flex";var y=document.getElementById("cfmYes").cloneNode(true);var n=document.getElementById("cfmNo").cloneNode(true);document.getElementById("cfmYes").parentNode.replaceChild(y,document.getElementById("cfmYes"));document.getElementById("cfmNo").parentNode.replaceChild(n,document.getElementById("cfmNo"));document.getElementById("cfmYes").onclick=function(){ov.style.display="none";cb();};document.getElementById("cfmNo").onclick=function(){ov.style.display="none";};ov.onclick=function(e){if(e.target===ov)ov.style.display="none";};}
 
 /* ══ 검색 ══ */
-function openSearchModal(){var current=document.getElementById("searchBox").value;showInputModal("검색",current,"text",function(v){var box=document.getElementById("searchBox");box.value=v;var clear=document.getElementById("searchClear");if(clear)clear.style.display=v?"block":"none";renderHistory();});}
-function clearSearch(){var box=document.getElementById("searchBox");box.value="";var clear=document.getElementById("searchClear");if(clear)clear.style.display="none";renderHistory();}
+function openSearch(){var cur=document.getElementById("searchBox").value;showIM("검색",cur,"text",function(v){var box=document.getElementById("searchBox");box.value=v;document.getElementById("searchClear").style.display=v?"block":"none";renderHist();});}
+function clrSearch(){document.getElementById("searchBox").value="";document.getElementById("searchClear").style.display="none";renderHist();}
 
-/* ══ 탭 전환 ══ */
-function showTab(tab){document.getElementById("page-calc").className="page"+(tab==="calc"?" on":"");document.getElementById("page-hist").className="page"+(tab==="hist"?" on":"");document.getElementById("tab-calc").className="tab"+(tab==="calc"?" on":"");document.getElementById("tab-hist").className="tab"+(tab==="hist"?" on":"");if(tab==="hist")renderHistory();}
+/* ══ 탭 ══ */
+function showTab(tab){document.getElementById("page-calc").className="page"+(tab==="calc"?" on":"");document.getElementById("page-hist").className="page"+(tab==="hist"?" on":"");document.getElementById("tab-calc").className="tab"+(tab==="calc"?" on":"");document.getElementById("tab-hist").className="tab"+(tab==="hist"?" on":"");if(tab==="hist")renderHist();}
 
-/* ══ 저장/기록 ══ */
-function saveHistory(siteName,clientName,clientPhone,brand,modelName,items,flat,total,eff,fw,fl,flame,pattern){try{var now=new Date();var dateStr=now.getFullYear()+"."+(now.getMonth()+1)+"."+(("0"+now.getDate()).slice(-2))+" "+(("0"+now.getHours()).slice(-2))+":"+(("0"+now.getMinutes()).slice(-2));var record={id:now.getTime(),date:dateStr,siteName:siteName,clientName:clientName,clientPhone:clientPhone,brand:brand,modelName:modelName,items:items,flat:flat,total:total,eff:eff,fw:fw,fl:fl,flame:flame,pattern:pattern};var saved=[];try{saved=JSON.parse(localStorage.getItem("filmHistory")||"[]");}catch(e){}saved.unshift(record);if(saved.length>50)saved=saved.slice(0,50);localStorage.setItem("filmHistory",JSON.stringify(saved));showToast();}catch(e){}}
+/* ══ 기록 ══ */
+function saveHist(sN,cN,cP,br,mn,items,flat,total,eff,fw,fl,flame,pattern){try{var now=new Date();var ds=now.getFullYear()+"."+(now.getMonth()+1)+"."+(("0"+now.getDate()).slice(-2))+" "+(("0"+now.getHours()).slice(-2))+":"+(("0"+now.getMinutes()).slice(-2));var rec={id:now.getTime(),date:ds,siteName:sN,clientName:cN,clientPhone:cP,brand:br,modelName:mn,items:items,flat:flat,total:total,eff:eff,fw:fw,fl:fl,flame:flame,pattern:pattern};var saved=[];try{saved=JSON.parse(localStorage.getItem("filmHistory")||"[]");}catch(e){}saved.unshift(rec);if(saved.length>50)saved=saved.slice(0,50);localStorage.setItem("filmHistory",JSON.stringify(saved));showToast();}catch(e){}}
 function showToast(){var t=document.getElementById("toast");t.className="save-toast show";setTimeout(function(){t.className="save-toast";},2000);}
-function getHistory(){try{return JSON.parse(localStorage.getItem("filmHistory")||"[]");}catch(e){return[];}}
-function renderHistory(){var list=document.getElementById("hist-list");if(!list)return;list.innerHTML="";var keyword=(document.getElementById("searchBox")?document.getElementById("searchBox").value.trim().toLowerCase():"");var all=getHistory();var records=keyword?all.filter(function(r){return(r.siteName||"").toLowerCase().indexOf(keyword)>=0||(r.clientName||"").toLowerCase().indexOf(keyword)>=0||(r.clientPhone||"").toLowerCase().indexOf(keyword)>=0;}):all;if(!records.length){var e=document.createElement("div");e.className="hist-empty";e.innerHTML="<div style='font-size:36px;margin-bottom:10px'>📋</div>아직 저장된 기록이 없어요<br>계산하면 자동으로 저장됩니다";list.appendChild(e);return;}for(var i=0;i<records.length;i++){(function(rec){var card=document.createElement("div");card.className="hcard";var hd=document.createElement("div");hd.className="hcard-head";var left=document.createElement("div");left.style.flex="1";var dt=document.createElement("div");dt.className="hcard-date";dt.textContent=rec.date;var tl=document.createElement("div");tl.className="hcard-title";tl.textContent=rec.siteName||"현장명 없음";var sub=document.createElement("div");sub.style.cssText="font-size:11px;color:#5a5650;margin-top:2px;";sub.textContent=rec.items.length+"개 항목 · "+(rec.total/1000).toFixed(2)+"M · "+rec.eff+"% 사용률";var meta=document.createElement("div");meta.style.cssText="font-size:11px;color:#9a9590;margin-top:3px;display:flex;flex-wrap:wrap;gap:6px;";if(rec.clientName){var s=document.createElement("span");s.textContent="👤 "+rec.clientName;meta.appendChild(s);}if(rec.clientPhone){var s=document.createElement("span");s.textContent="📞 "+rec.clientPhone;meta.appendChild(s);}if(rec.brand||rec.modelName){var s=document.createElement("span");s.textContent="🎨 "+(rec.brand||"")+(rec.modelName?" "+rec.modelName:"");meta.appendChild(s);}var sf=document.createElement("span");sf.textContent=rec.flame?"🔥 방염":"비방염";meta.appendChild(sf);var sp2=document.createElement("span");sp2.textContent=rec.pattern?"🌲 무늬있음":"무늬없음";meta.appendChild(sp2);var badges=document.createElement("div");badges.className="hcard-badges";var catMap={};for(var j=0;j<rec.items.length;j++){var nm=cl(rec.items[j].cat);catMap[nm]=(catMap[nm]||0)+rec.items[j].qty;}for(var nm in catMap){var b=document.createElement("span");b.className="badge";b.textContent=nm+" "+catMap[nm]+"개";badges.appendChild(b);}left.appendChild(dt);left.appendChild(tl);left.appendChild(sub);left.appendChild(meta);left.appendChild(badges);hd.appendChild(left);card.appendChild(hd);var bd=document.createElement("div");bd.className="hcard-body";var info=document.createElement("div");info.style.cssText="font-size:11px;color:#9a9590;margin-bottom:8px;";info.textContent="필름: "+rec.fw+"mm × "+(rec.fl?rec.fl.toLocaleString()+"mm":"미설정")+" | "+(rec.flame?"방염":"비방염");bd.appendChild(info);var btns=document.createElement("div");btns.className="hcard-btns";var lb=document.createElement("button");lb.className="load-btn";lb.textContent="불러오기";lb.onclick=function(){loadRecord(rec);};var db=document.createElement("button");db.className="del-btn2";db.textContent="삭제";db.onclick=function(){showConfirm("기록 삭제","이 기록을 삭제할까요?\n삭제 후 복구할 수 없습니다.",function(){var saved=getHistory();saved=saved.filter(function(r){return r.id!==rec.id;});localStorage.setItem("filmHistory",JSON.stringify(saved));renderHistory();});};btns.appendChild(lb);btns.appendChild(db);bd.appendChild(btns);card.appendChild(bd);list.appendChild(card);})(records[i]);}}
-function loadRecord(rec){IDS=[];seq=0;document.getElementById("ilist").innerHTML="";document.getElementById("icnt").textContent="0개";document.getElementById("fw").value=rec.fw;document.getElementById("fl").value=rec.fl?rec.fl/1000:0;document.getElementById("siteName").value=rec.siteName||"";document.getElementById("clientName").value=rec.clientName||"";document.getElementById("clientPhone").value=rec.clientPhone||"";document.getElementById("modelName").value=rec.modelName||"";setSelectedBrand(rec.brand||"");setFlame(rec.flame||false);isFlame=rec.flame||false;setPattern(rec.pattern||false);hasPattern=rec.pattern||false;for(var i=0;i<rec.items.length;i++){var it=rec.items[i];addItemData(it.cat,it.pW,it.pL,it.name,it.qty);}showTab("calc");setTimeout(function(){renderResult(rec.flat,[],rec.total,rec.eff,rec.fl>0&&rec.total>rec.fl,rec.fw,rec.fl,rec.flame||false);},100);alert("불러왔어요! 항목을 확인하고 다시 계산할 수 있어요.");}
-function addItemData(cat,pW,pL,name,qty){seq++;var id="item"+seq;IDS.push(id);var card=document.createElement("div");card.className="icard";card.id=id;var head=document.createElement("div");head.className="ich";var num=document.createElement("div");num.className="inum";num.style.background=cc(cat);num.textContent=IDS.length;var ni=document.createElement("input");ni.className="iname";ni.type="text";ni.placeholder="이름 입력";ni.readOnly=true;ni.addEventListener("click",function(){var self=this;showInputModal("항목 이름",self.value,"text",function(v){self.value=v;});});ni.value=name||"";var db=document.createElement("button");db.className="dbtn";db.textContent="X";db.setAttribute("data-id",id);db.addEventListener("click",function(){delItem(this.getAttribute("data-id"));});head.appendChild(num);head.appendChild(ni);head.appendChild(db);var body=document.createElement("div");body.className="icb";var cg=document.createElement("div");cg.className="cgrid";for(var i=0;i<CATS.length;i++){(function(c,cg,num){var b=document.createElement("button");b.className="cb"+(c.id===cat?" on":"");b.textContent=c.lb;b.setAttribute("data-c",c.id);b.addEventListener("click",function(){var bs=cg.querySelectorAll(".cb");for(var j=0;j<bs.length;j++)bs[j].className="cb";this.className="cb on";num.style.background=cc(this.getAttribute("data-c"));});cg.appendChild(b);})(CATS[i],cg,num);}var dr=document.createElement("div");dr.className="drow";function mk(lbl,cls,val,def){var w=document.createElement("div");w.className="dw";var l=document.createElement("label");l.textContent=lbl;var inp=document.createElement("input");inp.type="number";inp.className=cls;inp.value=val;var dv=String(def);inp.addEventListener("focus",function(){if(this.value===dv)this.value="";});inp.addEventListener("blur",function(){if(this.value==="")this.value=dv;});var u=document.createElement("div");u.className="du";u.textContent=cls==="iq"?"개":"mm";w.appendChild(l);w.appendChild(inp);w.appendChild(u);return w;}dr.appendChild(mk("폭 (W)","iw",pW,0));dr.appendChild(mk("길이 (L)","il",pL,0));dr.appendChild(mk("수량","iq",qty||1,1));body.appendChild(cg);body.appendChild(dr);card.appendChild(head);card.appendChild(body);document.getElementById("ilist").appendChild(card);document.getElementById("icnt").textContent=IDS.length+"개";}
+function getHist(){try{return JSON.parse(localStorage.getItem("filmHistory")||"[]");}catch(e){return[];}}
+function renderHist(){var list=document.getElementById("hist-list");if(!list)return;list.innerHTML="";var kw=(document.getElementById("searchBox")?document.getElementById("searchBox").value.trim().toLowerCase():"");var all=getHist();var recs=kw?all.filter(function(r){return(r.siteName||"").toLowerCase().indexOf(kw)>=0||(r.clientName||"").toLowerCase().indexOf(kw)>=0||(r.clientPhone||"").toLowerCase().indexOf(kw)>=0;}):all;if(!recs.length){var e=document.createElement("div");e.className="hist-empty";e.innerHTML="<div style='font-size:36px;margin-bottom:10px'>📋</div>아직 저장된 기록이 없어요<br>계산하면 자동으로 저장됩니다";list.appendChild(e);return;}for(var i=0;i<recs.length;i++){(function(rec){var card=document.createElement("div");card.className="hcard";var hd=document.createElement("div");hd.className="hcard-head";var left=document.createElement("div");left.style.flex="1";var dt=document.createElement("div");dt.className="hcard-date";dt.textContent=rec.date;var tl=document.createElement("div");tl.className="hcard-title";tl.textContent=rec.siteName||"현장명 없음";var sub=document.createElement("div");sub.style.cssText="font-size:11px;color:#5a5650;margin-top:2px;";sub.textContent=rec.items.length+"개 항목 · "+(rec.total/1000).toFixed(2)+"M · "+rec.eff+"% 사용률";var meta=document.createElement("div");meta.style.cssText="font-size:11px;color:#9a9590;margin-top:3px;display:flex;flex-wrap:wrap;gap:6px;";if(rec.clientName){var s=document.createElement("span");s.textContent="👤 "+rec.clientName;meta.appendChild(s);}if(rec.clientPhone){var s=document.createElement("span");s.textContent="📞 "+rec.clientPhone;meta.appendChild(s);}if(rec.brand||rec.modelName){var s=document.createElement("span");s.textContent="🎨 "+(rec.brand||"")+(rec.modelName?" "+rec.modelName:"");meta.appendChild(s);}var sf=document.createElement("span");sf.textContent=rec.flame?"🔥 방염":"비방염";meta.appendChild(sf);var sp=document.createElement("span");sp.textContent=rec.pattern?"🌲 무늬있음":"무늬없음";meta.appendChild(sp);var badges=document.createElement("div");badges.className="hcard-badges";var cm={};for(var j=0;j<rec.items.length;j++){var nm=cl(rec.items[j].cat);cm[nm]=(cm[nm]||0)+rec.items[j].qty;}for(var nm in cm){var b=document.createElement("span");b.className="badge";b.textContent=nm+" "+cm[nm]+"개";badges.appendChild(b);}left.appendChild(dt);left.appendChild(tl);left.appendChild(sub);left.appendChild(meta);left.appendChild(badges);hd.appendChild(left);card.appendChild(hd);var bd=document.createElement("div");bd.className="hcard-body";var info=document.createElement("div");info.style.cssText="font-size:11px;color:#9a9590;margin-bottom:8px;";info.textContent="필름: "+rec.fw+"mm x "+(rec.fl?rec.fl.toLocaleString()+"mm":"미설정")+" | "+(rec.flame?"방염":"비방염");bd.appendChild(info);var btns=document.createElement("div");btns.className="hcard-btns";var lb=document.createElement("button");lb.className="load-btn";lb.textContent="불러오기";lb.onclick=function(){loadRec(rec);};var db=document.createElement("button");db.className="del-btn2";db.textContent="삭제";db.onclick=function(){showCfm("기록 삭제","이 기록을 삭제할까요?\n삭제 후 복구할 수 없습니다.",function(){var saved=getHist();saved=saved.filter(function(r){return r.id!==rec.id;});localStorage.setItem("filmHistory",JSON.stringify(saved));renderHist();});};btns.appendChild(lb);btns.appendChild(db);bd.appendChild(btns);card.appendChild(bd);list.appendChild(card);})(recs[i]);}}
+function loadRec(rec){IDS=[];seq=0;document.getElementById("ilist").innerHTML="";document.getElementById("icnt").textContent="0개";document.getElementById("fw").value=rec.fw;document.getElementById("fl").value=rec.fl?rec.fl/1000:0;document.getElementById("siteName").value=rec.siteName||"";document.getElementById("clientName").value=rec.clientName||"";document.getElementById("clientPhone").value=rec.clientPhone||"";document.getElementById("modelName").value=rec.modelName||"";setBrand(rec.brand||"");setFlame(rec.flame||false);isFlame=rec.flame||false;setPattern(rec.pattern||false);hasPattern=rec.pattern||false;for(var i=0;i<rec.items.length;i++){var it=rec.items[i];addItemData(it.cat,it.pW,it.pL,it.name,it.qty);}showTab("calc");setTimeout(function(){renderResult(rec.flat,[],rec.total,rec.eff,rec.fl>0&&rec.total>rec.fl,rec.fw,rec.fl,rec.flame||false);},100);alert("불러왔어요!");}
+function addItemData(cat,pW,pL,name,qty){seq++;var id="item"+seq;IDS.push(id);var card=document.createElement("div");card.className="icard";card.id=id;var head=document.createElement("div");head.className="ich";var num=document.createElement("div");num.className="inum";num.style.background=cc(cat);num.textContent=IDS.length;var ni=document.createElement("input");ni.className="iname";ni.type="text";ni.readOnly=true;ni.addEventListener("click",function(){var self=this;showIM("항목 이름",self.value,"text",function(v){self.value=v;});});ni.value=name||"";var db=document.createElement("button");db.className="dbtn";db.textContent="X";db.setAttribute("data-id",id);db.addEventListener("click",function(){delItem(this.getAttribute("data-id"));});head.appendChild(num);head.appendChild(ni);head.appendChild(db);var body=document.createElement("div");body.className="icb";var cg=document.createElement("div");cg.className="cgrid";for(var i=0;i<CATS.length;i++){(function(c,cg,num){var b=document.createElement("button");b.className="cb"+(c.id===cat?" on":"");b.textContent=c.lb;b.setAttribute("data-c",c.id);b.addEventListener("click",function(){var bs=cg.querySelectorAll(".cb");for(var j=0;j<bs.length;j++)bs[j].className="cb";this.className="cb on";num.style.background=cc(this.getAttribute("data-c"));});cg.appendChild(b);})(CATS[i],cg,num);}var dr=document.createElement("div");dr.className="drow";function mk(lbl,cls,val,def){var w=document.createElement("div");w.className="dw";var l=document.createElement("label");l.textContent=lbl;var inp=document.createElement("input");inp.type="number";inp.className=cls;inp.value=val;var dv=String(def);inp.addEventListener("focus",function(){if(this.value===dv)this.value="";});inp.addEventListener("blur",function(){if(this.value==="")this.value=dv;});var u=document.createElement("div");u.className="du";u.textContent=cls==="iq"?"개":"mm";w.appendChild(l);w.appendChild(inp);w.appendChild(u);return w;}dr.appendChild(mk("폭 (W)","iw",pW,0));dr.appendChild(mk("길이 (L)","il",pL,0));dr.appendChild(mk("수량","iq",qty||1,1));body.appendChild(cg);body.appendChild(dr);card.appendChild(head);card.appendChild(body);document.getElementById("ilist").appendChild(card);document.getElementById("icnt").textContent=IDS.length+"개";}
 
 function init(){document.getElementById("addBtn").onclick=addItem;document.getElementById("calcBtn").onclick=calculate;addItem();}
-if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",init);
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);
 else init();
 </script>
 </body>
