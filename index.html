@@ -126,6 +126,17 @@ body{background:#faf7f2;color:#2a2420;font-family:-apple-system,BlinkMacSystemFo
 .ftbtn{padding:4px 9px;border-radius:4px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.07);color:rgba(255,255,255,.5);font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;}
 .pat-btn{padding:5px 12px;font-size:12px;border-radius:6px;}
 .pat-btn.on{background:#27ae60;color:#fff;border-color:#27ae60;font-weight:700;}
+/* 패턴 선택 바 */
+.pbar{background:#1e1c18;padding:8px 12px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #2a2820;}
+.pbar-lbl{font-size:10px;color:rgba(255,255,255,.5);font-weight:700;letter-spacing:1px;text-transform:uppercase;white-space:nowrap;flex-shrink:0;}
+.pbar-btns{display:flex;gap:6px;flex:1;}
+.pbtn{flex:1;padding:7px 10px;border-radius:8px;border:1.5px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);cursor:pointer;display:flex;align-items:center;gap:8px;transition:all .2s;}
+.pbtn.on{background:#1a5c8a;border-color:#2980b9;}
+.pbtn-icon{font-size:18px;flex-shrink:0;line-height:1;}
+.pbtn-txt{font-size:13px;font-weight:700;color:rgba(255,255,255,.5);white-space:nowrap;}
+.pbtn.on .pbtn-txt{color:#fff;}
+.pbtn-sub{font-size:10px;color:rgba(255,255,255,.3);white-space:nowrap;}
+.pbtn.on .pbtn-sub{color:rgba(255,255,255,.6);}
 .ftbtn.on{background:#e8c14a;color:#1a1814;border-color:#e8c14a;font-weight:700;}
 
 /* 레이아웃 */
@@ -442,12 +453,21 @@ tr:hover td{background:#faf7f2;}
       <button class="ftbtn" id="flameN" onclick="setFlame(false)">비방염</button>
     </div>
   </div>
-  <div class="fbar-group">
-    <span class="flbl" style="color:rgba(255,255,255,.8);font-weight:700;">패턴</span>
-    <div class="fbar-toggle">
-      <button class="ftbtn pat-btn" id="patY" onclick="setPat(true)">🌲 있음</button>
-      <button class="ftbtn pat-btn on" id="patN" onclick="setPat(false)">없음</button>
-    </div>
+</div>
+<!-- 패턴 선택 바 - 별도 분리 -->
+<div class="pbar">
+  <span class="pbar-lbl">나무 패턴</span>
+  <div class="pbar-btns">
+    <button class="pbtn" id="patY" onclick="setPat(true)">
+      <span class="pbtn-icon">🌲</span>
+      <span class="pbtn-txt">패턴 있음</span>
+      <span class="pbtn-sub">무늬 방향 고정</span>
+    </button>
+    <button class="pbtn on" id="patN" onclick="setPat(false)">
+      <span class="pbtn-icon">◻</span>
+      <span class="pbtn-txt">패턴 없음</span>
+      <span class="pbtn-sub">자유 회전 최적화</span>
+    </button>
   </div>
 </div>
 <div class="wrap">
@@ -829,77 +849,65 @@ function doJoin(){
   var btn=document.getElementById('verifyBtn');
   btn.disabled=true;btn.textContent='확인 중...';
 
+  var _phoneUser=null;
+
+  /* STEP1: OTP 확인 */
   cfmResult.confirm(code)
-    .then(function(result){
-      var phoneUser=result.user;
+  .then(function(result){
+    _phoneUser=result.user;
 
-      /* 1차: providerData (실제번호) */
-      var alreadyJoined=phoneUser.providerData.some(function(p){
-        return p.providerId==='password';
-      });
-      if(alreadyJoined){
-        return window._auth.signOut().then(function(){
-          return Promise.reject({code:'phone/already-exists'});
-        });
-      }
+    /* STEP2: Firestore에서 전화번호 중복 확인 */
+    return window._db.collection('users').where('phone','==',pE164).limit(1).get();
+  })
+  .then(function(snap){
+    /* 전화번호 이미 존재 → 즉시 차단 */
+    if(!snap.empty){
+      return _phoneUser.delete().catch(function(){})
+        .then(function(){return window._auth.signOut().catch(function(){});})
+        .then(function(){return Promise.reject({code:'phone/already-exists'});});
+    }
 
-      /* 2차: Firestore phone 체크 - 오류나도 진행 금지 */
-      return window._db.collection('users').where('phone','==',pE164).limit(1).get()
-        .then(function(snap){
-          if(!snap.empty){
-            return window._auth.signOut().then(function(){
-              return Promise.reject({code:'phone/already-exists'});
-            });
-          }
-          /* 통과: 전화계정 삭제 → 이메일 계정 생성 */
-          return phoneUser.delete().then(function(){
-            return window._auth.createUserWithEmailAndPassword(pEmail,pPw);
-          });
-        })
-        .catch(function(err){
-          /* Firestore 오류(permission-denied 등) → 안전하게 차단 */
-          if(err.code==='phone/already-exists'||err.code==='auth/email-already-in-use'){
-            return Promise.reject(err);
-          }
-          /* Firestore 읽기 실패 → 가입 진행 불가, 규칙 설정 안내 */
-          return window._auth.signOut().then(function(){
-            return Promise.reject({
-              code:'firestore/rules-error',
-              message:'Firestore 규칙 오류 - Firebase Console에서 allow read: if true 설정 필요'
-            });
-          });
-        });
-    })
-    .then(function(cred){
-      var user=cred.user;
-      return user.updateProfile({displayName:pName}).then(function(){
-        var disp=pPhone.replace(/(\d{3})(\d{3,4})(\d{4})/,'$1-$2-$3');
-        return window._saveUser(user.uid,{
-          uid:user.uid,name:pName,email:pEmail,
-          phone:pE164,phoneDisplay:disp,
-          createdAt:firebase.firestore.FieldValue.serverTimestamp()
-        });
+    /* STEP3: 전화 임시계정 삭제 */
+    return _phoneUser.delete();
+  })
+  .then(function(){
+    /* STEP4: 이메일 계정 생성 (이메일 중복이면 여기서 차단) */
+    return window._auth.createUserWithEmailAndPassword(pEmail,pPw);
+  })
+  .then(function(cred){
+    /* STEP5: 프로필 업데이트 + Firestore 저장 */
+    var user=cred.user;
+    var disp=pPhone.replace(/(\d{3})(\d{3,4})(\d{4})/,'$1-$2-$3');
+    return user.updateProfile({displayName:pName}).then(function(){
+      return window._saveUser(user.uid,{
+        uid:user.uid,name:pName,email:pEmail,
+        phone:pE164,phoneDisplay:disp,
+        createdAt:firebase.firestore.FieldValue.serverTimestamp()
       });
-    })
-    .then(function(){
-      clearInterval(timerIv);
-      enterApp();
-    })
-    .catch(function(e){
-      btn.disabled=false;btn.textContent='가입 완료';
-      if(e.code==='phone/already-exists'){
-        showErr('이미 가입된 전화번호입니다.\n다른 번호를 사용하거나 로그인해주세요.');
-      } else if(e.code==='auth/invalid-verification-code'){
-        showErr('인증번호가 올바르지 않습니다. 다시 확인해주세요.');
-      } else if(e.code==='auth/code-expired'){
-        showErr('인증번호가 만료됐습니다. 재전송해주세요.');
-      } else if(e.code==='auth/email-already-in-use'){
-        showErr('이미 사용 중인 이메일입니다.\n로그인하거나 다른 이메일을 사용해주세요.');
-      } else {
-        showErr('가입 실패: '+(e.message||e.code||'알 수 없는 오류'));
-        console.error('doJoin error:',e.code,e.message);
-      }
     });
+  })
+  .then(function(){
+    clearInterval(timerIv);
+    enterApp();
+  })
+  .catch(function(e){
+    btn.disabled=false;btn.textContent='가입 완료';
+    var code=e.code||'';
+    if(code==='phone/already-exists'){
+      showErr('이미 가입된 전화번호입니다.\n다른 번호를 사용하거나 로그인해주세요.');
+    } else if(code==='auth/invalid-verification-code'){
+      showErr('인증번호가 올바르지 않습니다.');
+    } else if(code==='auth/code-expired'){
+      showErr('인증번호가 만료됐습니다. 재전송해주세요.');
+    } else if(code==='auth/email-already-in-use'){
+      showErr('이미 사용 중인 이메일입니다.\n다른 이메일을 사용하거나 로그인해주세요.');
+    } else if(code==='permission-denied'||code==='firestore/permission-denied'){
+      showErr('설정 오류: Firebase Console → Firestore → 규칙에서\nallow read: if true 를 설정해주세요.');
+    } else {
+      showErr('가입 실패: '+(e.message||code||'알 수 없는 오류'));
+      console.error('doJoin error:',code,e.message,e);
+    }
+  });
 }
 
 function doLogin(){
@@ -961,7 +969,12 @@ function clrBrand(){var btns=document.getElementById("brandGrid").querySelectorA
 /* ══ 방염/패턴 ══ */
 var isFlame=false,hasPat=false;
 function setFlame(v){isFlame=v;var y=document.getElementById("flameY"),n=document.getElementById("flameN");y.className="ftbtn"+(v?" on":"");n.className="ftbtn"+(!v?" on":"");}
-function setPat(v){hasPat=v;var y=document.getElementById("patY"),n=document.getElementById("patN");y.className="ftbtn pat-btn"+(v?" on":"");n.className="ftbtn pat-btn"+(!v?" on":"");}
+function setPat(v){
+  hasPat=v;
+  var y=document.getElementById("patY"),n=document.getElementById("patN");
+  y.className="pbtn"+(v?" on":"");
+  n.className="pbtn"+(!v?" on":"");
+}
 
 /* ══ 입력 팝업 ══ */
 function showIM(lbl,val,type,cb){
