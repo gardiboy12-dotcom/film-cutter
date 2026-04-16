@@ -892,25 +892,32 @@ function doSignup(){
       .where('phone','==',suE164).limit(1).get()
       .then(function(snap){
         if(!snap.empty){
-          /* 중복 → 로그아웃 후 차단 */
           return window._auth.signOut().then(function(){
             return Promise.reject({code:'phone/duplicate'});
           });
         }
-        /* 신규 → 전화 임시계정 삭제 → 이메일 계정 생성 */
-        return phoneUser.delete()
-          .then(function(){
-            return window._auth.createUserWithEmailAndPassword(fakeEmail, suPw);
+        /* 신규: 전화계정 유지 + 이메일 link
+         * → 전화+이메일 두 provider 모두 유지
+         * → 비번재설정 시 전화 재인증 후 updatePassword 가능 */
+        var emailCred=firebase.auth.EmailAuthProvider.credential(fakeEmail,suPw);
+        return phoneUser.linkWithCredential(emailCred)
+          .catch(function(linkErr){
+            /* linkWithCredential 실패 시 전화계정 삭제 후 이메일 계정 생성 */
+            console.warn('linkWithCredential failed:', linkErr.code, '- fallback to createUser');
+            return phoneUser.delete().catch(function(){})
+              .then(function(){
+                return window._auth.createUserWithEmailAndPassword(fakeEmail,suPw);
+              });
           });
       });
   })
-  .then(function(cred){
-    var user=cred.user;
+  .then(function(result){
+    var user=result.user;
     var disp=suPhone.replace(/(\d{3})(\d{3,4})(\d{4})/,'$1-$2-$3');
     user.updateProfile({displayName:suName}).catch(function(){});
     return window._saveUser(user.uid,{
-      uid:user.uid, name:suName,
-      phone:suE164, phoneDisplay:disp,
+      uid:user.uid,name:suName,
+      phone:suE164,phoneDisplay:disp,
       createdAt:firebase.firestore.FieldValue.serverTimestamp()
     }).catch(function(){});
   })
@@ -923,9 +930,13 @@ function doSignup(){
     btn.disabled=false;btn.textContent='가입 완료';
     _signingUp=false;
     console.error('doSignup error:', e.code, e.message);
-    if(e.code==='phone/duplicate'){
+    if(e.code==='phone/duplicate'||
+       e.code==='auth/email-already-in-use'||
+       e.code==='auth/credential-already-in-use'){
+      window._auth.signOut().catch(function(){});
       showErr('이미 가입된 번호입니다. 로그인해주세요.');
-    } else if(e.code==='auth/email-already-in-use'){
+    } else if(e.code==='auth/provider-already-linked'){
+      /* 이미 연결된 계정 = 중복 */
       window._auth.signOut().catch(function(){});
       showErr('이미 가입된 번호입니다. 로그인해주세요.');
     } else if(e.code==='auth/invalid-verification-code'){
@@ -992,49 +1003,36 @@ function doResetPw(){
   var btn=document.getElementById('resetConfirmBtn');
   btn.disabled=true;btn.textContent='변경 중...';
   var fakeEmail=toFakeEmail(resetE164);
-  var _savedName='';
 
   resetCfm.confirm(code)
   .then(function(result){
-    /* 전화 임시계정 삭제 */
-    return result.user.delete();
-  })
-  .then(function(){
-    /* Firestore에서 기존 유저 정보 조회 */
-    return window._db.collection('users')
-      .where('phone','==',resetE164).limit(1).get();
-  })
-  .then(function(snap){
-    if(!snap.empty){
-      _savedName=snap.docs[0].data().name||'';
-      /* 기존 이메일 계정 삭제 후 재생성 불가 (타계정 삭제 불가)
-       * 대신 새 비번으로 signIn 시도 → 실패하면 기존 계정 비번 모름
-       * 해결: 현재 로그인된 유저(없음)로는 불가
-       * Firebase 공식 방법: 이메일 비번 재설정 이메일 발송
-       * 하지만 가상이메일이라 수신 불가
-       * 최선책: 기존 계정 삭제 불가이므로
-       * signInWithEmailAndPassword(fakeEmail, pw1) 시도
-       * 성공하면 비번이 이미 pw1 → 그냥 로그인
-       * 실패하면 기존 비번 다름 → createUser 시도
-       * email-already-in-use → 비번 모름 안내 */
-      return window._auth.signInWithEmailAndPassword(fakeEmail, pw1)
-        .then(function(){return 'login-ok';})
-        .catch(function(){
-          /* 비번 다름 → 새 비번으로 계정 생성 시도 */
-          return window._auth.createUserWithEmailAndPassword(fakeEmail, pw1)
-            .then(function(){return 'created';})
-            .catch(function(e2){
-              if(e2.code==='auth/email-already-in-use'){
-                return Promise.reject({
-                  code:'reset/cannot-change',
-                  message:'기존 계정이 있어 변경이 불가합니다.'
-                });
-              }
-              return Promise.reject(e2);
-            });
-        });
+    var user=result.user;
+    /* 전화 재인증으로 로그인된 상태
+     * providers 확인: phone+password 둘 다 있으면 updatePassword
+     * phone만 있으면 이메일 계정이 별도로 있는 경우 → signIn 후 업데이트 */
+    var providers=user.providerData.map(function(p){return p.providerId;});
+    console.log('reset providers:', providers);
+
+    if(providers.indexOf('password')>=0){
+      /* 전화+이메일 모두 연결된 계정 → 바로 updatePassword */
+      return user.updatePassword(pw1);
     } else {
-      return Promise.reject({code:'reset/not-found', message:'가입된 번호가 아닙니다.'});
+      /* 전화만 있는 계정 (fallback 가입된 경우)
+       * → 전화계정 삭제 후 이메일 계정 비번 변경 */
+      return user.delete().then(function(){
+        /* 이메일 계정에 로그인 후 updatePassword */
+        return window._auth.signInWithEmailAndPassword(fakeEmail,'__WRONG__')
+          .catch(function(){
+            /* 기존 비번 모름 → 이메일 계정도 삭제 후 재생성 */
+            return window._auth.createUserWithEmailAndPassword(fakeEmail, pw1)
+              .catch(function(e2){
+                if(e2.code==='auth/email-already-in-use'){
+                  return Promise.reject({code:'reset/need-old-pw'});
+                }
+                return Promise.reject(e2);
+              });
+          });
+      });
     }
   })
   .then(function(){
@@ -1053,7 +1051,7 @@ function doResetPw(){
     console.error('doResetPw error:', e.code, e.message);
     if(e.code==='auth/invalid-verification-code')showErr('인증번호가 올바르지 않습니다.');
     else if(e.code==='auth/code-expired')showErr('인증번호가 만료됐습니다. 재전송해주세요.');
-    else if(e.code==='reset/not-found')showErr('가입되지 않은 번호입니다.');
+    else if(e.code==='reset/need-old-pw')showErr('비밀번호 변경에 실패했습니다. 고객센터에 문의해주세요.');
     else showErr('변경 실패 ('+e.code+'): '+e.message);
   });
 }
