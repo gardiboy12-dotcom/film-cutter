@@ -105,7 +105,7 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;}
-body{background:#f4f1ec;color:#1e1b18;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding-bottom:56px;}
+body{background:#f4f1ec;color:#1e1b18;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding-bottom:72px;}
 
 /* ── 공통 컨테이너 ── */
 .container{max-width:640px;margin:0 auto;padding:0 14px;}
@@ -124,13 +124,22 @@ body{background:#f4f1ec;color:#1e1b18;font-family:-apple-system,BlinkMacSystemFo
 .fbar{background:#2a2620;border-bottom:1px solid #3a3530;}
 .fbar-inner{max-width:640px;margin:0 auto;padding:12px 14px;display:flex;align-items:center;gap:10px;flex-wrap:nowrap;}
 .flbl{font-size:11px;color:rgba(255,255,255,.5);white-space:nowrap;font-weight:600;}
-.fbar-inp{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;color:#fff;font-size:14px;font-weight:700;padding:7px 8px;text-align:center;width:70px;cursor:pointer;}
+
 .fbar-inp:focus{outline:none;}
 .funit{font-size:10px;color:rgba(255,255,255,.35);}
 .fbar-group{display:flex;align-items:center;gap:5px;}
 .fbar-toggle{display:flex;gap:3px;}
 .ftbtn{padding:6px 12px;border-radius:6px;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.45);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s;}
 .ftbtn.on{background:#e8c14a;color:#1e1b18;border-color:#e8c14a;font-weight:700;}
+
+
+/* 필름바 박스 */
+.fbar-box{display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:6px 10px;cursor:pointer;flex-shrink:0;transition:background .15s;}
+.fbar-box:active{background:rgba(255,255,255,.18);}
+.fbar-box-lbl{font-size:10px;color:rgba(255,255,255,.5);font-weight:600;}
+.fbar-box-val{font-size:15px;font-weight:700;color:#fff;min-width:32px;text-align:center;}
+.fbar-box-unit{font-size:10px;color:rgba(255,255,255,.4);}
+.fbar-sep{width:1px;height:22px;background:rgba(255,255,255,.15);margin:0 4px;flex-shrink:0;}
 
 /* ── 패턴 바 ── */
 .pbar{background:#242018;border-bottom:1px solid #3a3530;}
@@ -146,7 +155,7 @@ body{background:#f4f1ec;color:#1e1b18;font-family:-apple-system,BlinkMacSystemFo
 .pbtn.on .pbtn-sub{color:rgba(255,255,255,.5);}
 
 /* ── 메인 레이아웃 ── */
-.wrap{max-width:640px;margin:0 auto;padding:12px 14px;display:flex;flex-direction:column;gap:10px;}
+.wrap{max-width:640px;margin:0 auto;padding:12px 14px 72px;display:flex;flex-direction:column;gap:10px;}
 @media(min-width:900px){
   .wrap{max-width:1200px;display:grid;grid-template-columns:360px 1fr;align-items:start;gap:16px;padding:16px 14px;}
   .container,.fbar-inner,.pbar-inner,.hdr-inner{max-width:1200px;}
@@ -155,17 +164,17 @@ body{background:#f4f1ec;color:#1e1b18;font-family:-apple-system,BlinkMacSystemFo
 /* ── 카드 ── */
 .card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06);}
 .card-head{padding:10px 14px;background:#edeae4;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ddd9d0;}
-.card-title{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#8a8078;}
+.card-title{font-size:11px;font-weight:600;letter-spacing:0.3px;color:#6a6058;}
 .card-body{padding:12px 14px;}
 
 /* ── 현장정보 ── */
 .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
 .info-full{grid-template-columns:1fr;}
 .info-row{display:flex;flex-direction:column;gap:3px;}
-.info-lbl{font-size:9px;color:#8a8078;text-transform:uppercase;letter-spacing:1px;font-weight:700;}
+.info-lbl{font-size:10px;color:#8a8078;letter-spacing:0.3px;font-weight:500;}
 .info-inp{background:#f0ede8;border:1px solid #ddd9d0;border-radius:7px;color:#1e1b18;font-size:13px;font-weight:600;padding:8px 10px;width:100%;cursor:pointer;transition:border-color .15s;}
 .info-inp:focus{outline:none;border-color:#2a5c8a;}
-.sec-div{font-size:9px;color:#8a8078;text-transform:uppercase;letter-spacing:2px;font-weight:700;padding:8px 0 5px;border-bottom:1px solid #e8e4dc;margin-bottom:8px;}
+.sec-div{font-size:10px;color:#8a8078;letter-spacing:0.5px;font-weight:500;padding:8px 0 5px;border-bottom:1px solid #e8e4dc;margin-bottom:8px;}
 .brand-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:4px;}
 .brand-btn{padding:6px 3px;border:1.5px solid #ddd9d0;border-radius:6px;background:#fff;color:#5a5450;font-size:11px;font-weight:600;cursor:pointer;text-align:center;transition:all .15s;}
 .brand-btn.on{border-color:#2a5c8a;background:#e8f0f8;color:#1a4a7a;font-weight:700;}
@@ -197,7 +206,7 @@ body{background:#f4f1ec;color:#1e1b18;font-family:-apple-system,BlinkMacSystemFo
 .sg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;}
 .sb{background:#f5f2ec;border:1px solid #e8e4dc;border-radius:8px;padding:10px 6px;text-align:center;}
 .sv{font-size:16px;font-weight:700;color:#c0392b;line-height:1;margin-bottom:3px;}
-.sl{font-size:9px;color:#8a8078;}
+.sl{font-size:10px;color:#8a8078;font-weight:400;}
 .urow{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
 .ulbl{font-size:10px;width:50px;color:#8a8078;flex-shrink:0;}
 .ubg{flex:1;height:6px;background:#e8e4dc;border-radius:3px;overflow:hidden;}
@@ -222,7 +231,7 @@ tr:hover td{background:#faf8f5;}
 .tag{display:inline-block;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:700;border:1px solid;}
 .empty{padding:40px 14px;text-align:center;color:#8a8078;font-size:13px;line-height:2;}
 .ei{font-size:30px;margin-bottom:8px;}
-.info-txt{font-size:10px;color:#8a8078;text-align:right;margin-top:5px;}
+.info-txt{font-size:11px;color:#8a8078;text-align:right;margin-top:5px;font-weight:400;}
 
 /* ── 탭바 ── */
 .tabbar{position:fixed;bottom:0;left:0;right:0;background:#1e1b18;display:flex;border-top:1px solid #2a2620;z-index:100;height:56px;}
@@ -250,6 +259,7 @@ tr:hover td{background:#faf8f5;}
 .load-btn{flex:1;padding:9px;background:#1e1b18;color:#e8c14a;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;}
 .del-btn{padding:9px 12px;background:#fff;color:#c0392b;border:1px solid #e8e4dc;border-radius:7px;font-size:12px;cursor:pointer;}
 .hist-empty{padding:36px 14px;text-align:center;color:#8a8078;font-size:13px;line-height:2;}
+.page-inner{padding-bottom:72px;}
 
 /* ── 토스트 ── */
 .toast{position:fixed;top:82px;left:50%;transform:translateX(-50%);background:#27ae60;color:#fff;padding:7px 18px;border-radius:18px;font-size:13px;font-weight:700;z-index:300;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;}
@@ -474,14 +484,22 @@ tr:hover td{background:#faf8f5;}
 </div>
 <div class="fbar">
   <div class="fbar-inner">
-    <span class="flbl">폭</span>
-    <input class="fbar-inp" id="fw" type="number" value="1220" readonly onclick="showIM('필름 폭 (mm)',this.value==='1220'?'':this.value,'number',function(v){document.getElementById('fw').value=v===''?'1220':v;})">
-    <span class="funit">mm</span>
-    <span class="flbl" style="margin-left:4px;">길이</span>
-    <input class="fbar-inp" id="fl" type="number" value="0" readonly onclick="showIM('필름 길이 (m)',this.value==='0'?'':this.value,'number',function(v){document.getElementById('fl').value=v===''?'0':v;})">
-    <span class="funit">m</span>
-    <div style="width:1px;height:20px;background:rgba(255,255,255,.15);margin:0 4px;flex-shrink:0;"></div>
-    <span class="flbl">방염</span>
+    <!-- 폭 박스: 텍스트+값 함께 표시 -->
+    <div class="fbar-box" onclick="showIM('필름 폭 (mm)',document.getElementById('fw').value==='1220'?'':document.getElementById('fw').value,'number',function(v){var val=v===''?'1220':v;document.getElementById('fw').value=val;document.getElementById('fw-disp').textContent=val;})">
+      <span class="fbar-box-lbl">폭</span>
+      <span class="fbar-box-val" id="fw-disp">1220</span>
+      <span class="fbar-box-unit">mm</span>
+      <input id="fw" type="hidden" value="1220">
+    </div>
+    <!-- 길이 박스 -->
+    <div class="fbar-box" onclick="showIM('필름 길이 (m)',document.getElementById('fl').value==='0'?'':document.getElementById('fl').value,'number',function(v){var val=v===''?'0':v;document.getElementById('fl').value=val;document.getElementById('fl-disp').textContent=val;})">
+      <span class="fbar-box-lbl">길이</span>
+      <span class="fbar-box-val" id="fl-disp">0</span>
+      <span class="fbar-box-unit">m</span>
+      <input id="fl" type="hidden" value="0">
+    </div>
+    <div class="fbar-sep"></div>
+    <!-- 방염 선택 (텍스트 없이 버튼만) -->
     <div class="fbar-toggle">
       <button class="ftbtn on" id="flameY" onclick="setFlame(true)">방염</button>
       <button class="ftbtn" id="flameN" onclick="setFlame(false)">비방염</button>
@@ -555,7 +573,7 @@ tr:hover td{background:#faf8f5;}
     <span class="hdr-sub">CUTTING RESULT</span>
   </div>
 </div>
-<div style="max-width:640px;margin:0 auto;padding:12px 14px;">
+<div style="max-width:640px;margin:0 auto;padding:12px 14px 72px;">
   <div id="rcol">
     <div class="card"><div class="card-body"><div class="empty"><div class="ei">✂</div>항목을 추가하고<br><strong>최적 재단 계산하기</strong>를 눌러주세요</div></div></div>
   </div>
@@ -570,7 +588,7 @@ tr:hover td{background:#faf8f5;}
     <span class="hdr-sub">HISTORY</span>
   </div>
 </div>
-<div class="container" style="padding-top:12px;">
+<div class="container" style="padding-top:12px;padding-bottom:72px;">
   <div style="margin-bottom:10px;position:relative;">
     <input type="text" id="searchBox" placeholder="🔍 현장명 · 고객명 · 연락처 검색" readonly onclick="openSearch()" style="width:100%;padding:9px 13px;border:1px solid #d8d0c4;border-radius:8px;font-size:14px;background:#fff;color:#2a2420;cursor:pointer;">
     <span id="sClear" onclick="clrSearch()" style="display:none;position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:17px;color:#9a8f84;">✕</span>
@@ -1273,7 +1291,8 @@ function renderHist(){
 
 function loadRec(rec){
   IDS=[];seq=0;document.getElementById("ilist").innerHTML="";document.getElementById("icnt").textContent="0개";
-  document.getElementById("fw").value=rec.fw;document.getElementById("fl").value=rec.fl?rec.fl/1000:0;
+  document.getElementById('fw').value=rec.fw;document.getElementById('fw-disp').textContent=rec.fw;
+  var flVal=rec.fl?rec.fl/1000:0;document.getElementById('fl').value=flVal;document.getElementById('fl-disp').textContent=flVal;
   document.getElementById("siteName").value=rec.siteName||"";document.getElementById("clientName").value=rec.clientName||"";
   document.getElementById("clientPhone").value=rec.clientPhone||"";document.getElementById("modelName").value=rec.modelName||"";
   setBrand(rec.brand||"");setFlame(rec.flame||false);isFlame=rec.flame||false;setPat(rec.pattern||false);hasPat=rec.pattern||false;
