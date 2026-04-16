@@ -829,14 +829,23 @@ function doJoin(){
   cfmResult.confirm(code)
     .then(function(result){
       var phoneUser=result.user;
-      var info=result.additionalUserInfo;
-      /* 신규 전화계정이 아니면 = 이미 가입된 번호 → 즉시 차단 */
-      if(info&&info.isNewUser===false){
-        /* 기존 계정으로 로그인됐으므로 로그아웃 후 차단 */
-        return phoneUser.delete().catch(function(){}).then(function(){
-          return Promise.reject({code:'phone/already-exists',message:'이미 가입된 전화번호입니다.'});
+      /*
+       * 전화번호 중복 판단 기준:
+       * - phoneUser.email이 이미 있음 → 이전에 이메일까지 연결 완료된 계정 = 중복
+       * - phoneUser.providerData에 'password' provider가 있음 → 이메일 연결된 계정 = 중복
+       * - 위 두 조건 모두 없음 → 방금 생성된 순수 전화번호 계정 = 신규
+       */
+      var hasEmail = phoneUser.email && phoneUser.email.length > 0;
+      var hasPasswordProvider = phoneUser.providerData.some(function(p){
+        return p.providerId === 'password';
+      });
+      if(hasEmail || hasPasswordProvider){
+        /* 이미 가입된 전화번호 → 로그아웃 후 차단 */
+        return window._auth.signOut().then(function(){
+          return Promise.reject({code:'phone/already-exists'});
         });
       }
+      /* 신규 전화계정 → 이메일 연결 */
       var emailCred=firebase.auth.EmailAuthProvider.credential(pEmail,pPw);
       return phoneUser.linkWithCredential(emailCred);
     })
