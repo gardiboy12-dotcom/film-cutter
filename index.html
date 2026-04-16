@@ -111,36 +111,36 @@ body{background:#f4f1ec;color:#1e1b18;font-family:-apple-system,BlinkMacSystemFo
 .container{max-width:640px;margin:0 auto;padding:0 14px;}
 
 /* ── 헤더 ── */
-.hdr{background:#1e1b18;color:#fff;padding:0 14px;height:48px;display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:50;}
+.hdr{background:#1e1b18;color:#fff;padding:0 14px;height:72px;display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:50;}
 .hdr-inner{max-width:640px;margin:0 auto;width:100%;display:flex;align-items:center;gap:8px;}
-.hdr h1{font-size:16px;font-weight:900;white-space:nowrap;}
+.hdr h1{font-size:22px;font-weight:900;white-space:nowrap;}
 .hdr h1 span{color:#e8c14a;}
-.hdr-sub{font-size:9px;color:rgba(255,255,255,.3);letter-spacing:1px;}
+.hdr-sub{font-size:10px;color:rgba(255,255,255,.3);letter-spacing:1.5px;}
 .user-bar{display:flex;align-items:center;gap:6px;margin-left:auto;}
 .user-email{font-size:10px;color:rgba(255,255,255,.5);max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .logout-btn{font-size:11px;color:rgba(255,255,255,.7);background:transparent;border:1px solid rgba(255,255,255,.25);border-radius:5px;padding:3px 9px;cursor:pointer;}
 
 /* ── 필름 설정 바 ── */
 .fbar{background:#2a2620;border-bottom:1px solid #3a3530;}
-.fbar-inner{max-width:640px;margin:0 auto;padding:8px 14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
-.flbl{font-size:10px;color:rgba(255,255,255,.45);white-space:nowrap;font-weight:600;}
-.fbar-inp{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;color:#fff;font-size:13px;font-weight:700;padding:5px 8px;text-align:center;width:64px;cursor:pointer;}
+.fbar-inner{max-width:640px;margin:0 auto;padding:12px 14px;display:flex;align-items:center;gap:10px;flex-wrap:nowrap;}
+.flbl{font-size:11px;color:rgba(255,255,255,.5);white-space:nowrap;font-weight:600;}
+.fbar-inp{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;color:#fff;font-size:14px;font-weight:700;padding:7px 8px;text-align:center;width:70px;cursor:pointer;}
 .fbar-inp:focus{outline:none;}
 .funit{font-size:10px;color:rgba(255,255,255,.35);}
 .fbar-group{display:flex;align-items:center;gap:5px;}
 .fbar-toggle{display:flex;gap:3px;}
-.ftbtn{padding:4px 10px;border-radius:5px;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.45);font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s;}
+.ftbtn{padding:6px 12px;border-radius:6px;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.45);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s;}
 .ftbtn.on{background:#e8c14a;color:#1e1b18;border-color:#e8c14a;font-weight:700;}
 
 /* ── 패턴 바 ── */
 .pbar{background:#242018;border-bottom:1px solid #3a3530;}
-.pbar-inner{max-width:640px;margin:0 auto;padding:6px 14px;display:flex;align-items:center;gap:8px;}
+.pbar-inner{max-width:640px;margin:0 auto;padding:10px 14px;display:flex;align-items:center;gap:8px;}
 .pbar-lbl{font-size:10px;color:rgba(255,255,255,.4);font-weight:600;white-space:nowrap;flex-shrink:0;}
 .pbar-btns{display:flex;gap:5px;flex:1;}
-.pbtn{flex:1;padding:5px 8px;border-radius:6px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .15s;}
+.pbtn{flex:1;padding:7px 10px;border-radius:7px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .15s;}
 .pbtn.on{background:#2a5c8a;border-color:#3a7cbd;}
-.pbtn-icon{font-size:14px;flex-shrink:0;}
-.pbtn-txt{font-size:11px;font-weight:700;color:rgba(255,255,255,.4);}
+.pbtn-icon{font-size:16px;flex-shrink:0;}
+.pbtn-txt{font-size:12px;font-weight:700;color:rgba(255,255,255,.4);}
 .pbtn.on .pbtn-txt{color:#fff;}
 .pbtn-sub{font-size:9px;color:rgba(255,255,255,.25);}
 .pbtn.on .pbtn-sub{color:rgba(255,255,255,.5);}
@@ -188,9 +188,9 @@ body{background:#f4f1ec;color:#1e1b18;font-family:-apple-system,BlinkMacSystemFo
 .inp-unit{font-size:11px;color:#8a8078;font-weight:600;flex-shrink:0;width:22px;text-align:right;}
 
 /* ── 버튼 ── */
-.add-btn{width:100%;padding:10px;background:#f5f2ec;border:1.5px dashed #ccc8c0;border-radius:8px;color:#8a8078;font-size:12px;cursor:pointer;margin-bottom:8px;display:block;transition:all .15s;}
-.add-btn:hover{background:#edeae4;color:#5a5450;}
-.go-btn{width:100%;padding:13px;background:#1e1b18;color:#e8c14a;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;transition:opacity .15s;}
+.add-btn{width:100%;padding:15px;background:#6a6058;border:none;border-radius:8px;color:#e8e4dc;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:8px;display:block;transition:all .15s;}
+.add-btn:hover{background:#5a5048;}
+.go-btn{width:100%;padding:19px;background:#1e1b18;color:#e8c14a;border:none;border-radius:8px;font-size:16px;font-weight:700;cursor:pointer;transition:opacity .15s;}
 .go-btn:active{opacity:.85;}
 
 /* ── 결과 ── */
@@ -226,8 +226,11 @@ tr:hover td{background:#faf8f5;}
 
 /* ── 탭바 ── */
 .tabbar{position:fixed;bottom:0;left:0;right:0;background:#1e1b18;display:flex;border-top:1px solid #2a2620;z-index:100;height:56px;}
-.tab{flex:1;padding:8px 4px 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;border:none;background:none;color:rgba(255,255,255,.35);font-size:9px;letter-spacing:.5px;transition:color .15s;}
-.tab.on{color:#e8c14a;}
+.tab{flex:1;padding:8px 4px 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;border:none;background:none;color:rgba(255,255,255,.35);font-size:9px;letter-spacing:.5px;transition:all .15s;}
+.tab.on{color:#fff;}
+.tab-calc.on{color:#7ec8e3;border-top:2px solid #7ec8e3;}
+.tab-result.on{color:#e8c14a;border-top:2px solid #e8c14a;}
+.tab-hist.on{color:#a8e6a3;border-top:2px solid #a8e6a3;}
 .tab-icon{font-size:18px;line-height:1;}
 .page{display:none;}
 .page.on{display:block;}
@@ -249,7 +252,7 @@ tr:hover td{background:#faf8f5;}
 .hist-empty{padding:36px 14px;text-align:center;color:#8a8078;font-size:13px;line-height:2;}
 
 /* ── 토스트 ── */
-.toast{position:fixed;top:58px;left:50%;transform:translateX(-50%);background:#27ae60;color:#fff;padding:7px 18px;border-radius:18px;font-size:13px;font-weight:700;z-index:300;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;}
+.toast{position:fixed;top:82px;left:50%;transform:translateX(-50%);background:#27ae60;color:#fff;padding:7px 18px;border-radius:18px;font-size:13px;font-weight:700;z-index:300;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;}
 .toast.on{opacity:1;}
 
 /* ── 입력 팝업 ── */
@@ -471,19 +474,18 @@ tr:hover td{background:#faf8f5;}
 </div>
 <div class="fbar">
   <div class="fbar-inner">
-  <span class="flbl">필름 폭</span>
-  <input class="fbar-inp" id="fw" type="number" value="1220" readonly onclick="showIM('필름 폭 (mm)',this.value==='1220'?'':this.value,'number',function(v){document.getElementById('fw').value=v===''?'1220':v;})">
-  <span class="funit">mm</span>
-  <span class="flbl">길이</span>
-  <input class="fbar-inp" id="fl" type="number" value="0" readonly onclick="showIM('필름 길이 (m)',this.value==='0'?'':this.value,'number',function(v){document.getElementById('fl').value=v===''?'0':v;})">
-  <span class="funit">m</span>
-  <div class="fbar-group">
+    <span class="flbl">폭</span>
+    <input class="fbar-inp" id="fw" type="number" value="1220" readonly onclick="showIM('필름 폭 (mm)',this.value==='1220'?'':this.value,'number',function(v){document.getElementById('fw').value=v===''?'1220':v;})">
+    <span class="funit">mm</span>
+    <span class="flbl" style="margin-left:4px;">길이</span>
+    <input class="fbar-inp" id="fl" type="number" value="0" readonly onclick="showIM('필름 길이 (m)',this.value==='0'?'':this.value,'number',function(v){document.getElementById('fl').value=v===''?'0':v;})">
+    <span class="funit">m</span>
+    <div style="width:1px;height:20px;background:rgba(255,255,255,.15);margin:0 4px;flex-shrink:0;"></div>
     <span class="flbl">방염</span>
     <div class="fbar-toggle">
       <button class="ftbtn on" id="flameY" onclick="setFlame(true)">방염</button>
       <button class="ftbtn" id="flameN" onclick="setFlame(false)">비방염</button>
     </div>
-  </div>
   </div>
 </div>
 <!-- 패턴 선택 바 - 별도 분리 -->
@@ -542,6 +544,18 @@ tr:hover td{background:#faf8f5;}
       </div>
     </div>
   </div>
+</div>
+</div>
+
+<!-- 계산 결과 페이지 -->
+<div class="page" id="pg-result">
+<div class="hdr">
+  <div class="hdr-inner">
+    <h1>재단<span>결과</span></h1>
+    <span class="hdr-sub">CUTTING RESULT</span>
+  </div>
+</div>
+<div style="max-width:640px;margin:0 auto;padding:12px 14px;">
   <div id="rcol">
     <div class="card"><div class="card-body"><div class="empty"><div class="ei">✂</div>항목을 추가하고<br><strong>최적 재단 계산하기</strong>를 눌러주세요</div></div></div>
   </div>
@@ -550,7 +564,12 @@ tr:hover td{background:#faf8f5;}
 
 <!-- 기록 페이지 -->
 <div class="page" id="pg-hist">
-<div class="hdr"><h1>계산 <span>기록</span></h1></div>
+<div class="hdr">
+  <div class="hdr-inner">
+    <h1>계산 <span>기록</span></h1>
+    <span class="hdr-sub">HISTORY</span>
+  </div>
+</div>
 <div class="container" style="padding-top:12px;">
   <div style="margin-bottom:10px;position:relative;">
     <input type="text" id="searchBox" placeholder="🔍 현장명 · 고객명 · 연락처 검색" readonly onclick="openSearch()" style="width:100%;padding:9px 13px;border:1px solid #d8d0c4;border-radius:8px;font-size:14px;background:#fff;color:#2a2420;cursor:pointer;">
@@ -561,8 +580,9 @@ tr:hover td{background:#faf8f5;}
 </div>
 
 <div class="tabbar">
-  <button class="tab on" id="tab-calc" onclick="showTab('calc')"><span class="tab-icon">✂</span>재단 계산</button>
-  <button class="tab" id="tab-hist" onclick="showTab('hist')"><span class="tab-icon">📋</span>계산 기록</button>
+  <button class="tab tab-calc on" id="tab-calc" onclick="showTab('calc')"><span class="tab-icon">✂</span>항목</button>
+  <button class="tab tab-result" id="tab-result" onclick="showTab('result')"><span class="tab-icon">📐</span>계산</button>
+  <button class="tab tab-hist" id="tab-hist" onclick="showTab('hist')"><span class="tab-icon">📋</span>기록</button>
 </div>
 <script>
 /* ══ 재단 계산 ══ */
@@ -713,6 +733,7 @@ function calculate(){
   var ua=0;for(var i=0;i<pieces.length;i++)ua+=pieces[i].pW*pieces[i].pH;
   var eff=(ua/(fw*res.total)*100).toFixed(1);
   renderResult(res.flat,res.strips,res.total,eff,fl>0&&res.total>fl,fw,fl);
+  showTab('result'); /* 계산 완료 → 결과 탭으로 이동 */
   saveHist(
     document.getElementById("siteName").value.trim()||"현장명 없음",
     document.getElementById("clientName").value.trim(),
@@ -1187,7 +1208,15 @@ function openSearch(){var cur=document.getElementById("searchBox").value;showIM(
 function clrSearch(){document.getElementById("searchBox").value="";document.getElementById("sClear").style.display="none";renderHist();}
 
 /* ══ 탭 ══ */
-function showTab(tab){document.getElementById("pg-calc").className="page"+(tab==="calc"?" on":"");document.getElementById("pg-hist").className="page"+(tab==="hist"?" on":"");document.getElementById("tab-calc").className="tab"+(tab==="calc"?" on":"");document.getElementById("tab-hist").className="tab"+(tab==="hist"?" on":"");if(tab==="hist")renderHist();}
+function showTab(tab){
+  document.getElementById("pg-calc").className="page"+(tab==="calc"?" on":"");
+  document.getElementById("pg-result").className="page"+(tab==="result"?" on":"");
+  document.getElementById("pg-hist").className="page"+(tab==="hist"?" on":"");
+  document.getElementById("tab-calc").className="tab tab-calc"+(tab==="calc"?" on":"");
+  document.getElementById("tab-result").className="tab tab-result"+(tab==="result"?" on":"");
+  document.getElementById("tab-hist").className="tab tab-hist"+(tab==="hist"?" on":"");
+  if(tab==="hist")renderHist();
+}
 
 /* ══ 기록 ══ */
 function saveHist(sN,cN,cP,br,mn,items,flat,total,eff,fw,fl,flame,pattern){
@@ -1249,7 +1278,7 @@ function loadRec(rec){
   document.getElementById("clientPhone").value=rec.clientPhone||"";document.getElementById("modelName").value=rec.modelName||"";
   setBrand(rec.brand||"");setFlame(rec.flame||false);isFlame=rec.flame||false;setPat(rec.pattern||false);hasPat=rec.pattern||false;
   for(var i=0;i<rec.items.length;i++){var it=rec.items[i];addItemData(it.cat,it.pW,it.pL,it.name,it.qty);}
-  showTab("calc");
+  showTab('calc');
   setTimeout(function(){renderResult(rec.flat,[],rec.total,rec.eff,rec.fl>0&&rec.total>rec.fl,rec.fw,rec.fl);},100);
   alert("불러왔어요!");
 }
