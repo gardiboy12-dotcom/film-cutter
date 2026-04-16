@@ -845,6 +845,7 @@ function sendSignupOtp(){
   var btn=document.getElementById('suSendBtn');
   btn.disabled=true;btn.textContent='발송 중...';
   if(!rcpV)initRcp();
+  _signingUp=true; /* 가입 진행 중 - 자동 로그인 차단 */
   window._auth.signInWithPhoneNumber(suE164,rcpV)
     .then(function(result){
       suCfm=result;
@@ -882,33 +883,29 @@ function doSignup(){
   var btn=document.getElementById('suVerifyBtn');
   btn.disabled=true;btn.textContent='확인 중...';
   var fakeEmail=toFakeEmail(suE164);
+  var _isNewSignup=false; /* 진짜 신규 가입인지 추적 */
 
-  /* OTP 확인 → 전화계정 획득 → 가상이메일+비번 link
-   * 전화번호 중복이면 Firebase가 credential-already-in-use 반환 */
   suCfm.confirm(code)
   .then(function(result){
     var phoneUser=result.user;
 
-    /* Firestore에서 전화번호 중복 확인 */
+    /* Firestore 중복 체크 */
     return window._db.collection('users')
       .where('phone','==',suE164).limit(1).get()
       .then(function(snap){
         if(!snap.empty){
-          /* 이미 가입된 번호 → 전화계정 삭제 후 차단 */
-          return phoneUser.delete().catch(function(){})
-            .then(function(){
-              return Promise.reject({
-                code:'phone/duplicate',
-                message:'이미 가입된 번호입니다. 로그인해주세요.'
-              });
-            });
+          /* 이미 가입된 번호 → 로그아웃 후 차단 (delete 금지!) */
+          return window._auth.signOut().then(function(){
+            return Promise.reject({code:'phone/duplicate'});
+          });
         }
-        /* 신규 → 가상이메일+비번 link */
+        /* 신규 확인 → 가상이메일+비번 link */
         var emailCred=firebase.auth.EmailAuthProvider.credential(fakeEmail,suPw);
         return phoneUser.linkWithCredential(emailCred);
       });
   })
   .then(function(linked){
+    _isNewSignup=true;
     var user=linked.user;
     return user.updateProfile({displayName:suName}).then(function(){
       var disp=suPhone.replace(/(\d{3})(\d{3,4})(\d{4})/,'$1-$2-$3');
@@ -921,11 +918,15 @@ function doSignup(){
   })
   .then(function(){
     clearInterval(suTimerIv);
+    _signingUp=false;
     enterApp();
   })
   .catch(function(e){
     btn.disabled=false;btn.textContent='가입 완료';
     console.error('signup error:',e.code,e.message);
+    /* 중복이면 auth 상태가 로그인됐을 수 있으므로 강제 로그아웃 */
+    _signingUp=false;
+    window._auth.signOut().catch(function(){});
     if(e.code==='auth/invalid-verification-code')
       showErr('인증번호가 올바르지 않습니다.');
     else if(e.code==='auth/code-expired')
@@ -1068,11 +1069,12 @@ function doLogout(){
   });
 }
 
+var _signingUp=false; /* 가입 진행 중 플래그 */
 function startAuthListen(){
   window._onAuth(function(user){
     curUser=user;
-    if(user)enterApp();
-    else document.getElementById('authPg').style.display='flex';
+    if(user&&!_signingUp)enterApp();
+    else if(!user)document.getElementById('authPg').style.display='flex';
   });
 }
 if(window._fbReady)startAuthListen();
