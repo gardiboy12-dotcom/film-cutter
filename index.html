@@ -883,7 +883,6 @@ function doSignup(){
   var btn=document.getElementById('suVerifyBtn');
   btn.disabled=true;btn.textContent='확인 중...';
   var fakeEmail=toFakeEmail(suE164);
-  var _isNewSignup=false; /* 진짜 신규 가입인지 추적 */
 
   suCfm.confirm(code)
   .then(function(result){
@@ -894,51 +893,59 @@ function doSignup(){
       .where('phone','==',suE164).limit(1).get()
       .then(function(snap){
         if(!snap.empty){
-          /* 이미 가입된 번호 → 로그아웃 후 차단 (delete 금지!) */
+          /* 이미 가입된 번호 → signOut 후 차단 */
           return window._auth.signOut().then(function(){
             return Promise.reject({code:'phone/duplicate'});
           });
         }
-        /* 신규 확인 → 가상이메일+비번 link */
+        /* 신규 → 가상이메일+비번 link */
         var emailCred=firebase.auth.EmailAuthProvider.credential(fakeEmail,suPw);
         return phoneUser.linkWithCredential(emailCred);
       });
   })
   .then(function(linked){
-    _isNewSignup=true;
+    /* link 성공 → 프로필/Firestore 저장 (실패해도 로그아웃 안함) */
     var user=linked.user;
-    return user.updateProfile({displayName:suName}).then(function(){
-      var disp=suPhone.replace(/(\d{3})(\d{3,4})(\d{4})/,'$1-$2-$3');
-      return window._saveUser(user.uid,{
-        uid:user.uid,name:suName,
-        phone:suE164,phoneDisplay:disp,
-        createdAt:firebase.firestore.FieldValue.serverTimestamp()
-      });
+    var disp=suPhone.replace(/(\d{3})(\d{3,4})(\d{4})/,'$1-$2-$3');
+    /* updateProfile 실패해도 가입은 완료된 것이므로 catch 안함 */
+    user.updateProfile({displayName:suName}).catch(function(e){
+      console.warn('updateProfile error:',e.message);
+    });
+    return window._saveUser(user.uid,{
+      uid:user.uid,name:suName,
+      phone:suE164,phoneDisplay:disp,
+      createdAt:firebase.firestore.FieldValue.serverTimestamp()
+    }).catch(function(e){
+      console.warn('saveUser error:',e.message);
     });
   })
   .then(function(){
+    /* 가입 완료 → 앱 진입 */
     clearInterval(suTimerIv);
     _signingUp=false;
     enterApp();
   })
   .catch(function(e){
+    /* 여기는 진짜 실패만 (phone/duplicate, OTP오류, email중복) */
     btn.disabled=false;btn.textContent='가입 완료';
-    console.error('signup error:',e.code,e.message);
-    /* 중복이면 auth 상태가 로그인됐을 수 있으므로 강제 로그아웃 */
     _signingUp=false;
-    window._auth.signOut().catch(function(){});
-    if(e.code==='auth/invalid-verification-code')
+    console.error('signup error:',e.code,e.message);
+
+    /* 중복일 때만 signOut (이미 signOut 했지만 혹시 몰라) */
+    if(e.code==='phone/duplicate'||
+       e.code==='auth/email-already-in-use'||
+       e.code==='auth/credential-already-in-use'||
+       e.code==='auth/provider-already-linked'||
+       e.code==='auth/operation-not-allowed'){
+      window._auth.signOut().catch(function(){});
+      showErr('이미 가입된 번호입니다. 로그인해주세요.');
+    } else if(e.code==='auth/invalid-verification-code'){
       showErr('인증번호가 올바르지 않습니다.');
-    else if(e.code==='auth/code-expired')
+    } else if(e.code==='auth/code-expired'){
       showErr('인증번호가 만료됐습니다. 재전송해주세요.');
-    else if(e.code==='phone/duplicate'||
-            e.code==='auth/email-already-in-use'||
-            e.code==='auth/credential-already-in-use'||
-            e.code==='auth/provider-already-linked')
-      showErr('이미 가입된 번호입니다. 로그인해주세요.');
-    else if(e.code==='auth/operation-not-allowed')
-      showErr('이미 가입된 번호입니다. 로그인해주세요.');
-    else showErr('가입 실패: '+e.message);
+    } else {
+      showErr('가입 실패: '+e.message);
+    }
   });
 }
 
