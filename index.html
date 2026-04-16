@@ -282,6 +282,8 @@ tr:hover td{background:#faf8f5;}
 .im-ov{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:600;display:flex;align-items:center;justify-content:center;padding:20px;}
 .im-box{background:#f5f2ec;border-radius:14px;padding:20px 16px;width:100%;max-width:320px;box-shadow:0 16px 48px rgba(0,0,0,.2);animation:pop .18s ease;}
 @keyframes pop{from{opacity:0;transform:scale(.93);}to{opacity:1;transform:scale(1);}}
+@keyframes tooltipIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.onboarding-anim{animation:tooltipIn .3s ease;}
 .im-lbl{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#8a8078;margin-bottom:7px;}
 .im-fld{width:100%;background:#e8e4dc;border:1.5px solid #d8d4cc;border-radius:8px;color:#1e1b18;font-size:17px;font-weight:600;padding:11px 13px;margin-bottom:12px;font-family:inherit;}
 .im-fld:focus{outline:none;border-color:#2a5c8a;}
@@ -459,6 +461,19 @@ tr:hover td{background:#faf8f5;}
 
 <div class="toast" id="toast">저장됐어요!</div>
 
+<!-- 온보딩 툴팁 -->
+<div id="onboardingOv" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:800;pointer-events:none;">
+  <div id="onboardingBox" style="position:absolute;background:#1e1b18;color:#fff;border-radius:12px;padding:12px 16px;font-size:13px;line-height:1.6;max-width:220px;box-shadow:0 8px 32px rgba(0,0,0,.4);pointer-events:all;">
+    <div style="font-weight:700;font-size:14px;margin-bottom:6px;color:#e8c14a;">💡 색상을 바꿀 수 있어요!</div>
+    <div style="color:rgba(255,255,255,.8);font-size:12px;">항목 왼쪽 <strong style="color:#e8c14a;">동그라미</strong>를 누르면<br>항목 색상을 자유롭게<br>바꿀 수 있어요.</div>
+    <div style="margin-top:10px;text-align:right;">
+      <button onclick="closeOnboarding()" style="background:#e8c14a;color:#1e1b18;border:none;border-radius:7px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;">확인</button>
+    </div>
+    <!-- 말풍선 꼬리 -->
+    <div id="onboardingTail" style="position:absolute;width:12px;height:12px;background:#1e1b18;transform:rotate(45deg);"></div>
+  </div>
+</div>
+
 <!-- 입력 팝업 -->
 <div class="im-ov" id="imOv" style="display:none;">
   <div class="im-box">
@@ -619,6 +634,50 @@ tr:hover td{background:#faf8f5;}
 </div>
 <script>
 
+/* ── 온보딩 툴팁 ── */
+var ONBOARD_KEY='jdw_onboard_color_v1';
+
+function showOnboarding(targetEl){
+  /* localStorage로 1회만 표시 */
+  if(localStorage.getItem(ONBOARD_KEY))return;
+  var ov=document.getElementById('onboardingOv');
+  var box=document.getElementById('onboardingBox');
+  var tail=document.getElementById('onboardingTail');
+  ov.style.display='block';
+  box.className='onboarding-anim';
+
+  /* 타겟 동그라미 위치 기준으로 툴팁 배치 */
+  setTimeout(function(){
+    var rect=targetEl.getBoundingClientRect();
+    var boxW=220, boxH=140;
+    var left=rect.left+rect.width/2-boxW/2;
+    var top=rect.bottom+14;
+
+    /* 화면 밖으로 나가지 않게 조정 */
+    left=Math.max(10,Math.min(left,window.innerWidth-boxW-10));
+    if(top+boxH>window.innerHeight-70)top=rect.top-boxH-14;
+
+    box.style.left=left+'px';
+    box.style.top=top+'px';
+    box.style.width=boxW+'px';
+
+    /* 꼬리 위치 */
+    var tailLeft=rect.left+rect.width/2-left-6;
+    tailLeft=Math.max(10,Math.min(tailLeft,boxW-22));
+    if(top>rect.bottom){
+      tail.style.top='-6px';tail.style.bottom='auto';
+    } else {
+      tail.style.bottom='-6px';tail.style.top='auto';
+    }
+    tail.style.left=tailLeft+'px';
+  },50);
+}
+
+function closeOnboarding(){
+  document.getElementById('onboardingOv').style.display='none';
+  localStorage.setItem(ONBOARD_KEY,'1');
+}
+
 /* ── 색상 선택 ── */
 var ITEM_COLORS=['#e74c3c', '#e67e22', '#f1c40f', '#2ecc71', '#1abc9c', '#3498db', '#2980b9', '#9b59b6', '#e91e63', '#795548', '#607d8b', '#2c3e50'];
 var _colorTarget=null, _colorSelected=null;
@@ -700,6 +759,8 @@ function addItem(){
   card.appendChild(head);card.appendChild(body);
   document.getElementById("ilist").appendChild(card);
   document.getElementById("icnt").textContent=IDS.length+"개";
+  /* 첫 항목 추가 시 온보딩 툴팁 */
+  if(IDS.length===1){setTimeout(function(){showOnboarding(num);},400);}
 }
 
 function delItem(id){
