@@ -117,8 +117,8 @@ body{background:#f4f1ec;color:#1e1b18;font-family:-apple-system,BlinkMacSystemFo
 .hdr h1 span{color:#e8c14a;}
 .hdr-sub{font-size:10px;color:rgba(255,255,255,.3);letter-spacing:1.5px;}
 .user-bar{display:flex;align-items:center;gap:6px;margin-left:auto;}
-.user-email{font-size:10px;color:rgba(255,255,255,.5);max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.logout-btn{font-size:11px;color:rgba(255,255,255,.7);background:transparent;border:1px solid rgba(255,255,255,.25);border-radius:5px;padding:3px 9px;cursor:pointer;}
+.user-email{font-size:11px;color:rgba(255,255,255,.7);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600;}
+.logout-btn{font-size:11px;color:#e8c14a;background:transparent;border:1.5px solid #e8c14a;border-radius:5px;padding:4px 10px;cursor:pointer;font-weight:600;}
 
 /* ── 필름 설정 바 ── */
 .fbar{background:#2a2620;border-bottom:1px solid #3a3530;}
@@ -129,12 +129,12 @@ body{background:#f4f1ec;color:#1e1b18;font-family:-apple-system,BlinkMacSystemFo
 .funit{font-size:10px;color:rgba(255,255,255,.35);}
 .fbar-group{display:flex;align-items:center;gap:5px;}
 .fbar-toggle{display:flex;gap:3px;}
-.ftbtn{padding:6px 12px;border-radius:6px;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.45);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s;}
+.ftbtn{padding:0 14px;height:38px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.45);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s;display:flex;align-items:center;}
 .ftbtn.on{background:#e8c14a;color:#1e1b18;border-color:#e8c14a;font-weight:700;}
 
 
 /* 필름바 박스 */
-.fbar-box{display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:6px 10px;cursor:pointer;flex-shrink:0;transition:background .15s;}
+.fbar-box{display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:0 12px;height:38px;cursor:pointer;flex-shrink:0;transition:background .15s;}
 .fbar-box:active{background:rgba(255,255,255,.18);}
 .fbar-box-lbl{font-size:10px;color:rgba(255,255,255,.5);font-weight:600;}
 .fbar-box-val{font-size:15px;font-weight:700;color:#fff;min-width:32px;text-align:center;}
@@ -143,10 +143,10 @@ body{background:#f4f1ec;color:#1e1b18;font-family:-apple-system,BlinkMacSystemFo
 
 /* ── 패턴 바 ── */
 .pbar{background:#242018;border-bottom:1px solid #3a3530;}
-.pbar-inner{max-width:640px;margin:0 auto;padding:10px 14px;display:flex;align-items:center;gap:8px;}
-.pbar-lbl{font-size:10px;color:rgba(255,255,255,.4);font-weight:600;white-space:nowrap;flex-shrink:0;}
-.pbar-btns{display:flex;gap:5px;flex:1;}
-.pbtn{flex:1;padding:7px 10px;border-radius:7px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .15s;}
+.pbar-inner{max-width:640px;margin:0 auto;padding:10px 14px;display:flex;align-items:center;justify-content:center;gap:8px;}
+.pbar-lbl{display:none;}
+.pbar-btns{display:flex;gap:8px;max-width:360px;width:100%;}
+.pbtn{flex:1;padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .15s;}
 .pbtn.on{background:#2a5c8a;border-color:#3a7cbd;}
 .pbtn-icon{font-size:16px;flex-shrink:0;}
 .pbtn-txt{font-size:12px;font-weight:700;color:rgba(255,255,255,.4);}
@@ -164,21 +164,21 @@ body{background:#f4f1ec;color:#1e1b18;font-family:-apple-system,BlinkMacSystemFo
 /* ── 카드 ── */
 .card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06);}
 .card-head{padding:10px 14px;background:#edeae4;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ddd9d0;}
-.card-title{font-size:11px;font-weight:600;letter-spacing:0.3px;color:#6a6058;}
+.card-title{font-size:12px;font-weight:700;letter-spacing:0.2px;color:#2a2520;}
 .card-body{padding:12px 14px;}
 
 /* ── 현장정보 ── */
 .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
 .info-full{grid-template-columns:1fr;}
 .info-row{display:flex;flex-direction:column;gap:3px;}
-.info-lbl{font-size:10px;color:#8a8078;letter-spacing:0.3px;font-weight:500;}
-.info-inp{background:#f0ede8;border:1px solid #ddd9d0;border-radius:7px;color:#1e1b18;font-size:13px;font-weight:600;padding:8px 10px;width:100%;cursor:pointer;transition:border-color .15s;}
+.info-lbl{font-size:11px;color:#3a3530;letter-spacing:0.2px;font-weight:700;}
+.info-inp{background:#f0ede8;border:1px solid #ddd9d0;border-radius:7px;color:#2a2520;font-size:13px;font-weight:700;padding:8px 10px;width:100%;cursor:pointer;transition:border-color .15s;}
 .info-inp:focus{outline:none;border-color:#2a5c8a;}
-.sec-div{font-size:10px;color:#8a8078;letter-spacing:0.5px;font-weight:500;padding:8px 0 5px;border-bottom:1px solid #e8e4dc;margin-bottom:8px;}
+.sec-div{font-size:11px;color:#3a3530;letter-spacing:0.2px;font-weight:700;padding:8px 0 5px;border-bottom:1px solid #e8e4dc;margin-bottom:8px;}
 .brand-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:4px;}
-.brand-btn{padding:6px 3px;border:1.5px solid #ddd9d0;border-radius:6px;background:#fff;color:#5a5450;font-size:11px;font-weight:600;cursor:pointer;text-align:center;transition:all .15s;}
+.brand-btn{padding:6px 3px;border:1.5px solid #ddd9d0;border-radius:6px;background:#fff;color:#3a3530;font-size:11px;font-weight:700;cursor:pointer;text-align:center;transition:all .15s;}
 .brand-btn.on{border-color:#2a5c8a;background:#e8f0f8;color:#1a4a7a;font-weight:700;}
-.model-inp{background:#f0ede8;border:1px solid #ddd9d0;border-radius:7px;color:#1e1b18;font-size:13px;font-weight:600;padding:8px 10px;width:100%;cursor:pointer;}
+.model-inp{background:#f0ede8;border:1px solid #ddd9d0;border-radius:7px;color:#2a2520;font-size:13px;font-weight:700;padding:8px 10px;width:100%;cursor:pointer;}
 
 /* ── 재단 항목 ── */
 .icard{border:1px solid #e8e4dc;border-radius:8px;margin-bottom:6px;overflow:hidden;background:#fff;}
@@ -205,8 +205,8 @@ body{background:#f4f1ec;color:#1e1b18;font-family:-apple-system,BlinkMacSystemFo
 /* ── 결과 ── */
 .sg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;}
 .sb{background:#f5f2ec;border:1px solid #e8e4dc;border-radius:8px;padding:10px 6px;text-align:center;}
-.sv{font-size:16px;font-weight:700;color:#c0392b;line-height:1;margin-bottom:3px;}
-.sl{font-size:10px;color:#8a8078;font-weight:400;}
+.sv{font-size:17px;font-weight:800;color:#c0392b;line-height:1;margin-bottom:3px;}
+.sl{font-size:10px;color:#3a3530;font-weight:600;}
 .urow{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
 .ulbl{font-size:10px;width:50px;color:#8a8078;flex-shrink:0;}
 .ubg{flex:1;height:6px;background:#e8e4dc;border-radius:3px;overflow:hidden;}
@@ -224,14 +224,14 @@ body{background:#f4f1ec;color:#1e1b18;font-family:-apple-system,BlinkMacSystemFo
 .ld{width:9px;height:9px;border-radius:2px;flex-shrink:0;}
 .tw{overflow-x:auto;}
 table{width:100%;border-collapse:collapse;font-size:11px;}
-th{text-align:left;padding:7px 8px;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:#8a8078;border-bottom:2px solid #e8e4dc;white-space:nowrap;}
-td{padding:6px 8px;border-bottom:1px solid #f0ede8;white-space:nowrap;}
+th{text-align:left;padding:7px 8px;font-size:10px;letter-spacing:0.3px;color:#3a3530;font-weight:700;border-bottom:2px solid #e8e4dc;white-space:nowrap;}
+td{padding:6px 8px;border-bottom:1px solid #f0ede8;white-space:nowrap;color:#2a2520;font-weight:600;}
 tr:last-child td{border-bottom:none;}
 tr:hover td{background:#faf8f5;}
 .tag{display:inline-block;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:700;border:1px solid;}
 .empty{padding:40px 14px;text-align:center;color:#8a8078;font-size:13px;line-height:2;}
 .ei{font-size:30px;margin-bottom:8px;}
-.info-txt{font-size:11px;color:#8a8078;text-align:right;margin-top:5px;font-weight:400;}
+.info-txt{font-size:11px;color:#3a3530;text-align:right;margin-top:5px;font-weight:600;}
 
 /* ── 탭바 ── */
 .tabbar{position:fixed;bottom:0;left:0;right:0;background:#1e1b18;display:flex;border-top:1px solid #2a2620;z-index:100;height:56px;}
@@ -509,15 +509,14 @@ tr:hover td{background:#faf8f5;}
 <!-- 패턴 선택 바 - 별도 분리 -->
 <div class="pbar">
   <div class="pbar-inner">
-  <span class="pbar-lbl">패턴</span>
   <div class="pbar-btns">
     <button class="pbtn" id="patY" onclick="setPat(true)">
-      <span class="pbtn-icon">🌲</span>
+      <span class="pbtn-icon">🪵</span>
       <span class="pbtn-txt">패턴 있음</span>
       <span class="pbtn-sub">무늬 방향 고정</span>
     </button>
     <button class="pbtn on" id="patN" onclick="setPat(false)">
-      <span class="pbtn-icon">◻</span>
+      <span class="pbtn-icon">⬜</span>
       <span class="pbtn-txt">패턴 없음</span>
       <span class="pbtn-sub">자유 회전 최적화</span>
     </button>
