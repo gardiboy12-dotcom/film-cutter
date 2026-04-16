@@ -111,8 +111,8 @@ body{background:#f4f1ec;color:#1e1b18;font-family:-apple-system,BlinkMacSystemFo
 .container{max-width:640px;margin:0 auto;padding:0 14px;}
 
 /* ── 헤더 ── */
-.hdr{background:#1e1b18;color:#fff;padding:0 14px;height:72px;display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:50;}
-.hdr-inner{max-width:640px;margin:0 auto;width:100%;display:flex;align-items:center;gap:8px;}
+.hdr{background:#1e1b18;color:#fff;padding:0;height:72px;display:flex;align-items:center;position:sticky;top:0;z-index:50;}
+.hdr-inner{max-width:900px;margin:0 auto;width:100%;display:flex;align-items:center;gap:8px;padding:0 14px;}
 .hdr h1{font-size:22px;font-weight:900;white-space:nowrap;}
 .hdr h1 span{color:#e8c14a;}
 .hdr-sub{font-size:10px;color:rgba(255,255,255,.3);letter-spacing:1.5px;}
@@ -121,8 +121,8 @@ body{background:#f4f1ec;color:#1e1b18;font-family:-apple-system,BlinkMacSystemFo
 .logout-btn{font-size:11px;color:#e8c14a;background:transparent;border:1.5px solid #e8c14a;border-radius:5px;padding:4px 10px;cursor:pointer;font-weight:600;}
 
 /* ── 필름 설정 바 ── */
-.fbar{background:#2a2620;border-bottom:1px solid #3a3530;}
-.fbar-inner{max-width:640px;margin:0 auto;padding:12px 14px;display:flex;align-items:center;gap:10px;flex-wrap:nowrap;}
+.fbar{background:#2a2620;border-bottom:1px solid #3a3530;display:flex;}
+.fbar-inner{max-width:900px;margin:0 auto;padding:12px 14px;display:flex;align-items:center;gap:10px;flex-wrap:nowrap;width:100%;}
 .flbl{font-size:11px;color:rgba(255,255,255,.5);white-space:nowrap;font-weight:600;}
 
 .fbar-inp:focus{outline:none;}
@@ -142,7 +142,7 @@ body{background:#f4f1ec;color:#1e1b18;font-family:-apple-system,BlinkMacSystemFo
 .fbar-sep{width:1px;height:22px;background:rgba(255,255,255,.15);margin:0 4px;flex-shrink:0;}
 
 /* ── 패턴 바 ── */
-.pbar{background:#242018;border-bottom:1px solid #3a3530;}
+.pbar{background:#242018;border-bottom:1px solid #3a3530;display:flex;}
 .pbar-inner{max-width:640px;margin:0 auto;padding:8px 14px;display:flex;align-items:center;justify-content:center;gap:8px;height:54px;}
 .pbar-lbl{display:none;}
 .pbar-btns{display:flex;gap:8px;max-width:360px;width:100%;}
@@ -155,10 +155,10 @@ body{background:#f4f1ec;color:#1e1b18;font-family:-apple-system,BlinkMacSystemFo
 
 
 /* ── 메인 레이아웃 ── */
-.wrap{max-width:640px;margin:0 auto;padding:12px 14px 72px;display:flex;flex-direction:column;gap:10px;}
+.wrap{max-width:640px;margin:0 auto;padding:12px 14px 72px;display:flex;flex-direction:column;gap:10px;width:100%;}
 @media(min-width:900px){
-  .wrap{max-width:1200px;display:grid;grid-template-columns:360px 1fr;align-items:start;gap:16px;padding:16px 14px;}
-  .container,.fbar-inner,.pbar-inner,.hdr-inner{max-width:1200px;}
+  .wrap{max-width:900px;display:grid;grid-template-columns:360px 1fr;align-items:start;gap:16px;padding:16px 14px;}
+  .hdr-inner,.fbar-inner,.pbar-inner,.container{max-width:900px;}
 }
 
 /* ── 카드 ── */
@@ -606,7 +606,7 @@ tr:hover td{background:#faf8f5;}
     <span class="hdr-sub">CUTTING RESULT</span>
   </div>
 </div>
-<div style="max-width:640px;margin:0 auto;padding:12px 14px 72px;">
+<div style="max-width:900px;margin:0 auto;padding:12px 14px 72px;">
   <div id="rcol">
     <div class="card"><div class="card-body"><div class="empty"><div class="ei">✂</div>항목을 추가하고<br><strong>최적 재단 계산하기</strong>를 눌러주세요</div></div></div>
   </div>
@@ -621,7 +621,7 @@ tr:hover td{background:#faf8f5;}
     <span class="hdr-sub">HISTORY</span>
   </div>
 </div>
-<div class="container" style="padding-top:12px;padding-bottom:72px;">
+<div style="max-width:900px;margin:0 auto;padding:12px 14px 72px;">
   <div style="margin-bottom:10px;position:relative;">
     <input type="text" id="searchBox" placeholder="🔍 현장명 · 고객명 · 연락처 검색" readonly onclick="openSearch()" style="width:100%;padding:9px 13px;border:1px solid #d8d0c4;border-radius:8px;font-size:14px;background:#fff;color:#2a2420;cursor:pointer;">
     <span id="sClear" onclick="clrSearch()" style="display:none;position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:17px;color:#9a8f84;">✕</span>
