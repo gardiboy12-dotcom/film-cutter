@@ -936,6 +936,8 @@ function doSignup(){
             e.code==='auth/credential-already-in-use'||
             e.code==='auth/provider-already-linked')
       showErr('이미 가입된 번호입니다. 로그인해주세요.');
+    else if(e.code==='auth/operation-not-allowed')
+      showErr('이미 가입된 번호입니다. 로그인해주세요.');
     else showErr('가입 실패: '+e.message);
   });
 }
