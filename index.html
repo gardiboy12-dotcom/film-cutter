@@ -124,6 +124,8 @@ body{background:#faf7f2;color:#2a2420;font-family:-apple-system,BlinkMacSystemFo
 .fbar-group{display:flex;align-items:center;gap:4px;}
 .fbar-toggle{display:flex;gap:3px;}
 .ftbtn{padding:4px 9px;border-radius:4px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.07);color:rgba(255,255,255,.5);font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;}
+.pat-btn{padding:5px 12px;font-size:12px;border-radius:6px;}
+.pat-btn.on{background:#27ae60;color:#fff;border-color:#27ae60;font-weight:700;}
 .ftbtn.on{background:#e8c14a;color:#1a1814;border-color:#e8c14a;font-weight:700;}
 
 /* 레이아웃 */
@@ -441,10 +443,10 @@ tr:hover td{background:#faf7f2;}
     </div>
   </div>
   <div class="fbar-group">
-    <span class="flbl">패턴</span>
+    <span class="flbl" style="color:rgba(255,255,255,.8);font-weight:700;">패턴</span>
     <div class="fbar-toggle">
-      <button class="ftbtn" id="patY" onclick="setPat(true)">있음</button>
-      <button class="ftbtn on" id="patN" onclick="setPat(false)">없음</button>
+      <button class="ftbtn pat-btn" id="patY" onclick="setPat(true)">🌲 있음</button>
+      <button class="ftbtn pat-btn on" id="patN" onclick="setPat(false)">없음</button>
     </div>
   </div>
 </div>
@@ -831,7 +833,7 @@ function doJoin(){
     .then(function(result){
       var phoneUser=result.user;
 
-      /* ── 1차: providerData로 중복 체크 (실제 번호용) ── */
+      /* 1차: providerData (실제번호) */
       var alreadyJoined=phoneUser.providerData.some(function(p){
         return p.providerId==='password';
       });
@@ -841,33 +843,43 @@ function doJoin(){
         });
       }
 
-      /* ── 2차: Firestore에서 phone 필드로 중복 체크 (테스트번호 포함) ── */
+      /* 2차: Firestore phone 체크 - 오류나도 진행 금지 */
       return window._db.collection('users').where('phone','==',pE164).limit(1).get()
         .then(function(snap){
           if(!snap.empty){
-            /* Firestore에 이미 동일 번호 존재 → 중복 */
             return window._auth.signOut().then(function(){
               return Promise.reject({code:'phone/already-exists'});
             });
           }
-          /* ── 통과: 전화 임시계정 삭제 → 이메일 계정 생성 ── */
-          return phoneUser.delete()
-            .then(function(){
-              return window._auth.createUserWithEmailAndPassword(pEmail,pPw);
-            });
+          /* 통과: 전화계정 삭제 → 이메일 계정 생성 */
+          return phoneUser.delete().then(function(){
+            return window._auth.createUserWithEmailAndPassword(pEmail,pPw);
+          });
         })
-        .then(function(cred){
-          var user=cred.user;
-          return user.updateProfile({displayName:pName})
-            .then(function(){
-              var disp=pPhone.replace(/(\d{3})(\d{3,4})(\d{4})/,'$1-$2-$3');
-              return window._saveUser(user.uid,{
-                uid:user.uid,name:pName,email:pEmail,
-                phone:pE164,phoneDisplay:disp,
-                createdAt:firebase.firestore.FieldValue.serverTimestamp()
-              });
+        .catch(function(err){
+          /* Firestore 오류(permission-denied 등) → 안전하게 차단 */
+          if(err.code==='phone/already-exists'||err.code==='auth/email-already-in-use'){
+            return Promise.reject(err);
+          }
+          /* Firestore 읽기 실패 → 가입 진행 불가, 규칙 설정 안내 */
+          return window._auth.signOut().then(function(){
+            return Promise.reject({
+              code:'firestore/rules-error',
+              message:'Firestore 규칙 오류 - Firebase Console에서 allow read: if true 설정 필요'
             });
+          });
         });
+    })
+    .then(function(cred){
+      var user=cred.user;
+      return user.updateProfile({displayName:pName}).then(function(){
+        var disp=pPhone.replace(/(\d{3})(\d{3,4})(\d{4})/,'$1-$2-$3');
+        return window._saveUser(user.uid,{
+          uid:user.uid,name:pName,email:pEmail,
+          phone:pE164,phoneDisplay:disp,
+          createdAt:firebase.firestore.FieldValue.serverTimestamp()
+        });
+      });
     })
     .then(function(){
       clearInterval(timerIv);
@@ -949,7 +961,7 @@ function clrBrand(){var btns=document.getElementById("brandGrid").querySelectorA
 /* ══ 방염/패턴 ══ */
 var isFlame=false,hasPat=false;
 function setFlame(v){isFlame=v;var y=document.getElementById("flameY"),n=document.getElementById("flameN");y.className="ftbtn"+(v?" on":"");n.className="ftbtn"+(!v?" on":"");}
-function setPat(v){hasPat=v;var y=document.getElementById("patY"),n=document.getElementById("patN");y.className="ftbtn"+(v?" on":"");n.className="ftbtn"+(!v?" on":"");}
+function setPat(v){hasPat=v;var y=document.getElementById("patY"),n=document.getElementById("patN");y.className="ftbtn pat-btn"+(v?" on":"");n.className="ftbtn pat-btn"+(!v?" on":"");}
 
 /* ══ 입력 팝업 ══ */
 function showIM(lbl,val,type,cb){
@@ -989,16 +1001,22 @@ function showTab(tab){document.getElementById("pg-calc").className="page"+(tab==
 /* ══ 기록 ══ */
 function saveHist(sN,cN,cP,br,mn,items,flat,total,eff,fw,fl,flame,pattern){
   try{
+    var uid=curUser?curUser.uid:'guest';
+    var key='filmHist_'+uid;
     var now=new Date();
     var ds=now.getFullYear()+"."+(now.getMonth()+1)+"."+(("0"+now.getDate()).slice(-2))+" "+(("0"+now.getHours()).slice(-2))+":"+(("0"+now.getMinutes()).slice(-2));
     var rec={id:now.getTime(),date:ds,siteName:sN,clientName:cN,clientPhone:cP,brand:br,modelName:mn,items:items,flat:flat,total:total,eff:eff,fw:fw,fl:fl,flame:flame,pattern:pattern};
-    var saved=[];try{saved=JSON.parse(localStorage.getItem("filmHistory")||"[]");}catch(e){}
+    var saved=[];try{saved=JSON.parse(localStorage.getItem(key)||'[]');}catch(e){}
     saved.unshift(rec);if(saved.length>50)saved=saved.slice(0,50);
-    localStorage.setItem("filmHistory",JSON.stringify(saved));showToast();
+    localStorage.setItem(key,JSON.stringify(saved));showToast();
   }catch(e){}
 }
-function showToast(){var t=document.getElementById("toast");t.className="toast on";setTimeout(function(){t.className="toast";},2000);}
-function getHist(){try{return JSON.parse(localStorage.getItem("filmHistory")||"[]");}catch(e){return[];}}
+function getHist(){
+  try{
+    var uid=curUser?curUser.uid:'guest';
+    return JSON.parse(localStorage.getItem('filmHist_'+uid)||'[]');
+  }catch(e){return[];}
+}
 
 function renderHist(){
   var list=document.getElementById("hist-list");if(!list)return;list.innerHTML="";
@@ -1028,7 +1046,7 @@ function renderHist(){
     var btns=document.createElement("div");btns.className="hcard-btns";
     var lb=document.createElement("button");lb.className="load-btn";lb.textContent="불러오기";lb.onclick=function(){loadRec(rec);};
     var db=document.createElement("button");db.className="del-btn";db.textContent="삭제";
-    db.onclick=function(){showCfm("기록 삭제","이 기록을 삭제할까요?\n삭제 후 복구할 수 없습니다.",function(){var saved=getHist();saved=saved.filter(function(r){return r.id!==rec.id;});localStorage.setItem("filmHistory",JSON.stringify(saved));renderHist();});};
+    db.onclick=function(){showCfm("기록 삭제","이 기록을 삭제할까요?\n삭제 후 복구할 수 없습니다.",function(){var saved=getHist();saved=saved.filter(function(r){return r.id!==rec.id;});localStorage.setItem("filmHist_"+(curUser?curUser.uid:"guest"),JSON.stringify(saved));renderHist();});};
     btns.appendChild(lb);btns.appendChild(db);bd.appendChild(btns);card.appendChild(bd);list.appendChild(card);
   })(recs[i]);}
 }
