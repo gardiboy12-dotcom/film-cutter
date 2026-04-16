@@ -802,10 +802,12 @@ function doLogin(){
   window._auth.signInWithEmailAndPassword(fakeEmail,pw)
     .then(function(){enterApp();})
     .catch(function(e){
-      if(e.code==='auth/user-not-found'||e.code==='auth/invalid-credential')
-        showErr('가입되지 않은 번호이거나 비밀번호가 틀렸습니다.');
-      else if(e.code==='auth/wrong-password')
-        showErr('비밀번호가 올바르지 않습니다.');
+      console.error('login error:',e.code);
+      if(e.code==='auth/user-not-found'||
+         e.code==='auth/wrong-password'||
+         e.code==='auth/invalid-credential'||
+         e.code==='auth/invalid-login-credentials')
+        showErr('전화번호 또는 비밀번호가 올바르지 않습니다.');
       else showErr('로그인 실패: '+e.message);
     });
 }
@@ -886,8 +888,25 @@ function doSignup(){
   suCfm.confirm(code)
   .then(function(result){
     var phoneUser=result.user;
-    var emailCred=firebase.auth.EmailAuthProvider.credential(fakeEmail,suPw);
-    return phoneUser.linkWithCredential(emailCred);
+
+    /* Firestore에서 전화번호 중복 확인 */
+    return window._db.collection('users')
+      .where('phone','==',suE164).limit(1).get()
+      .then(function(snap){
+        if(!snap.empty){
+          /* 이미 가입된 번호 → 전화계정 삭제 후 차단 */
+          return phoneUser.delete().catch(function(){})
+            .then(function(){
+              return Promise.reject({
+                code:'phone/duplicate',
+                message:'이미 가입된 번호입니다. 로그인해주세요.'
+              });
+            });
+        }
+        /* 신규 → 가상이메일+비번 link */
+        var emailCred=firebase.auth.EmailAuthProvider.credential(fakeEmail,suPw);
+        return phoneUser.linkWithCredential(emailCred);
+      });
   })
   .then(function(linked){
     var user=linked.user;
@@ -911,7 +930,8 @@ function doSignup(){
       showErr('인증번호가 올바르지 않습니다.');
     else if(e.code==='auth/code-expired')
       showErr('인증번호가 만료됐습니다. 재전송해주세요.');
-    else if(e.code==='auth/email-already-in-use'||
+    else if(e.code==='phone/duplicate'||
+            e.code==='auth/email-already-in-use'||
             e.code==='auth/credential-already-in-use'||
             e.code==='auth/provider-already-linked')
       showErr('이미 가입된 번호입니다. 로그인해주세요.');
