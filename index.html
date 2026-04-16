@@ -387,6 +387,10 @@ tr:hover td{background:#faf7f2;}
           <div class="ph-hint">📋 핸드폰 번호 1개당 계정 1개만 가입 가능합니다.</div>
         </div>
         <div class="af">
+          <label>이메일 (선택)</label>
+          <input type="email" id="suEmail" placeholder="example@email.com">
+        </div>
+        <div class="af">
           <label>비밀번호</label>
           <input type="password" id="suPw" placeholder="6자리 이상">
         </div>
@@ -744,7 +748,7 @@ var curUser=null;
 var rcpV=null,rcpV2=null;
 var suCfm=null,resetCfm=null;
 var suTimerIv=null,resetTimerIv=null;
-var suPhone='',suE164='',suName='',suPw='';
+var suPhone='',suE164='',suName='',suPw='',suEmail_='';
 var resetPhone='',resetE164='';
 
 function showErr(msg){
@@ -842,6 +846,7 @@ function sendSignupOtp(){
   suPhone=rawPh;
   suE164='+82'+(rawPh.startsWith('0')?rawPh.slice(1):rawPh);
   suPw=pw;
+  suEmail_=document.getElementById('suEmail').value.trim();
   var btn=document.getElementById('suSendBtn');
   btn.disabled=true;btn.textContent='발송 중...';
   if(!rcpV)initRcp();
@@ -915,11 +920,13 @@ function doSignup(){
     var user=result.user;
     var disp=suPhone.replace(/(\d{3})(\d{3,4})(\d{4})/,'$1-$2-$3');
     user.updateProfile({displayName:suName}).catch(function(){});
-    return window._saveUser(user.uid,{
-      uid:user.uid,name:suName,
-      phone:suE164,phoneDisplay:disp,
-      createdAt:firebase.firestore.FieldValue.serverTimestamp()
-    }).catch(function(){});
+    var userData={
+        uid:user.uid,name:suName,
+        phone:suE164,phoneDisplay:disp,
+        createdAt:firebase.firestore.FieldValue.serverTimestamp()
+      };
+      if(suEmail_)userData.email=suEmail_;
+      return window._saveUser(user.uid,userData).catch(function(){});
   })
   .then(function(){
     clearInterval(suTimerIv);
@@ -1097,6 +1104,8 @@ function doLogout(){
       document.getElementById('loginPw').value='';
       document.getElementById('signupStep1').style.display='block';
       document.getElementById('signupStep2').style.display='none';
+      document.getElementById('suEmail').value='';
+      suEmail_='';
     });
   });
 }
