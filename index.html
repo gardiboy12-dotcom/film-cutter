@@ -235,11 +235,8 @@ tr:hover td{background:#faf8f5;}
 
 /* ── 탭바 ── */
 .tabbar{position:fixed;bottom:0;left:0;right:0;background:#1e1b18;display:flex;border-top:1px solid #2a2620;z-index:100;height:56px;}
-.tab{flex:1;padding:8px 4px 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;border:none;background:none;color:rgba(255,255,255,.35);font-size:9px;letter-spacing:.5px;transition:all .15s;}
-.tab.on{color:#fff;}
-.tab-calc.on{color:#7ec8e3;border-top:2px solid #7ec8e3;}
-.tab-result.on{color:#e8c14a;border-top:2px solid #e8c14a;}
-.tab-hist.on{color:#a8e6a3;border-top:2px solid #a8e6a3;}
+.tab{flex:1;padding:8px 4px 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;border:none;border-top:2.5px solid transparent;background:none;color:rgba(255,255,255,.35);font-size:9px;letter-spacing:.5px;transition:all .2s;}
+.tab.on{color:#e8c14a;border-top:2.5px solid #e8c14a;}
 .tab-icon{font-size:18px;line-height:1;}
 .page{display:none;}
 .page.on{display:block;}
@@ -285,10 +282,10 @@ tr:hover td{background:#faf8f5;}
 @keyframes tooltipIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
 @keyframes pulse{
   0%{box-shadow:0 0 0 0 rgba(232,193,74,0.8);transform:scale(1);}
-  50%{box-shadow:0 0 0 8px rgba(232,193,74,0);transform:scale(1.15);}
+  60%{box-shadow:0 0 0 10px rgba(232,193,74,0);transform:scale(1.12);}
   100%{box-shadow:0 0 0 0 rgba(232,193,74,0);transform:scale(1);}
 }
-.inum-pulse{animation:pulse 1s ease 3;}
+.inum-pulse{animation:pulse 2.2s ease infinite;}
 .onboarding-anim{animation:tooltipIn .3s ease;}
 .im-lbl{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#8a8078;margin-bottom:7px;}
 .im-fld{width:100%;background:#e8e4dc;border:1.5px solid #d8d4cc;border-radius:8px;color:#1e1b18;font-size:17px;font-weight:600;padding:11px 13px;margin-bottom:12px;font-family:inherit;}
@@ -768,7 +765,6 @@ function addItem(){
   /* 첫 항목 추가 시: 깜빡임 + 온보딩 툴팁 */
   if(IDS.length===1){
     num.classList.add('inum-pulse');
-    num.addEventListener('animationend',function(){num.classList.remove('inum-pulse');},{once:true});
     setTimeout(function(){showOnboarding(num);},400);
   }
 }
