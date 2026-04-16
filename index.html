@@ -741,19 +741,25 @@ if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').cat
 
 /* ══ Auth ══ */
 var curUser=null;
-var rcpV=null, rcpV2=null;
-var suCfm=null, resetCfm=null;
-var suTimerIv=null, resetTimerIv=null;
-var suPhone='', suE164='', suName='', suPw='';
-var resetE164='', resetPhone='';
+var rcpV=null,rcpV2=null;
+var suCfm=null,resetCfm=null;
+var suTimerIv=null,resetTimerIv=null;
+var suPhone='',suE164='',suName='',suPw='';
+var resetPhone='',resetE164='';
 
-function showErr(msg){var e=document.getElementById('authMsg');e.className='auth-msg err';e.textContent=msg;e.style.display='block';}
-function showOk(msg){var e=document.getElementById('authMsg');e.className='auth-msg ok';e.textContent=msg;e.style.display='block';}
+function showErr(msg){
+  var e=document.getElementById('authMsg');
+  e.className='auth-msg err';e.textContent=msg;e.style.display='block';
+}
+function showOk(msg){
+  var e=document.getElementById('authMsg');
+  e.className='auth-msg ok';e.textContent=msg;e.style.display='block';
+}
 function hideMsg(){document.getElementById('authMsg').style.display='none';}
 
-/* 전화번호 → 가상 이메일 변환 (Firebase Email Auth 활용) */
-function phoneToEmail(e164){
-  return e164.replace('+','').replace(/-/g,'')+('@jdw.app');
+/* 전화번호 → 가상이메일 */
+function toFakeEmail(e164){
+  return e164.replace('+','')+'@jdw.app';
 }
 
 function fmtPh(inp){
@@ -773,15 +779,18 @@ function switchAuthTab(tab){
   document.getElementById('resetSection').style.display='none';
   document.getElementById('resetPwSection').style.display='none';
 }
-
-function showLogin(){switchAuthTab('login');}
+function showLogin(){
+  switchAuthTab('login');
+}
 function showResetPw(){
   hideMsg();
   document.getElementById('loginSection').style.display='none';
   document.getElementById('resetSection').style.display='block';
 }
 
-/* ══ 로그인: 전화번호 + 비밀번호 ══ */
+/* ════════════════════════════════
+   로그인: 전화번호 + 비밀번호
+   ════════════════════════════════ */
 function doLogin(){
   hideMsg();
   var rawPh=document.getElementById('loginPhone').value.replace(/\D/g,'');
@@ -789,36 +798,48 @@ function doLogin(){
   if(rawPh.length<10||rawPh.length>11){showErr('올바른 핸드폰 번호를 입력해주세요.');return;}
   if(!pw){showErr('비밀번호를 입력해주세요.');return;}
   var e164='+82'+(rawPh.startsWith('0')?rawPh.slice(1):rawPh);
-  var fakeEmail=phoneToEmail(e164);
+  var fakeEmail=toFakeEmail(e164);
   window._auth.signInWithEmailAndPassword(fakeEmail,pw)
     .then(function(){enterApp();})
     .catch(function(e){
-      if(e.code==='auth/user-not-found')showErr('가입되지 않은 번호입니다. 회원가입을 해주세요.');
-      else if(e.code==='auth/wrong-password'||e.code==='auth/invalid-credential')showErr('비밀번호가 올바르지 않습니다.');
+      if(e.code==='auth/user-not-found'||e.code==='auth/invalid-credential')
+        showErr('가입되지 않은 번호이거나 비밀번호가 틀렸습니다.');
+      else if(e.code==='auth/wrong-password')
+        showErr('비밀번호가 올바르지 않습니다.');
       else showErr('로그인 실패: '+e.message);
     });
 }
 
-/* ══ 회원가입 ══ */
+/* ════════════════════════════════
+   회원가입
+   단계: 정보입력 → OTP발송 → OTP확인 → 완료
+   핵심: signInWithPhoneNumber → linkWithCredential(email+pw)
+         전화+이메일 두 provider 모두 계정에 연결
+         → 전화번호 중복: credential-already-in-use (Firebase 서버 차단)
+         → 이메일 중복: email-already-in-use (Firebase 서버 차단)
+   ════════════════════════════════ */
 function initRcp(){
   if(rcpV)return;
-  try{rcpV=new firebase.auth.RecaptchaVerifier('recaptcha-container',{'size':'invisible','callback':function(){}});}
-  catch(e){console.error('Rcp:',e);}
+  try{
+    rcpV=new firebase.auth.RecaptchaVerifier('recaptcha-container',
+      {'size':'invisible','callback':function(){}});
+  }catch(e){console.error('Rcp1:',e);}
 }
 
 function sendSignupOtp(){
   hideMsg();
-  var rawPh=document.getElementById('suPhone').value.replace(/\D/g,'');
   var name=document.getElementById('suName').value.trim();
+  var rawPh=document.getElementById('suPhone').value.replace(/\D/g,'');
   var pw=document.getElementById('suPw').value;
   var pwC=document.getElementById('suPwC').value;
   if(!name){showErr('이름을 입력해주세요.');return;}
   if(rawPh.length<10||rawPh.length>11){showErr('올바른 핸드폰 번호를 입력해주세요.');return;}
   if(pw.length<6){showErr('비밀번호는 6자리 이상이어야 합니다.');return;}
   if(pw!==pwC){showErr('비밀번호가 일치하지 않습니다.');return;}
+  suName=name;
   suPhone=rawPh;
   suE164='+82'+(rawPh.startsWith('0')?rawPh.slice(1):rawPh);
-  suName=name;suPw=pw;
+  suPw=pw;
   var btn=document.getElementById('suSendBtn');
   btn.disabled=true;btn.textContent='발송 중...';
   if(!rcpV)initRcp();
@@ -835,7 +856,8 @@ function sendSignupOtp(){
     .catch(function(e){
       btn.disabled=false;btn.textContent='📱 인증번호 받기';
       if(rcpV){try{rcpV.clear();}catch(err){}rcpV=null;}
-      if(e.code==='auth/too-many-requests')showErr('요청이 너무 많습니다. 잠시 후 다시 시도해주세요.');
+      if(e.code==='auth/too-many-requests')
+        showErr('요청이 너무 많습니다. 잠시 후 다시 시도해주세요.');
       else showErr('SMS 발송 실패: '+e.message);
     });
 }
@@ -845,13 +867,11 @@ function backToSignupStep1(){
   document.getElementById('signupStep1').style.display='block';
   hideMsg();clearInterval(suTimerIv);
 }
-
 function resendSignupOtp(){
   if(document.getElementById('suResendBtn').className.indexOf('off')>=0)return;
   backToSignupStep1();rcpV=null;
 }
 
-/* OTP 확인 후 가상이메일+비번으로 계정 생성 */
 function doSignup(){
   var code=document.getElementById('suOtpInp').value.trim();
   hideMsg();
@@ -859,13 +879,13 @@ function doSignup(){
   if(!suCfm){showErr('인증이 만료됐습니다. 다시 시도해주세요.');return;}
   var btn=document.getElementById('suVerifyBtn');
   btn.disabled=true;btn.textContent='확인 중...';
-  var fakeEmail=phoneToEmail(suE164);
+  var fakeEmail=toFakeEmail(suE164);
 
+  /* OTP 확인 → 전화계정 획득 → 가상이메일+비번 link
+   * 전화번호 중복이면 Firebase가 credential-already-in-use 반환 */
   suCfm.confirm(code)
   .then(function(result){
     var phoneUser=result.user;
-    /* 전화계정에 가상이메일+비번 연결 (전화계정 유지!)
-     * → 이후 비밀번호 재설정 시 전화 재인증으로 updatePassword 가능 */
     var emailCred=firebase.auth.EmailAuthProvider.credential(fakeEmail,suPw);
     return phoneUser.linkWithCredential(emailCred);
   })
@@ -886,20 +906,31 @@ function doSignup(){
   })
   .catch(function(e){
     btn.disabled=false;btn.textContent='가입 완료';
-    if(e.code==='auth/invalid-verification-code')showErr('인증번호가 올바르지 않습니다.');
-    else if(e.code==='auth/code-expired')showErr('인증번호가 만료됐습니다. 재전송해주세요.');
-    else if(e.code==='auth/email-already-in-use')showErr('이미 가입된 번호입니다. 로그인해주세요.');
-    else if(e.code==='auth/credential-already-in-use')showErr('이미 가입된 번호입니다. 로그인해주세요.');
-    else showErr('가입 실패: '+e.message);
     console.error('signup error:',e.code,e.message);
+    if(e.code==='auth/invalid-verification-code')
+      showErr('인증번호가 올바르지 않습니다.');
+    else if(e.code==='auth/code-expired')
+      showErr('인증번호가 만료됐습니다. 재전송해주세요.');
+    else if(e.code==='auth/email-already-in-use'||
+            e.code==='auth/credential-already-in-use'||
+            e.code==='auth/provider-already-linked')
+      showErr('이미 가입된 번호입니다. 로그인해주세요.');
+    else showErr('가입 실패: '+e.message);
   });
 }
 
-/* ══ 비밀번호 재설정 ══ */
+/* ════════════════════════════════
+   비밀번호 재설정
+   핵심: 전화 OTP 확인 → 전화계정으로 로그인됨
+         → updatePassword()로 연결된 이메일 계정 비번 변경
+         (같은 계정에 phone+email 두 provider가 있으므로 가능)
+   ════════════════════════════════ */
 function initRcp2(){
   if(rcpV2)return;
-  try{rcpV2=new firebase.auth.RecaptchaVerifier('recaptcha-container2',{'size':'invisible','callback':function(){}});}
-  catch(e){console.error('Rcp2:',e);}
+  try{
+    rcpV2=new firebase.auth.RecaptchaVerifier('recaptcha-container2',
+      {'size':'invisible','callback':function(){}});
+  }catch(e){console.error('Rcp2:',e);}
 }
 
 function sendResetOtp(){
@@ -924,7 +955,8 @@ function sendResetOtp(){
     .catch(function(e){
       btn.disabled=false;btn.textContent='📱 인증번호 받기';
       if(rcpV2){try{rcpV2.clear();}catch(err){}rcpV2=null;}
-      if(e.code==='auth/too-many-requests')showErr('요청이 너무 많습니다. 잠시 후 다시 시도해주세요.');
+      if(e.code==='auth/too-many-requests')
+        showErr('요청이 너무 많습니다. 잠시 후 다시 시도해주세요.');
       else showErr('SMS 발송 실패: '+e.message);
     });
 }
@@ -943,45 +975,50 @@ function doResetPw(){
 
   resetCfm.confirm(code)
   .then(function(result){
-    /* 전화OTP 확인 성공 → 전화계정으로 로그인된 상태
-     * 이 계정에 연결된 가상이메일 계정의 비번을 updatePassword로 변경 */
-    var user=result.user;
-    return user.updatePassword(pw1);
+    /* 전화OTP 확인 → 전화계정으로 로그인됨
+     * 이 계정에 linkWithCredential로 연결된 이메일 비번을 updatePassword로 변경 */
+    return result.user.updatePassword(pw1);
   })
   .then(function(){
     clearInterval(resetTimerIv);
     btn.disabled=false;btn.textContent='비밀번호 변경';
-    showOk('비밀번호가 변경됐습니다! 새 비밀번호로 로그인해주세요.');
+    showOk('비밀번호가 변경됐습니다!');
     setTimeout(function(){
       document.getElementById('resetPwSection').style.display='none';
       showLogin();
       document.getElementById('loginPhone').value=
         resetPhone.replace(/(\d{3})(\d{3,4})(\d{4})/,'$1-$2-$3');
-    },2000);
+    },1500);
   })
   .catch(function(e){
     btn.disabled=false;btn.textContent='비밀번호 변경';
-    if(e.code==='auth/invalid-verification-code')showErr('인증번호가 올바르지 않습니다.');
-    else if(e.code==='auth/code-expired')showErr('인증번호가 만료됐습니다. 재전송해주세요.');
-    else if(e.code==='auth/requires-recent-login')showErr('재인증이 필요합니다. 다시 시도해주세요.');
-    else showErr('변경 실패: '+e.message);
     console.error('reset error:',e.code,e.message);
+    if(e.code==='auth/invalid-verification-code')
+      showErr('인증번호가 올바르지 않습니다.');
+    else if(e.code==='auth/code-expired')
+      showErr('인증번호가 만료됐습니다. 재전송해주세요.');
+    else if(e.code==='auth/requires-recent-login')
+      showErr('재인증이 필요합니다. 다시 시도해주세요.');
+    else showErr('변경 실패: '+e.message);
   });
 }
 
 /* ── 타이머 ── */
 function startTimer(prefix,sec){
-  var iv=prefix==='su'?suTimerIv:resetTimerIv;
-  clearInterval(iv);
   var left=sec;
   var tEl=document.getElementById(prefix+'OtpTimer');
   var rBtn=document.getElementById(prefix==='su'?'suResendBtn':'suResendBtn');
-  if(prefix==='su'){rBtn=document.getElementById('suResendBtn');}
+  if(prefix==='su')rBtn=document.getElementById('suResendBtn');
   rBtn.className='rb off';
   function tick(){
     var m=Math.floor(left/60),s=left%60;
     if(tEl)tEl.textContent=(m>0?m+'분 ':'')+s+'초';
-    if(left<=0){clearInterval(iv);if(tEl)tEl.textContent='';rBtn.className='rb';}
+    if(left<=0){
+      if(prefix==='su')clearInterval(suTimerIv);
+      else clearInterval(resetTimerIv);
+      if(tEl)tEl.textContent='';
+      rBtn.className='rb';
+    }
     left--;
   }
   tick();
@@ -989,6 +1026,7 @@ function startTimer(prefix,sec){
   else resetTimerIv=setInterval(tick,1000);
 }
 
+/* ── 앱 진입/로그아웃 ── */
 function enterApp(){
   document.getElementById('authPg').style.display='none';
   if(curUser){
@@ -1004,6 +1042,8 @@ function doLogout(){
       switchAuthTab('login');
       document.getElementById('loginPhone').value='';
       document.getElementById('loginPw').value='';
+      document.getElementById('signupStep1').style.display='block';
+      document.getElementById('signupStep2').style.display='none';
     });
   });
 }
