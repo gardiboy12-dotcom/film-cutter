@@ -831,27 +831,30 @@ function doJoin(){
     .then(function(result){
       var phoneUser=result.user;
 
-      /* ── 전화번호 중복 판단 ──
-       * 이미 이메일(password)이 연결된 계정 = 중복
-       * providerData에 'password' provider가 있으면 완전히 가입된 계정
-       */
+      /* ── 1차: providerData로 중복 체크 (실제 번호용) ── */
       var alreadyJoined=phoneUser.providerData.some(function(p){
         return p.providerId==='password';
       });
       if(alreadyJoined){
-        /* 로그아웃만 하고 차단 (delete하면 기존 계정 삭제됨) */
         return window._auth.signOut().then(function(){
           return Promise.reject({code:'phone/already-exists'});
         });
       }
 
-      /* ── 신규 계정 처리 ──
-       * 전화 임시계정 삭제 → 이메일 계정 새로 생성
-       * 이메일이 중복이면 createUserWithEmailAndPassword가 email-already-in-use 반환
-       */
-      return phoneUser.delete()
-        .then(function(){
-          return window._auth.createUserWithEmailAndPassword(pEmail,pPw);
+      /* ── 2차: Firestore에서 phone 필드로 중복 체크 (테스트번호 포함) ── */
+      return window._db.collection('users').where('phone','==',pE164).limit(1).get()
+        .then(function(snap){
+          if(!snap.empty){
+            /* Firestore에 이미 동일 번호 존재 → 중복 */
+            return window._auth.signOut().then(function(){
+              return Promise.reject({code:'phone/already-exists'});
+            });
+          }
+          /* ── 통과: 전화 임시계정 삭제 → 이메일 계정 생성 ── */
+          return phoneUser.delete()
+            .then(function(){
+              return window._auth.createUserWithEmailAndPassword(pEmail,pPw);
+            });
         })
         .then(function(cred){
           var user=cred.user;
