@@ -724,8 +724,8 @@ tr:hover td{background:#faf8f5;}
       <div class="footer-company">
         <strong>탄탄필름</strong><br>
         대표자: 이중원 &nbsp;|&nbsp; 사업자등록번호: 371-23-02267<br>
-        주소: 경기도 성남시 수정구 남위례로 140 수자인센트럴 207동 902호<br>
-        연락처: 010-2805-0524<br>
+        주소: 경기도 성남시 수정구 남위례로 140<br>
+        연락처: 0507-1328-0524<br>
         © 2025 탄탄필름. All rights reserved.
       </div>
     </div>
@@ -763,8 +763,8 @@ tr:hover td{background:#faf8f5;}
       <div class="footer-company">
         <strong>탄탄필름</strong><br>
         대표자: 이중원 &nbsp;|&nbsp; 사업자등록번호: 371-23-02267<br>
-        주소: 경기도 성남시 수정구 남위례로 140 수자인센트럴 207동 902호<br>
-        연락처: 010-2805-0524<br>
+        주소: 경기도 성남시 수정구 남위례로 140<br>
+        연락처: 0507-1328-0524<br>
         © 2025 탄탄필름. All rights reserved.
       </div>
     </div>
@@ -804,8 +804,8 @@ tr:hover td{background:#faf8f5;}
       <div class="footer-company">
         <strong>탄탄필름</strong><br>
         대표자: 이중원 &nbsp;|&nbsp; 사업자등록번호: 371-23-02267<br>
-        주소: 경기도 성남시 수정구 남위례로 140 수자인센트럴 207동 902호<br>
-        연락처: 010-2805-0524<br>
+        주소: 경기도 성남시 수정구 남위례로 140<br>
+        연락처: 0507-1328-0524<br>
         © 2025 탄탄필름. All rights reserved.
       </div>
     </div>
@@ -1760,7 +1760,7 @@ var TERMS_HTML=`
 <h3>환불</h3>
 <ul>
 <li>구독 결제 후 7일 이내, 서비스를 이용하지 않은 경우 전액 환불이 가능합니다.</li>
-<li>환불 요청은 대표 연락처(010-2805-0524)로 접수하세요.</li>
+<li>환불 요청은 대표 연락처(0507-1328-0524)로 접수하세요.</li>
 </ul>
 <hr>
 <h2>제6조 이용자 의무</h2>
@@ -1781,8 +1781,8 @@ var TERMS_HTML=`
 <li>상호: 탄탄필름</li>
 <li>대표자: 이중원</li>
 <li>사업자등록번호: 371-23-02267</li>
-<li>주소: 경기도 성남시 수정구 남위례로 140 수자인센트럴 207동 902호</li>
-<li>연락처: 010-2805-0524</li>
+<li>주소: 경기도 성남시 수정구 남위례로 140</li>
+<li>연락처: 0507-1328-0524</li>
 </ul>
 `;
 
@@ -1840,14 +1840,14 @@ var PRIVACY_HTML=`
 <li>개인정보 열람, 수정, 삭제 요청</li>
 <li>회원 탈퇴</li>
 </ul>
-<p>권리 행사: 010-2805-0524로 연락해주세요.</p>
+<p>권리 행사: 0507-1328-0524로 연락해주세요.</p>
 <hr>
 <h2>제7조 개인정보 보호책임자</h2>
 <ul>
 <li>성명: 이중원</li>
 <li>상호: 탄탄필름</li>
-<li>연락처: 010-2805-0524</li>
-<li>주소: 경기도 성남시 수정구 남위례로 140 수자인센트럴 207동 902호</li>
+<li>연락처: 0507-1328-0524</li>
+<li>주소: 경기도 성남시 수정구 남위례로 140</li>
 </ul>
 <hr>
 <h2>제8조 방침 변경</h2>
@@ -1908,15 +1908,10 @@ function startPayment(){
   var btn=document.getElementById('subPayBtn');
   btn.disabled=true;btn.textContent='결제 준비 중...';
 
-  if(!curUser){
-    btn.disabled=false;btn.textContent='결제하기';
-    return;
-  }
-
+  if(!curUser){btn.disabled=false;btn.textContent='결제하기';return;}
   if(typeof IMP==='undefined'){
     alert('결제 모듈 로딩 중입니다. 잠시 후 다시 시도해주세요.');
-    btn.disabled=false;btn.textContent='결제하기';
-    return;
+    btn.disabled=false;btn.textContent='결제하기';return;
   }
 
   var amount=_selectedPlan==='monthly'?9900:99000;
@@ -1924,25 +1919,27 @@ function startPayment(){
   var merchantUid='jdw_'+curUser.uid.slice(0,8)+'_'+Date.now();
   var customerUid='cust_'+curUser.uid;
 
-  /* 포트원 V1 채널키 방식으로 초기화 */
   IMP.init('imp25462342');
 
+  /* 포트원 V1 - KPN 정기결제
+   * channelKey 방식 사용 (포트원 콘솔에서 생성한 채널 직접 참조) */
   IMP.request_pay({
-    channelKey:'channel-key-44670c07-b22d-4bfa-9b20-fbd0973cdbce',
+    pg:'kpn.merchantes10',
     pay_method:'card',
     merchant_uid:merchantUid,
     customer_uid:customerUid,
     name:planName,
     amount:amount,
     buyer_name:curUser.displayName||'재단왕 사용자',
-    buyer_tel:'010-0000-0000',
-    buyer_email:''
+    buyer_tel:'0507-1328-0524',
+    m_redirect_url:window.location.href
   },function(rsp){
     btn.disabled=false;btn.textContent='결제하기';
-    console.log('결제 응답:', rsp);
+    console.log('결제 응답 전체:', JSON.stringify(rsp));
     if(rsp.success){
       onPaymentSuccess(rsp,_selectedPlan);
     } else {
+      console.error('결제실패:', rsp.error_code, rsp.error_msg);
       alert('결제 실패: '+rsp.error_msg);
     }
   });
