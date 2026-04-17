@@ -1931,6 +1931,7 @@ function startPayment(){
     orderName:planName,
     totalAmount:amount,
     currency:'CURRENCY_KRW',
+    billingKeyAndPayMethod:'CARD',
     customer:{
       customerId:curUser.uid,
       fullName:curUser.displayName||'재단왕 사용자'
