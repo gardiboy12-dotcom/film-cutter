@@ -1922,7 +1922,7 @@ function startPayment(){
   /* STEP1: 빌링키 발급 (카드 등록) */
   PortOne.requestIssueBillingKey({
     storeId:'store-03c5990a-a966-48d2-b142-6a3d17ed7a2c',
-    channelKey:'channel-key-719a02bd-5260-4312-b818-29a80ecb264a',
+    channelKey:'channel-key-fb5a865d-7508-4ef6-90fe-fbd31262e802',
     billingKeyMethod:'CARD',
     issueId:billingKeyId,
     issueName:planName,
@@ -1941,7 +1941,7 @@ function startPayment(){
     /* STEP2: 발급된 빌링키로 즉시 결제 */
     return PortOne.requestPayment({
       storeId:'store-03c5990a-a966-48d2-b142-6a3d17ed7a2c',
-      channelKey:'channel-key-719a02bd-5260-4312-b818-29a80ecb264a',
+      channelKey:'channel-key-fb5a865d-7508-4ef6-90fe-fbd31262e802',
       paymentId:paymentId,
       orderName:planName,
       totalAmount:amount,
