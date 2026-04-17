@@ -359,7 +359,7 @@ tr:hover td{background:#faf8f5;}
 .im-ok{flex:1;padding:10px;background:#1e1b18;color:#e8c14a;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;}
 
 /* ── 확인 모달 ── */
-.cfm-ov{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:500;display:flex;align-items:center;justify-content:center;}
+.cfm-ov{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:1100;display:flex;align-items:center;justify-content:center;}
 .cfm-box{background:#fff;border-radius:14px;padding:22px 18px;width:84%;max-width:300px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.15);}
 .cfm-title{font-size:15px;font-weight:700;color:#1e1b18;margin-bottom:7px;}
 .cfm-msg{font-size:13px;color:#5a5450;margin-bottom:18px;line-height:1.6;white-space:pre-line;}
@@ -846,8 +846,8 @@ tr:hover td{background:#faf8f5;}
       <!-- 계정 관리 -->
       <div style="background:#fff;border-radius:12px;overflow:hidden;margin-bottom:24px;">
         <div style="font-size:11px;color:#8a8078;font-weight:700;padding:12px 16px 8px;letter-spacing:1px;">계정 관리</div>
-        <div onclick="doLogout()" style="padding:12px 16px;border-top:1px solid #f0ede8;font-size:13px;color:#3a3530;cursor:pointer;display:flex;justify-content:space-between;">로그아웃 <span style="color:#8a8078;">›</span></div>
-        <div onclick="doDeleteAccount()" style="padding:12px 16px;border-top:1px solid #f0ede8;font-size:13px;color:#c0392b;cursor:pointer;font-weight:600;">회원 탈퇴</div>
+        <div onclick="closeSettings();setTimeout(doLogout,100);" style="padding:12px 16px;border-top:1px solid #f0ede8;font-size:13px;color:#3a3530;cursor:pointer;display:flex;justify-content:space-between;">로그아웃 <span style="color:#8a8078;">›</span></div>
+        <div onclick="closeSettings();setTimeout(doDeleteAccount,100);" style="padding:12px 16px;border-top:1px solid #f0ede8;font-size:13px;color:#c0392b;cursor:pointer;font-weight:600;">회원 탈퇴</div>
       </div>
 
       <div style="font-size:11px;color:#8a8078;text-align:center;line-height:1.8;">
