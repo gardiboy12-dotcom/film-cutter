@@ -1614,53 +1614,134 @@ function showTab(tab){
 function saveHist(sN,cN,cP,br,mn,items,flat,total,eff,fw,fl,flame,pattern){
   try{
     var uid=curUser?curUser.uid:'guest';
-    var key='filmHist_'+uid;
     var now=new Date();
     var ds=now.getFullYear()+"."+(now.getMonth()+1)+"."+(("0"+now.getDate()).slice(-2))+" "+(("0"+now.getHours()).slice(-2))+":"+(("0"+now.getMinutes()).slice(-2));
     var rec={id:now.getTime(),date:ds,siteName:sN,clientName:cN,clientPhone:cP,brand:br,modelName:mn,items:items,flat:flat,total:total,eff:eff,fw:fw,fl:fl,flame:flame,pattern:pattern};
-    var saved=[];try{saved=JSON.parse(localStorage.getItem(key)||'[]');}catch(e){}
-    saved.unshift(rec);if(saved.length>50)saved=saved.slice(0,50);
-    localStorage.setItem(key,JSON.stringify(saved));showToast();
-  }catch(e){}
+
+    if(uid!=='guest'&&window._db){
+      /* Firestore 저장 */
+      window._db.collection('history').doc(uid)
+        .collection('records').doc(String(rec.id))
+        .set(rec)
+        .then(function(){showToast();})
+        .catch(function(e){
+          console.warn('Firestore 저장 실패, localStorage 사용:', e);
+          _saveToLocal(uid, rec);
+          showToast();
+        });
+    } else {
+      _saveToLocal(uid, rec);
+      showToast();
+    }
+  }catch(e){console.error('saveHist error:',e);}
+}
+
+function _saveToLocal(uid, rec){
+  var key='filmHist_'+uid;
+  var saved=[];
+  try{saved=JSON.parse(localStorage.getItem(key)||'[]');}catch(e){}
+  saved.unshift(rec);
+  if(saved.length>100)saved=saved.slice(0,100);
+  localStorage.setItem(key,JSON.stringify(saved));
 }
 function getHist(){
-  try{
-    var uid=curUser?curUser.uid:'guest';
-    return JSON.parse(localStorage.getItem('filmHist_'+uid)||'[]');
-  }catch(e){return[];}
+  var uid=curUser?curUser.uid:'guest';
+  try{return JSON.parse(localStorage.getItem('filmHist_'+uid)||'[]');}
+  catch(e){return[];}
+}
+
+function getHistAsync(callback){
+  var uid=curUser?curUser.uid:'guest';
+  if(uid==='guest'||!window._db){
+    callback(getHist());
+    return;
+  }
+  window._db.collection('history').doc(uid)
+    .collection('records')
+    .orderBy('id','desc')
+    .limit(200)
+    .get()
+    .then(function(snap){
+      var recs=[];
+      snap.forEach(function(doc){recs.push(doc.data());});
+      if(recs.length>0){
+        callback(recs);
+        /* Firestore 데이터를 localStorage에도 캐시 */
+        localStorage.setItem('filmHist_'+uid,JSON.stringify(recs));
+      } else {
+        /* Firestore 비어있으면 localStorage 데이터 마이그레이션 */
+        var local=getHist();
+        if(local.length>0){
+          migrateToFirestore(uid, local, function(){callback(local);});
+        } else {
+          callback([]);
+        }
+      }
+    })
+    .catch(function(e){
+      console.warn('Firestore 불러오기 실패, localStorage 사용:', e);
+      callback(getHist());
+    });
+}
+
+function migrateToFirestore(uid, records, done){
+  if(!window._db||records.length===0){if(done)done();return;}
+  var batch=window._db.batch();
+  records.forEach(function(rec){
+    var ref=window._db.collection('history').doc(uid)
+      .collection('records').doc(String(rec.id));
+    batch.set(ref, rec);
+  });
+  batch.commit()
+    .then(function(){
+      console.log('localStorage → Firestore 마이그레이션 완료:', records.length+'건');
+      if(done)done();
+    })
+    .catch(function(e){
+      console.warn('마이그레이션 실패:', e);
+      if(done)done();
+    });
 }
 
 function renderHist(){
-  var list=document.getElementById("hist-list");if(!list)return;list.innerHTML="";
+  var list=document.getElementById("hist-list");
+  if(!list)return;
+  list.innerHTML='<div style="padding:20px;text-align:center;color:#8a8078;font-size:13px;">불러오는 중...</div>';
   var kw=(document.getElementById("searchBox")?document.getElementById("searchBox").value.trim().toLowerCase():"");
-  var all=getHist();
-  var recs=kw?all.filter(function(r){return(r.siteName||"").toLowerCase().indexOf(kw)>=0||(r.clientName||"").toLowerCase().indexOf(kw)>=0||(r.clientPhone||"").toLowerCase().indexOf(kw)>=0;}):all;
-  if(!recs.length){var e=document.createElement("div");e.className="hist-empty";e.innerHTML="<div style='font-size:32px;margin-bottom:8px'>📋</div>아직 저장된 기록이 없어요<br>계산하면 자동으로 저장됩니다";list.appendChild(e);return;}
-  for(var i=0;i<recs.length;i++){(function(rec){
-    var card=document.createElement("div");card.className="hcard";
-    var hd=document.createElement("div");hd.className="hcard-head";
-    var dt=document.createElement("div");dt.className="hcard-date";dt.textContent=rec.date;
-    var tl=document.createElement("div");tl.className="hcard-title";tl.textContent=rec.siteName||"현장명 없음";
-    var sub=document.createElement("div");sub.className="hcard-sub";sub.textContent=rec.items.length+"개 항목 · "+(rec.total/1000).toFixed(2)+"M · "+rec.eff+"% 사용률";
-    var meta=document.createElement("div");meta.className="hcard-meta";
-    if(rec.clientName){var s=document.createElement("span");s.textContent="👤 "+rec.clientName;meta.appendChild(s);}
-    if(rec.clientPhone){var s=document.createElement("span");s.textContent="📞 "+rec.clientPhone;meta.appendChild(s);}
-    if(rec.brand||rec.modelName){var s=document.createElement("span");s.textContent="🎨 "+(rec.brand||"")+(rec.modelName?" "+rec.modelName:"");meta.appendChild(s);}
-    var sf=document.createElement("span");sf.textContent=rec.flame?"🔥 방염":"비방염";meta.appendChild(sf);
-    var sp=document.createElement("span");sp.textContent=rec.pattern?"🌲 패턴있음":"패턴없음";meta.appendChild(sp);
-    var badges=document.createElement("div");badges.className="hcard-badges";
-    var cm={};for(var j=0;j<rec.items.length;j++){var nm=cl(rec.items[j].cat);cm[nm]=(cm[nm]||0)+rec.items[j].qty;}
-    for(var nm in cm){var b=document.createElement("span");b.className="badge";b.textContent=nm+" "+cm[nm]+"개";badges.appendChild(b);}
-    hd.appendChild(dt);hd.appendChild(tl);hd.appendChild(sub);hd.appendChild(meta);hd.appendChild(badges);card.appendChild(hd);
-    var bd=document.createElement("div");bd.className="hcard-body";
-    var info=document.createElement("div");info.style.cssText="font-size:11px;color:#9a9590;margin-bottom:7px;";
-    info.textContent="필름: "+rec.fw+"mm × "+(rec.fl?rec.fl.toLocaleString()+"mm":"미설정")+" | "+(rec.flame?"방염":"비방염");bd.appendChild(info);
-    var btns=document.createElement("div");btns.className="hcard-btns";
-    var lb=document.createElement("button");lb.className="load-btn";lb.textContent="불러오기";lb.onclick=function(){loadRec(rec);};
-    var db=document.createElement("button");db.className="del-btn";db.textContent="삭제";
-    db.onclick=function(){showCfm("기록 삭제","이 기록을 삭제할까요?\n삭제 후 복구할 수 없습니다.",function(){var saved=getHist();saved=saved.filter(function(r){return r.id!==rec.id;});localStorage.setItem("filmHist_"+(curUser?curUser.uid:"guest"),JSON.stringify(saved));renderHist();});};
-    btns.appendChild(lb);btns.appendChild(db);bd.appendChild(btns);card.appendChild(bd);list.appendChild(card);
-  })(recs[i]);}
+  getHistAsync(function(all){
+    list.innerHTML="";
+    var recs=kw?all.filter(function(r){return(r.siteName||"").toLowerCase().indexOf(kw)>=0||(r.clientName||"").toLowerCase().indexOf(kw)>=0||(r.clientPhone||"").toLowerCase().indexOf(kw)>=0;}):all;
+    if(recs.length===0){
+      list.innerHTML='<div class="hist-empty"><div class="ei">📋</div>계산 기록이 없습니다.<br><small style="font-size:11px;">계산 후 저장하면 여기에 표시됩니다</small></div>';
+      return;
+    }
+    for(var i=0;i<recs.length;i++){
+      (function(rec){
+        var card=document.createElement("div");card.className="hcard";
+        var head=document.createElement("div");head.className="hcard-head";
+        head.innerHTML='<div class="hcard-date">'+rec.date+'</div><div class="hcard-title">'+(rec.siteName||"현장명 없음")+'</div><div class="hcard-sub">'+(rec.clientName||"")+(rec.clientPhone?' · '+rec.clientPhone:'')+'</div>';
+        var badges=document.createElement("div");badges.className="hcard-badges";
+        if(rec.brand)badges.innerHTML+='<span class="badge">'+rec.brand+'</span>';
+        if(rec.modelName)badges.innerHTML+='<span class="badge">'+rec.modelName+'</span>';
+        if(rec.flame)badges.innerHTML+='<span class="badge">'+(rec.flame?'방염':'비방염')+'</span>';
+        if(badges.innerHTML)head.appendChild(badges);
+        card.appendChild(head);
+        var bd=document.createElement("div");bd.className="hcard-body";
+        bd.innerHTML='<div style="font-size:11px;color:#6a6058;">필름 '+rec.fw+'mm × '+(rec.fl?rec.fl/1000+'m':'미설정')+' / 효율 '+Math.round(rec.eff*100)+'% / '+rec.total+'mm</div>';
+        var btns=document.createElement("div");btns.className="hcard-btns";
+        var lb=document.createElement("button");lb.className="load-btn";lb.textContent="불러오기";
+        lb.onclick=function(){loadRec(rec);};
+        var db=document.createElement("button");db.className="del-btn";db.textContent="삭제";
+        db.onclick=function(){
+          showCfm("기록 삭제","이 기록을 삭제할까요?\n삭제 후 복구할 수 없습니다.",function(){
+            delHist(rec.id);
+            renderHist();
+          });
+        };
+        btns.appendChild(lb);btns.appendChild(db);bd.appendChild(btns);card.appendChild(bd);list.appendChild(card);
+      })(recs[i]);
+    }
+  });
 }
 
 function loadRec(rec){
