@@ -13,7 +13,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="재단왕">
 <link rel="manifest" href="manifest.json">
-<script src="https://cdn.iamport.kr/v1/iamport.js"></script>
+<script src="https://cdn.portone.io/v2/browser-sdk.js"></script>
 <script>
 (function(){
   var scripts=[
@@ -1909,39 +1909,42 @@ function startPayment(){
   btn.disabled=true;btn.textContent='결제 준비 중...';
 
   if(!curUser){btn.disabled=false;btn.textContent='결제하기';return;}
-  if(typeof IMP==='undefined'){
+  if(typeof PortOne==='undefined'){
     alert('결제 모듈 로딩 중입니다. 잠시 후 다시 시도해주세요.');
     btn.disabled=false;btn.textContent='결제하기';return;
   }
 
   var amount=_selectedPlan==='monthly'?9900:99000;
   var planName=_selectedPlan==='monthly'?'재단왕 월 구독':'재단왕 연 구독';
-  var merchantUid='jdw_'+curUser.uid.slice(0,8)+'_'+Date.now();
-  var customerUid='cust_'+curUser.uid;
+  var paymentId='jdw_'+curUser.uid.slice(0,8)+'_'+Date.now();
 
-  IMP.init('imp25462342');
-
-  /* 포트원 V1 - KPN 정기결제
-   * channelKey 방식 사용 (포트원 콘솔에서 생성한 채널 직접 참조) */
-  IMP.request_pay({
-    pg:'kpn.merchantes10',
-    pay_method:'card',
-    merchant_uid:merchantUid,
-    customer_uid:customerUid,
-    name:planName,
-    amount:amount,
-    buyer_name:curUser.displayName||'재단왕 사용자',
-    buyer_tel:'0507-1328-0524',
-    m_redirect_url:window.location.href
-  },function(rsp){
-    btn.disabled=false;btn.textContent='결제하기';
-    console.log('결제 응답 전체:', JSON.stringify(rsp));
-    if(rsp.success){
-      onPaymentSuccess(rsp,_selectedPlan);
-    } else {
-      console.error('결제실패:', rsp.error_code, rsp.error_msg);
-      alert('결제 실패: '+rsp.error_msg);
+  /* 포트원 V2 - KPN 정기결제
+   * MID: merchantest6 (과세, 결제창 방식 정기결제) */
+  PortOne.requestIssueBillingKeyAndPay({
+    storeId:'store-03c5990a-a966-48d2-b142-6a3d17ed7a2c',
+    channelKey:'channel-key-719a02bd-5260-4312-b818-29a80ecb264a',
+    paymentId:paymentId,
+    orderName:planName,
+    totalAmount:amount,
+    currency:'CURRENCY_KRW',
+    billingKeyAndPayMethod:'CARD',
+    customer:{
+      customerId:curUser.uid,
+      fullName:curUser.displayName||'재단왕 사용자',
+      phoneNumber:'010-0000-0000'
     }
+  }).then(function(rsp){
+    btn.disabled=false;btn.textContent='결제하기';
+    console.log('결제 응답:', JSON.stringify(rsp));
+    if(rsp&&rsp.code){
+      alert('결제 실패: '+(rsp.message||rsp.code));
+    } else {
+      onPaymentSuccess(rsp,_selectedPlan);
+    }
+  }).catch(function(e){
+    btn.disabled=false;btn.textContent='결제하기';
+    console.error('결제 오류:', e);
+    alert('결제 오류: '+e.message);
   });
 }
 
