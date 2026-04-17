@@ -1924,17 +1924,19 @@ function startPayment(){
   var merchantUid='jdw_'+curUser.uid.slice(0,8)+'_'+Date.now();
   var customerUid='cust_'+curUser.uid;
 
+  /* 포트원 V1 채널키 방식으로 초기화 */
   IMP.init('imp25462342');
 
   IMP.request_pay({
-    pg:'kpn.merchantes10',
+    channelKey:'channel-key-44670c07-b22d-4bfa-9b20-fbd0973cdbce',
     pay_method:'card',
     merchant_uid:merchantUid,
     customer_uid:customerUid,
     name:planName,
     amount:amount,
     buyer_name:curUser.displayName||'재단왕 사용자',
-    buyer_tel:'010-0000-0000'
+    buyer_tel:'010-0000-0000',
+    buyer_email:''
   },function(rsp){
     btn.disabled=false;btn.textContent='결제하기';
     console.log('결제 응답:', rsp);
