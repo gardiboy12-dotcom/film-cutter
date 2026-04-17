@@ -159,7 +159,7 @@ body{background:#f4f1ec;color:#1e1b18;font-family:-apple-system,BlinkMacSystemFo
 
 
 /* ── 메인 레이아웃 ── */
-.wrap{max-width:640px;margin:0 auto;padding:12px 14px 72px;display:flex;flex-direction:column;gap:10px;width:100%;}
+.wrap{max-width:640px;margin:0 auto;padding:12px 14px 72px;display:flex;flex-direction:column;gap:10px;width:100%;transition:padding-top .2s;}
 @media(min-width:900px){
   .wrap{max-width:900px;display:grid;grid-template-columns:360px 1fr;align-items:start;gap:16px;padding:16px 14px;}
   .hdr-inner,.fbar-inner,.pbar-inner,.container{max-width:900px;}
@@ -238,7 +238,7 @@ tr:hover td{background:#faf8f5;}
 .info-txt{font-size:11px;color:#3a3530;text-align:right;margin-top:5px;font-weight:600;}
 
 /* ── 구독 배너 ── */
-.sub-banner{display:none;background:#c0392b;color:#fff;padding:9px 14px;font-size:12px;position:sticky;top:72px;z-index:49;}
+.sub-banner{display:none;background:#c0392b;color:#fff;padding:9px 14px;font-size:12px;position:fixed;top:72px;left:0;right:0;z-index:49;}
 .sub-banner.trial{background:#e67e22;}
 .sub-banner.on{display:flex;align-items:center;gap:8px;}
 .sub-banner-txt{flex:1;font-weight:600;}
@@ -246,29 +246,29 @@ tr:hover td{background:#faf8f5;}
 .sub-banner.trial .sub-banner-btn{color:#e67e22;}
 
 /* ── 구독 페이지 ── */
-.sub-pg{position:fixed;top:0;left:0;right:0;bottom:0;background:#f4f1ec;z-index:950;display:none;flex-direction:column;}
+.sub-pg{position:fixed;top:0;left:0;right:0;bottom:0;background:#f4f1ec;z-index:950;display:none;flex-direction:column;overflow:hidden;}
 .sub-pg.on{display:flex;}
 .sub-hdr{background:#1e1b18;color:#fff;height:52px;display:flex;align-items:center;padding:0 14px;gap:10px;flex-shrink:0;}
 .sub-back{background:none;border:none;color:#e8c14a;font-size:22px;cursor:pointer;}
 .sub-title{font-size:15px;font-weight:700;}
-.sub-body{flex:1;overflow-y:auto;padding:20px 16px 40px;}
-.sub-inner{max-width:420px;margin:0 auto;}
-.sub-hero{text-align:center;margin-bottom:24px;}
-.sub-hero h2{font-size:22px;font-weight:900;color:#1e1b18;margin-bottom:6px;}
+.sub-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 14px 40px;}
+.sub-inner{max-width:400px;margin:0 auto;}
+.sub-hero{text-align:center;margin-bottom:16px;}
+.sub-hero h2{font-size:20px;font-weight:900;color:#1e1b18;margin-bottom:4px;}
 .sub-hero p{font-size:13px;color:#6a6058;line-height:1.7;}
-.plan-cards{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
-.plan-card{border:2px solid #ddd9d0;border-radius:12px;padding:16px;background:#fff;cursor:pointer;transition:all .2s;position:relative;}
+.plan-cards{display:flex;flex-direction:column;gap:8px;margin-bottom:14px;}
+.plan-card{border:2px solid #ddd9d0;border-radius:10px;padding:12px 14px;background:#fff;cursor:pointer;transition:all .2s;position:relative;}
 .plan-card.on{border-color:#2a5c8a;background:#f0f6ff;}
 .plan-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
 .plan-name{font-size:15px;font-weight:700;color:#1e1b18;}
 .plan-badge{background:#e8c14a;color:#1e1b18;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;}
-.plan-price{font-size:24px;font-weight:900;color:#1e1b18;}
+.plan-price{font-size:22px;font-weight:900;color:#1e1b18;}
 .plan-price span{font-size:13px;font-weight:500;color:#6a6058;}
 .plan-desc{font-size:11px;color:#6a6058;margin-top:4px;}
 .plan-radio{position:absolute;top:16px;right:16px;width:20px;height:20px;border-radius:50%;border:2px solid #ddd9d0;background:#fff;display:flex;align-items:center;justify-content:center;}
 .plan-card.on .plan-radio{border-color:#2a5c8a;background:#2a5c8a;}
 .plan-card.on .plan-radio::after{content:"";width:8px;height:8px;border-radius:50%;background:#fff;}
-.sub-pay-btn{width:100%;padding:15px;background:#1e1b18;color:#e8c14a;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;margin-bottom:10px;}
+.sub-pay-btn{width:100%;padding:13px;background:#1e1b18;color:#e8c14a;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:8px;}
 .sub-pay-btn:disabled{opacity:.45;cursor:not-allowed;}
 .sub-notice{font-size:11px;color:#8a8078;text-align:center;line-height:1.7;}
 
@@ -1866,12 +1866,16 @@ function showSubBanner(status,daysLeft){
   } else if(status==='expired'){
     banner.className='sub-banner on';
     txt.textContent='⚠️ 체험 기간이 종료됐습니다. 구독 후 이용해주세요.';
-    /* 계산 기능 잠금 */
     lockCalcFeatures();
   }
+  /* wrap에 padding-top 추가 (배너 높이만큼) */
+  var wrap=document.querySelector('.wrap');
+  if(wrap)wrap.style.paddingTop='50px';
 }
 function hideSubBanner(){
   document.getElementById('subBanner').className='sub-banner';
+  var wrap=document.querySelector('.wrap');
+  if(wrap)wrap.style.paddingTop='';
 }
 
 function lockCalcFeatures(){
