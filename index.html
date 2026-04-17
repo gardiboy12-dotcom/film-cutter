@@ -10,6 +10,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="재단왕">
 <link rel="manifest" href="manifest.json">
+<script src="https://cdn.iamport.kr/v1/iamport.js"></script>
 <script>
 (function(){
   var scripts=[
@@ -232,6 +233,41 @@ tr:hover td{background:#faf8f5;}
 .empty{padding:40px 14px;text-align:center;color:#8a8078;font-size:13px;line-height:2;}
 .ei{font-size:30px;margin-bottom:8px;}
 .info-txt{font-size:11px;color:#3a3530;text-align:right;margin-top:5px;font-weight:600;}
+
+/* ── 구독 배너 ── */
+.sub-banner{display:none;background:#c0392b;color:#fff;padding:9px 14px;font-size:12px;position:sticky;top:72px;z-index:49;}
+.sub-banner.trial{background:#e67e22;}
+.sub-banner.on{display:flex;align-items:center;gap:8px;}
+.sub-banner-txt{flex:1;font-weight:600;}
+.sub-banner-btn{background:#fff;color:#c0392b;border:none;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;}
+.sub-banner.trial .sub-banner-btn{color:#e67e22;}
+
+/* ── 구독 페이지 ── */
+.sub-pg{position:fixed;top:0;left:0;right:0;bottom:0;background:#f4f1ec;z-index:950;display:none;flex-direction:column;}
+.sub-pg.on{display:flex;}
+.sub-hdr{background:#1e1b18;color:#fff;height:52px;display:flex;align-items:center;padding:0 14px;gap:10px;flex-shrink:0;}
+.sub-back{background:none;border:none;color:#e8c14a;font-size:22px;cursor:pointer;}
+.sub-title{font-size:15px;font-weight:700;}
+.sub-body{flex:1;overflow-y:auto;padding:20px 16px 40px;}
+.sub-inner{max-width:420px;margin:0 auto;}
+.sub-hero{text-align:center;margin-bottom:24px;}
+.sub-hero h2{font-size:22px;font-weight:900;color:#1e1b18;margin-bottom:6px;}
+.sub-hero p{font-size:13px;color:#6a6058;line-height:1.7;}
+.plan-cards{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+.plan-card{border:2px solid #ddd9d0;border-radius:12px;padding:16px;background:#fff;cursor:pointer;transition:all .2s;position:relative;}
+.plan-card.on{border-color:#2a5c8a;background:#f0f6ff;}
+.plan-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.plan-name{font-size:15px;font-weight:700;color:#1e1b18;}
+.plan-badge{background:#e8c14a;color:#1e1b18;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;}
+.plan-price{font-size:24px;font-weight:900;color:#1e1b18;}
+.plan-price span{font-size:13px;font-weight:500;color:#6a6058;}
+.plan-desc{font-size:11px;color:#6a6058;margin-top:4px;}
+.plan-radio{position:absolute;top:16px;right:16px;width:20px;height:20px;border-radius:50%;border:2px solid #ddd9d0;background:#fff;display:flex;align-items:center;justify-content:center;}
+.plan-card.on .plan-radio{border-color:#2a5c8a;background:#2a5c8a;}
+.plan-card.on .plan-radio::after{content:"";width:8px;height:8px;border-radius:50%;background:#fff;}
+.sub-pay-btn{width:100%;padding:15px;background:#1e1b18;color:#e8c14a;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;margin-bottom:10px;}
+.sub-pay-btn:disabled{opacity:.45;cursor:not-allowed;}
+.sub-notice{font-size:11px;color:#8a8078;text-align:center;line-height:1.7;}
 
 /* ── 푸터 ── */
 .footer{background:#1a1814;border-top:1px solid #2a2620;padding:16px 14px 80px;margin-top:16px;}
@@ -539,6 +575,53 @@ tr:hover td{background:#faf8f5;}
 </div>
 
 <!-- 계산 페이지 -->
+<!-- 구독 배너 -->
+<div class="sub-banner" id="subBanner">
+  <span class="sub-banner-txt" id="subBannerTxt"></span>
+  <button class="sub-banner-btn" onclick="showSubPage()">구독하기</button>
+</div>
+
+<!-- 구독 페이지 -->
+<div class="sub-pg" id="subPg">
+  <div class="sub-hdr">
+    <button class="sub-back" onclick="closeSubPage()">‹</button>
+    <span class="sub-title">재단왕 구독</span>
+  </div>
+  <div class="sub-body">
+    <div class="sub-inner">
+      <div class="sub-hero">
+        <h2>✂ 재단왕 PRO</h2>
+        <p>전문 인테리어 필름 시공인을 위한<br>최적 재단 계산 도구</p>
+      </div>
+      <div class="plan-cards">
+        <div class="plan-card on" id="planMonthly" onclick="selectPlan('monthly')">
+          <div class="plan-radio"></div>
+          <div class="plan-card-top">
+            <span class="plan-name">월 구독</span>
+          </div>
+          <div class="plan-price">9,900<span>원 / 월</span></div>
+          <div class="plan-desc">매월 자동 결제 · 언제든 해지 가능</div>
+        </div>
+        <div class="plan-card" id="planYearly" onclick="selectPlan('yearly')">
+          <div class="plan-radio"></div>
+          <div class="plan-card-top">
+            <span class="plan-name">연 구독</span>
+            <span class="plan-badge">2개월 무료</span>
+          </div>
+          <div class="plan-price">99,000<span>원 / 년</span></div>
+          <div class="plan-desc">월 8,250원 · 연 1회 결제</div>
+        </div>
+      </div>
+      <button class="sub-pay-btn" id="subPayBtn" onclick="startPayment()">결제하기</button>
+      <p class="sub-notice">
+        결제 후 즉시 이용 가능합니다.<br>
+        구독 취소는 언제든 가능하며,<br>
+        취소 시 현재 기간 만료일까지 이용 가능합니다.
+      </p>
+    </div>
+  </div>
+</div>
+
 <div class="page on" id="pg-calc">
 <div class="hdr">
   <div class="hdr-inner">
@@ -1217,10 +1300,16 @@ function doSignup(){
     var user=linked.user;
     var disp=suPhone.replace(/(\d{3})(\d{3,4})(\d{4})/,'$1-$2-$3');
     user.updateProfile({displayName:suName}).catch(function(){});
+    var _now=new Date();
+    var _trialEnd=new Date(_now.getTime()+7*24*60*60*1000);
     return window._saveUser(user.uid,{
       uid:user.uid,name:suName,
       phone:suE164,phoneDisplay:disp,
-      createdAt:firebase.firestore.FieldValue.serverTimestamp()
+      createdAt:firebase.firestore.FieldValue.serverTimestamp(),
+      trialEnd:_trialEnd.toISOString(),
+      subscriptionStatus:'trial',
+      subscriptionEnd:null,
+      planType:null
     }).catch(function(){});
   })
   .then(function(){
@@ -1378,11 +1467,58 @@ function startTimer(prefix,sec){
 }
 
 /* ── 앱 진입/로그아웃 ── */
+/* ── 구독 상태 체크 ── */
+function checkSubscription(callback){
+  if(!curUser){callback('expired');return;}
+  window._db.collection('users').doc(curUser.uid).get()
+    .then(function(doc){
+      if(!doc.exists){callback('expired');return;}
+      var data=doc.data();
+      var status=data.subscriptionStatus||'expired';
+      var now=new Date();
+
+      if(status==='active'){
+        /* 구독 만료 체크 */
+        if(data.subscriptionEnd&&new Date(data.subscriptionEnd)<now){
+          window._db.collection('users').doc(curUser.uid)
+            .update({subscriptionStatus:'expired'});
+          callback('expired');
+        } else {
+          callback('active');
+        }
+      } else if(status==='trial'){
+        /* 체험 기간 체크 */
+        if(data.trialEnd&&new Date(data.trialEnd)<now){
+          window._db.collection('users').doc(curUser.uid)
+            .update({subscriptionStatus:'expired'});
+          callback('expired');
+        } else {
+          var trialEnd=new Date(data.trialEnd);
+          var diff=Math.ceil((trialEnd-now)/(1000*60*60*24));
+          callback('trial',diff);
+        }
+      } else {
+        callback('expired');
+      }
+    })
+    .catch(function(){callback('trial',7);}); /* 오류 시 기본 허용 */
+}
+
 function enterApp(){
   document.getElementById('authPg').style.display='none';
   if(curUser){
     document.getElementById('uEmail').textContent=curUser.displayName||'';
   }
+  /* 구독 상태 체크 후 배너 표시 */
+  checkSubscription(function(status,daysLeft){
+    if(status==='trial'&&daysLeft!==undefined){
+      showSubBanner('trial',daysLeft);
+    } else if(status==='expired'){
+      showSubBanner('expired');
+    } else {
+      hideSubBanner();
+    }
+  });
 }
 
 function doLogout(){
@@ -1714,6 +1850,123 @@ var PRIVACY_HTML=`
 <h2>제8조 방침 변경</h2>
 <p>본 방침은 변경 시 앱 내 공지를 통해 7일 전에 안내합니다. 본 방침은 2025년 4월 17일부터 시행됩니다.</p>
 `;
+
+/* ── 구독 배너/페이지 ── */
+var _selectedPlan='monthly';
+
+function showSubBanner(status,daysLeft){
+  var banner=document.getElementById('subBanner');
+  var txt=document.getElementById('subBannerTxt');
+  if(status==='trial'){
+    banner.className='sub-banner trial on';
+    txt.textContent='🎁 무료 체험 '+daysLeft+'일 남았습니다. 구독하고 계속 사용하세요!';
+  } else if(status==='expired'){
+    banner.className='sub-banner on';
+    txt.textContent='⚠️ 체험 기간이 종료됐습니다. 구독 후 이용해주세요.';
+    /* 계산 기능 잠금 */
+    lockCalcFeatures();
+  }
+}
+function hideSubBanner(){
+  document.getElementById('subBanner').className='sub-banner';
+}
+
+function lockCalcFeatures(){
+  /* 계산하기 버튼 비활성화 */
+  var goBtn=document.querySelector('.go-btn');
+  if(goBtn){
+    goBtn.disabled=true;
+    goBtn.textContent='구독 후 이용 가능합니다';
+    goBtn.onclick=function(){showSubPage();};
+  }
+  /* 항목 추가 버튼 비활성화 */
+  var addBtn=document.querySelector('.add-btn');
+  if(addBtn){
+    addBtn.disabled=true;
+    addBtn.textContent='구독 후 이용 가능합니다';
+    addBtn.onclick=function(){showSubPage();};
+  }
+}
+
+function showSubPage(){
+  document.getElementById('subPg').classList.add('on');
+}
+function closeSubPage(){
+  document.getElementById('subPg').classList.remove('on');
+}
+function selectPlan(plan){
+  _selectedPlan=plan;
+  document.getElementById('planMonthly').className='plan-card'+(plan==='monthly'?' on':'');
+  document.getElementById('planYearly').className='plan-card'+(plan==='yearly'?' on':'');
+}
+
+/* ── 포트원 결제 ── */
+function startPayment(){
+  var btn=document.getElementById('subPayBtn');
+  btn.disabled=true;btn.textContent='결제 준비 중...';
+
+  if(!curUser){showSubPage();return;}
+
+  var amount=_selectedPlan==='monthly'?9900:99000;
+  var planName=_selectedPlan==='monthly'?'재단왕 월 구독':'재단왕 연 구독';
+  var merchantUid='jaedanwang_'+curUser.uid+'_'+Date.now();
+
+  /* 포트원 SDK 호출 */
+  var IMP=window.IMP;
+  if(!IMP){
+    alert('결제 모듈을 불러오는 중입니다. 잠시 후 다시 시도해주세요.');
+    btn.disabled=false;btn.textContent='결제하기';
+    return;
+  }
+
+  /* TODO: 실제 가맹점 식별코드로 교체 */
+  IMP.init('imp25462342');
+
+  IMP.request_pay({
+    pg:'kpn',  /* 한국결제네트워크 */
+    pay_method:'card',
+    merchant_uid:merchantUid,
+    name:planName,
+    amount:amount,
+    buyer_name:curUser.displayName||'',
+    buyer_tel:curUser.uid,
+    m_redirect_url:window.location.href
+  },function(rsp){
+    btn.disabled=false;btn.textContent='결제하기';
+    if(rsp.success){
+      /* 결제 성공 → 구독 상태 업데이트 */
+      onPaymentSuccess(rsp,_selectedPlan);
+    } else {
+      alert('결제 실패: '+rsp.error_msg);
+    }
+  });
+}
+
+function onPaymentSuccess(rsp,plan){
+  var now=new Date();
+  var end=new Date(now);
+  if(plan==='monthly'){
+    end.setMonth(end.getMonth()+1);
+  } else {
+    end.setFullYear(end.getFullYear()+1);
+  }
+  window._db.collection('users').doc(curUser.uid).update({
+    subscriptionStatus:'active',
+    subscriptionEnd:end.toISOString(),
+    planType:plan,
+    lastPaymentId:rsp.imp_uid,
+    lastMerchantUid:rsp.merchant_uid
+  }).then(function(){
+    hideSubBanner();
+    closeSubPage();
+    /* 계산 기능 잠금 해제 */
+    var goBtn=document.querySelector('.go-btn');
+    if(goBtn){goBtn.disabled=false;goBtn.textContent='최적 재단 계산하기';goBtn.onclick=calculate;}
+    var addBtn=document.querySelector('.add-btn');
+    if(addBtn){addBtn.disabled=false;addBtn.textContent='+ 항목 추가';addBtn.onclick=addItem;}
+    alert('구독이 완료됐습니다! 감사합니다 😊');
+  });
+}
 
 </script>
 </body>
