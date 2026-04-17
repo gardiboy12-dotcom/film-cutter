@@ -13,7 +13,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="재단왕">
 <link rel="manifest" href="manifest.json">
-<script src="https://cdn.portone.io/v2/browser-sdk.js?v=20250417"></script>
+<script src="https://cdn.portone.io/v2/browser-sdk.js?v=20250417" crossorigin="anonymous"></script>
 <script>
 (function(){
   var scripts=[
@@ -1913,39 +1913,40 @@ function startPayment(){
     return;
   }
 
+  /* PortOne V2 SDK 로드 확인 */
+  if(typeof PortOne==='undefined'){
+    alert('결제 모듈 로딩 중입니다. 잠시 후 다시 시도해주세요.');
+    btn.disabled=false;btn.textContent='결제하기';
+    return;
+  }
+
   var amount=_selectedPlan==='monthly'?9900:99000;
   var planName=_selectedPlan==='monthly'?'재단왕 월 구독':'재단왕 연 구독';
-  var paymentId='jaedanwang_'+curUser.uid+'_'+Date.now();
+  var paymentId='jdw'+curUser.uid.slice(0,8)+Date.now();
 
-  /* 포트원 V2 SDK 호출 */
-  PortOne.requestBillingKeyAndPay({
+  PortOne.requestIssueBillingKeyAndPay({
     storeId:'store-03c5990a-a966-48d2-b142-6a3d17ed7a2c',
     channelKey:'channel-key-b7827a7f-cceb-4510-8466-a2a1b7b723ac',
-    billingKeyAndPaymentId:paymentId,
+    paymentId:paymentId,
     orderName:planName,
     totalAmount:amount,
-    currency:'KRW',
+    currency:'CURRENCY_KRW',
     customer:{
       customerId:curUser.uid,
-      fullName:curUser.displayName||'',
-      phoneNumber:curUser.phoneNumber||''
-    },
-    offerPeriod:{
-      validHours:_selectedPlan==='monthly'?744:8760
+      fullName:curUser.displayName||'재단왕 사용자'
     }
   }).then(function(rsp){
     btn.disabled=false;btn.textContent='결제하기';
-    if(rsp.code!=null){
-      /* 오류 */
-      alert('결제 실패: '+rsp.message);
+    console.log('결제 응답:', rsp);
+    if(rsp&&rsp.code){
+      alert('결제 실패: '+(rsp.message||rsp.code));
     } else {
-      /* 성공 */
       onPaymentSuccess(rsp,_selectedPlan);
     }
   }).catch(function(e){
     btn.disabled=false;btn.textContent='결제하기';
     console.error('결제 오류:', e);
-    alert('결제 중 오류가 발생했습니다. 다시 시도해주세요.');
+    alert('결제 중 오류가 발생했습니다: '+e.message);
   });
 }
 
