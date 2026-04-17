@@ -1916,45 +1916,29 @@ function startPayment(){
 
   var amount=_selectedPlan==='monthly'?9900:99000;
   var planName=_selectedPlan==='monthly'?'재단왕 월 구독':'재단왕 연 구독';
-  var billingKeyId='bk_'+curUser.uid.slice(0,8)+'_'+Date.now();
   var paymentId='jdw_'+curUser.uid.slice(0,8)+'_'+Date.now();
 
-  /* STEP1: 빌링키 발급 (카드 등록) */
-  PortOne.requestIssueBillingKey({
+  /* KPN V2 결제창 방식 - 빌링키 발급 + 즉시결제 동시 처리
+   * requestPayment에 customer_uid 포함하면 빌링키 발급+결제 동시 가능 */
+  PortOne.requestPayment({
     storeId:'store-03c5990a-a966-48d2-b142-6a3d17ed7a2c',
     channelKey:'channel-key-562ea2df-f6a0-47b8-8fd8-9048b6ae4cde',
-    billingKeyMethod:'CARD',
-    issueId:billingKeyId,
-    issueName:planName,
+    paymentId:paymentId,
+    orderName:planName,
+    totalAmount:amount,
+    currency:'CURRENCY_KRW',
+    payMethod:'CARD',
     customer:{
       customerId:curUser.uid,
       fullName:curUser.displayName||'재단왕 사용자',
       phoneNumber:'010-0000-0000'
-    }
-  }).then(function(rsp){
-    console.log('빌링키 발급 응답:', JSON.stringify(rsp));
-    if(rsp&&rsp.code){
-      btn.disabled=false;btn.textContent='결제하기';
-      alert('카드 등록 실패: '+(rsp.message||rsp.code));
-      return;
-    }
-    /* STEP2: 발급된 빌링키로 즉시 결제 */
-    return PortOne.requestPayment({
-      storeId:'store-03c5990a-a966-48d2-b142-6a3d17ed7a2c',
-      channelKey:'channel-key-562ea2df-f6a0-47b8-8fd8-9048b6ae4cde',
-      paymentId:paymentId,
-      orderName:planName,
-      totalAmount:amount,
-      currency:'CURRENCY_KRW',
-      payMethod:'BILLING_KEY',
-      billingKey:rsp.billingKey,
-      customer:{
-        customerId:curUser.uid,
-        fullName:curUser.displayName||'재단왕 사용자'
+    },
+    bypass:{
+      kpn:{
+        customer_uid:'cust_'+curUser.uid
       }
-    });
+    }
   }).then(function(rsp){
-    if(!rsp)return;
     btn.disabled=false;btn.textContent='결제하기';
     console.log('결제 응답:', JSON.stringify(rsp));
     if(rsp&&rsp.code){
