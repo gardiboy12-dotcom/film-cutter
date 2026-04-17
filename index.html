@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="재단왕">
 <link rel="manifest" href="manifest.json">
-<script src="https://cdn.iamport.kr/v1/iamport.js"></script>
+<script src="https://cdn.portone.io/v2/browser-sdk.js"></script>
 <script>
 (function(){
   var scripts=[
@@ -1905,40 +1905,44 @@ function startPayment(){
   var btn=document.getElementById('subPayBtn');
   btn.disabled=true;btn.textContent='결제 준비 중...';
 
-  if(!curUser){showSubPage();return;}
-
-  var amount=_selectedPlan==='monthly'?9900:99000;
-  var planName=_selectedPlan==='monthly'?'재단왕 월 구독':'재단왕 연 구독';
-  var merchantUid='jaedanwang_'+curUser.uid+'_'+Date.now();
-
-  /* 포트원 SDK 호출 */
-  var IMP=window.IMP;
-  if(!IMP){
-    alert('결제 모듈을 불러오는 중입니다. 잠시 후 다시 시도해주세요.');
+  if(!curUser){
     btn.disabled=false;btn.textContent='결제하기';
     return;
   }
 
-  /* TODO: 실제 가맹점 식별코드로 교체 */
-  IMP.init('imp25462342');
+  var amount=_selectedPlan==='monthly'?9900:99000;
+  var planName=_selectedPlan==='monthly'?'재단왕 월 구독':'재단왕 연 구독';
+  var paymentId='jaedanwang_'+curUser.uid+'_'+Date.now();
 
-  IMP.request_pay({
-    pg:'kpn',  /* 한국결제네트워크 */
-    pay_method:'card',
-    merchant_uid:merchantUid,
-    name:planName,
-    amount:amount,
-    buyer_name:curUser.displayName||'',
-    buyer_tel:curUser.uid,
-    m_redirect_url:window.location.href
-  },function(rsp){
-    btn.disabled=false;btn.textContent='결제하기';
-    if(rsp.success){
-      /* 결제 성공 → 구독 상태 업데이트 */
-      onPaymentSuccess(rsp,_selectedPlan);
-    } else {
-      alert('결제 실패: '+rsp.error_msg);
+  /* 포트원 V2 SDK 호출 */
+  PortOne.requestBillingKeyAndPay({
+    storeId:'store-03c5990a-a966-48d2-b142-6a3d17ed7a2c',
+    channelKey:'channel-key-b7827a7f-cceb-4510-8466-a2a1b7b723ac',
+    billingKeyAndPaymentId:paymentId,
+    orderName:planName,
+    totalAmount:amount,
+    currency:'KRW',
+    customer:{
+      customerId:curUser.uid,
+      fullName:curUser.displayName||'',
+      phoneNumber:curUser.phoneNumber||''
+    },
+    offerPeriod:{
+      validHours:_selectedPlan==='monthly'?744:8760
     }
+  }).then(function(rsp){
+    btn.disabled=false;btn.textContent='결제하기';
+    if(rsp.code!=null){
+      /* 오류 */
+      alert('결제 실패: '+rsp.message);
+    } else {
+      /* 성공 */
+      onPaymentSuccess(rsp,_selectedPlan);
+    }
+  }).catch(function(e){
+    btn.disabled=false;btn.textContent='결제하기';
+    console.error('결제 오류:', e);
+    alert('결제 중 오류가 발생했습니다. 다시 시도해주세요.');
   });
 }
 
@@ -1954,17 +1958,28 @@ function onPaymentSuccess(rsp,plan){
     subscriptionStatus:'active',
     subscriptionEnd:end.toISOString(),
     planType:plan,
-    lastPaymentId:rsp.imp_uid,
-    lastMerchantUid:rsp.merchant_uid
+    lastPaymentId:rsp.paymentId||rsp.billingKeyAndPaymentId||'',
+    lastBillingKey:rsp.billingKey||''
   }).then(function(){
     hideSubBanner();
     closeSubPage();
     /* 계산 기능 잠금 해제 */
     var goBtn=document.querySelector('.go-btn');
-    if(goBtn){goBtn.disabled=false;goBtn.textContent='최적 재단 계산하기';goBtn.onclick=calculate;}
+    if(goBtn){
+      goBtn.disabled=false;
+      goBtn.textContent='최적 재단 계산하기';
+      goBtn.onclick=calculate;
+    }
     var addBtn=document.querySelector('.add-btn');
-    if(addBtn){addBtn.disabled=false;addBtn.textContent='+ 항목 추가';addBtn.onclick=addItem;}
+    if(addBtn){
+      addBtn.disabled=false;
+      addBtn.textContent='+ 항목 추가';
+      addBtn.onclick=addItem;
+    }
     alert('구독이 완료됐습니다! 감사합니다 😊');
+  }).catch(function(e){
+    console.error('구독 저장 오류:', e);
+    alert('결제는 완료됐으나 상태 저장 중 오류가 발생했습니다. 고객센터에 문의해주세요.');
   });
 }
 
