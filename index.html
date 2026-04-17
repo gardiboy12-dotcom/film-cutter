@@ -1916,7 +1916,7 @@ function startPayment(){
 
   var amount=_selectedPlan==='monthly'?9900:99000;
   var planName=_selectedPlan==='monthly'?'재단왕 월 구독':'재단왕 연 구독';
-  var paymentId='jdw_'+curUser.uid.slice(0,8)+'_'+Date.now();
+  var paymentId='jdw'+curUser.uid.slice(0,8).replace(/[^a-zA-Z0-9]/g,'')+String(Date.now());
 
   /* KPN V2 결제창 방식 - 빌링키 발급 + 즉시결제 동시 처리
    * requestPayment에 customer_uid 포함하면 빌링키 발급+결제 동시 가능 */
