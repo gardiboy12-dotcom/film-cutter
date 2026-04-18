@@ -1557,20 +1557,32 @@ function enterApp(){
   if(curUser){
     document.getElementById('uEmail').textContent=curUser.displayName||'';
   }
-  /* 구독 상태 체크 후 배너 표시 */
-  checkSubscription(function(status,daysLeft){
-    if(status==='trial'&&daysLeft!==undefined){
-      showSubBanner('trial',daysLeft);
-    } else if(status==='expired'){
-      showSubBanner('expired');
-    } else {
-      hideSubBanner();
+
+  /* 기기 등록 확인 */
+  _checkDeviceRegistration(
+    function(){
+      /* 등록된 기기 → 정상 진행 */
+      _startSession();
+      checkSubscription(function(status,daysLeft){
+        if(status==='trial'&&daysLeft!==undefined){
+          showSubBanner('trial',daysLeft);
+        } else if(status==='expired'){
+          showSubBanner('expired');
+        } else {
+          hideSubBanner();
+        }
+      });
+    },
+    function(newFp){
+      /* 새 기기 → OTP 인증 필요 */
+      _showNewDeviceModal(newFp);
     }
-  });
+  );
 }
 
 function doLogout(){
   showCfm('로그아웃','로그아웃 하시겠습니까?',function(){
+    _stopSession();
     window._auth.signOut().then(function(){
       document.getElementById('authPg').style.display='flex';
       document.getElementById('uEmail').textContent='';
@@ -2239,6 +2251,338 @@ function onPaymentSuccess(rsp,plan){
     alert('결제는 완료됐으나 상태 저장 중 오류가 발생했습니다. 고객센터에 문의해주세요.');
   });
 }
+
+/* ══ 중복 로그인 방지 세션 관리 ══ */
+var _sessionId = null;
+var _sessionCheckIv = null;
+var _SESSION_CHECK_INTERVAL = 30000; /* 30초마다 체크 */
+
+function _genSessionId(){
+  return 'sess_' + Date.now() + '_' + Math.random().toString(36).slice(2,9);
+}
+
+function _startSession(){
+  if(!curUser||!window._db)return;
+  _sessionId=_genSessionId();
+
+  /* Firestore에 현재 세션 ID 저장 */
+  window._db.collection('users').doc(curUser.uid).update({
+    sessionId: _sessionId,
+    lastLoginAt: firebase.firestore.FieldValue.serverTimestamp(),
+    lastDevice: navigator.userAgent.slice(0,100)
+  }).catch(function(e){
+    /* 문서 없으면 set으로 */
+    window._db.collection('users').doc(curUser.uid).set({
+      sessionId: _sessionId
+    },{merge:true}).catch(function(){});
+  });
+
+  /* 주기적으로 세션 유효성 체크 */
+  clearInterval(_sessionCheckIv);
+  _sessionCheckIv=setInterval(_checkSession, _SESSION_CHECK_INTERVAL);
+  console.log('세션 시작:', _sessionId);
+}
+
+function _checkSession(){
+  if(!curUser||!window._db||!_sessionId)return;
+  window._db.collection('users').doc(curUser.uid).get()
+    .then(function(doc){
+      if(!doc.exists)return;
+      var serverSession=doc.data().sessionId;
+      if(serverSession&&serverSession!==_sessionId){
+        /* 다른 기기에서 로그인됨 → 강제 로그아웃 */
+        console.warn('다른 기기 로그인 감지:', serverSession);
+        _forceLogout();
+      }
+    })
+    .catch(function(e){console.warn('세션 체크 오류:',e);});
+}
+
+function _forceLogout(){
+  clearInterval(_sessionCheckIv);
+  _sessionId=null;
+  window._auth.signOut().then(function(){
+    document.getElementById('authPg').style.display='flex';
+    document.getElementById('uEmail').textContent='';
+    switchAuthTab('login');
+    document.getElementById('loginPhone').value='';
+    document.getElementById('loginPw').value='';
+    hideSubBanner();
+    /* 안내 메시지 */
+    setTimeout(function(){
+      alert('다른 기기에서 로그인되어 자동 로그아웃됐습니다.\n\n재단왕은 1인 1기기 정책으로 운영됩니다.');
+    },300);
+  });
+}
+
+function _stopSession(){
+  clearInterval(_sessionCheckIv);
+  _sessionId=null;
+}
+
+
+/* ══ 기기 핑거프린트 & 등록 제한 ══ */
+
+function _getDeviceFingerprint(){
+  var components = [
+    navigator.userAgent,
+    navigator.language,
+    screen.width + 'x' + screen.height,
+    screen.colorDepth,
+    new Date().getTimezoneOffset(),
+    navigator.hardwareConcurrency||'',
+    navigator.deviceMemory||'',
+    navigator.platform||''
+  ];
+  /* 간단한 해시 생성 */
+  var str = components.join('|');
+  var hash = 0;
+  for(var i=0;i<str.length;i++){
+    var ch=str.charCodeAt(i);
+    hash=((hash<<5)-hash)+ch;
+    hash=hash&hash;
+  }
+  return 'fp_'+Math.abs(hash).toString(36);
+}
+
+/* 로그인 후 기기 확인 */
+function _checkDeviceRegistration(onPass, onNewDevice){
+  if(!curUser||!window._db){onPass();return;}
+  var currentFp=_getDeviceFingerprint();
+
+  window._db.collection('users').doc(curUser.uid).get()
+    .then(function(doc){
+      if(!doc.exists){onPass();return;}
+      var data=doc.data();
+      var registeredFp=data.deviceFingerprint;
+
+      if(!registeredFp){
+        /* 최초 기기 등록 */
+        window._db.collection('users').doc(curUser.uid).update({
+          deviceFingerprint: currentFp,
+          deviceRegisteredAt: firebase.firestore.FieldValue.serverTimestamp()
+        }).catch(function(){});
+        onPass();
+      } else if(registeredFp===currentFp){
+        /* 등록된 기기 → 정상 */
+        onPass();
+      } else {
+        /* 다른 기기 → OTP 재인증 필요 */
+        onNewDevice(currentFp);
+      }
+    })
+    .catch(function(e){
+      console.warn('기기 확인 오류:', e);
+      onPass(); /* 오류 시 허용 */
+    });
+}
+
+/* 새 기기 등록 확인 팝업 */
+function _showNewDeviceModal(newFp){
+  _newDeviceFp=newFp;
+  var existing=document.getElementById('deviceModal');
+  if(existing)existing.remove();
+
+  var modal=document.createElement('div');
+  modal.id='deviceModal';
+  modal.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.75);z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px;';
+
+  var box=document.createElement('div');
+  box.style.cssText='background:#fff;border-radius:16px;padding:24px 20px;width:100%;max-width:340px;text-align:center;';
+
+  var icon=document.createElement('div');
+  icon.style.cssText='font-size:36px;margin-bottom:12px;';
+  icon.textContent='📱';
+
+  var title=document.createElement('div');
+  title.style.cssText='font-size:16px;font-weight:700;color:#1e1b18;margin-bottom:8px;';
+  title.textContent='새 기기 감지';
+
+  var desc=document.createElement('div');
+  desc.style.cssText='font-size:13px;color:#6a6058;line-height:1.7;margin-bottom:16px;';
+  desc.innerHTML='등록되지 않은 기기입니다.<br>이 기기를 사용하려면<br>휴대폰 인증이 필요합니다.';
+
+  var warn=document.createElement('div');
+  warn.style.cssText='background:#f5f2ec;border-radius:10px;padding:12px;margin-bottom:18px;font-size:12px;color:#8a8078;line-height:1.6;text-align:left;';
+  warn.innerHTML='⚠️ 기기 변경 시 기존 기기에서<br>자동 로그아웃됩니다.';
+
+  var authBtn=document.createElement('button');
+  authBtn.style.cssText='width:100%;padding:13px;background:#1e1b18;color:#e8c14a;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:10px;';
+  authBtn.textContent='📱 휴대폰 인증하기';
+  authBtn.onclick=function(){_startDeviceVerification();};
+
+  var cancelBtn=document.createElement('button');
+  cancelBtn.style.cssText='width:100%;padding:11px;background:#f0ede8;color:#6a6058;border:none;border-radius:8px;font-size:13px;cursor:pointer;';
+  cancelBtn.textContent='취소 (로그아웃)';
+  cancelBtn.onclick=function(){_cancelDeviceVerification();};
+
+  box.appendChild(icon);
+  box.appendChild(title);
+  box.appendChild(desc);
+  box.appendChild(warn);
+  box.appendChild(authBtn);
+  box.appendChild(cancelBtn);
+  modal.appendChild(box);
+  document.body.appendChild(modal);
+}
+
+var _newDeviceFp=null;
+var _deviceCfmResult=null;
+var _deviceTimerIv=null;
+var _deviceRcpV=null;
+
+function _startDeviceVerification(){
+  window._db.collection('users').doc(curUser.uid).get()
+    .then(function(doc){
+      var phone=doc.data().phone||'';
+      var phoneDisplay=doc.data().phoneDisplay||phone;
+
+      var modal=document.getElementById('deviceModal');
+      if(!modal)return;
+      modal.querySelector('div').innerHTML='';
+
+      var box=modal.querySelector('div');
+
+      var title=document.createElement('div');
+      title.style.cssText='font-size:15px;font-weight:700;color:#1e1b18;margin-bottom:16px;text-align:center;';
+      title.textContent='휴대폰 인증';
+
+      var info=document.createElement('div');
+      info.style.cssText='background:#f0f8f0;border:1px solid #b8e0c0;border-radius:8px;padding:10px 12px;margin-bottom:14px;font-size:12px;color:#2a7a3a;line-height:1.6;';
+      info.innerHTML='📱 <strong>'+phoneDisplay+'</strong><br>위 번호로 인증번호를 발송합니다.';
+
+      var rcpDiv=document.createElement('div');
+      rcpDiv.id='deviceRcpContainer';
+
+      var sendBtn=document.createElement('button');
+      sendBtn.id='deviceSendBtn';
+      sendBtn.style.cssText='width:100%;padding:12px;background:#1e1b18;color:#e8c14a;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:10px;margin-top:12px;';
+      sendBtn.textContent='인증번호 받기';
+      sendBtn.onclick=function(){_sendDeviceOtp(phone);};
+
+      var cancelBtn=document.createElement('button');
+      cancelBtn.style.cssText='width:100%;padding:10px;background:#f0ede8;color:#6a6058;border:none;border-radius:8px;font-size:13px;cursor:pointer;';
+      cancelBtn.textContent='취소';
+      cancelBtn.onclick=function(){_cancelDeviceVerification();};
+
+      box.appendChild(title);
+      box.appendChild(info);
+      box.appendChild(rcpDiv);
+      box.appendChild(sendBtn);
+      box.appendChild(cancelBtn);
+    });
+}
+
+function _sendDeviceOtp(phone){
+  var sendBtn=document.getElementById('deviceSendBtn');
+  if(sendBtn){sendBtn.disabled=true;sendBtn.textContent='발송 중...';}
+
+  if(!_deviceRcpV){
+    try{
+      _deviceRcpV=new firebase.auth.RecaptchaVerifier('deviceRcpContainer',
+        {'size':'invisible','callback':function(){}});
+    }catch(e){console.error('Rcp:',e);}
+  }
+
+  window._auth.signInWithPhoneNumber(phone,_deviceRcpV)
+    .then(function(result){
+      _deviceCfmResult=result;
+      var modal=document.getElementById('deviceModal');
+      if(!modal)return;
+      var box=modal.querySelector('div');
+      box.innerHTML='';
+
+      var title=document.createElement('div');
+      title.style.cssText='font-size:15px;font-weight:700;color:#1e1b18;margin-bottom:16px;text-align:center;';
+      title.textContent='인증번호 입력';
+
+      var info=document.createElement('div');
+      info.style.cssText='background:#f0f8f0;border:1px solid #b8e0c0;border-radius:8px;padding:10px 12px;margin-bottom:14px;font-size:12px;color:#2a7a3a;';
+      info.textContent='인증번호 6자리를 입력해주세요.';
+
+      var inp=document.createElement('input');
+      inp.type='tel';
+      inp.id='deviceOtpInp';
+      inp.maxLength=6;
+      inp.placeholder='000000';
+      inp.style.cssText='width:100%;padding:12px;background:#f5f2ec;border:1.5px solid #ddd9d0;border-radius:8px;font-size:22px;font-weight:700;color:#1e1b18;letter-spacing:8px;text-align:center;font-family:monospace;margin-bottom:12px;box-sizing:border-box;';
+
+      var confirmBtn=document.createElement('button');
+      confirmBtn.style.cssText='width:100%;padding:12px;background:#1e1b18;color:#e8c14a;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:10px;';
+      confirmBtn.textContent='확인';
+      confirmBtn.onclick=function(){_confirmDeviceOtp();};
+
+      var cancelBtn=document.createElement('button');
+      cancelBtn.style.cssText='width:100%;padding:10px;background:#f0ede8;color:#6a6058;border:none;border-radius:8px;font-size:13px;cursor:pointer;';
+      cancelBtn.textContent='취소';
+      cancelBtn.onclick=function(){_cancelDeviceVerification();};
+
+      box.appendChild(title);
+      box.appendChild(info);
+      box.appendChild(inp);
+      box.appendChild(confirmBtn);
+      box.appendChild(cancelBtn);
+      inp.focus();
+    })
+    .catch(function(e){
+      if(sendBtn){sendBtn.disabled=false;sendBtn.textContent='인증번호 받기';}
+      if(_deviceRcpV){try{_deviceRcpV.clear();}catch(err){}_deviceRcpV=null;}
+      alert('SMS 발송 실패: '+e.message);
+    });
+}
+
+function _confirmDeviceOtp(){
+  var inp=document.getElementById('deviceOtpInp');
+  var code=inp?inp.value.trim():'';
+  if(code.length!==6){alert('6자리 인증번호를 입력해주세요.');return;}
+  if(!_deviceCfmResult){alert('인증이 만료됐습니다. 다시 시도해주세요.');return;}
+
+  _deviceCfmResult.confirm(code)
+    .then(function(){
+      return window._db.collection('users').doc(curUser.uid).update({
+        deviceFingerprint:_newDeviceFp,
+        deviceChangedAt:firebase.firestore.FieldValue.serverTimestamp()
+      });
+    })
+    .then(function(){
+      _newDeviceFp=null;
+      _deviceCfmResult=null;
+      var modal=document.getElementById('deviceModal');
+      if(modal)modal.remove();
+      _startSession();
+      checkSubscription(function(status,daysLeft){
+        if(status==='trial'&&daysLeft!==undefined){
+          showSubBanner('trial',daysLeft);
+        } else if(status==='expired'){
+          showSubBanner('expired');
+        } else {
+          hideSubBanner();
+        }
+      });
+      alert('새 기기가 등록됐습니다!');
+    })
+    .catch(function(e){
+      if(e.code==='auth/invalid-verification-code'){
+        alert('인증번호가 올바르지 않습니다.');
+      } else {
+        alert('인증 실패: '+e.message);
+      }
+    });
+}
+
+function _cancelDeviceVerification(){
+  _newDeviceFp=null;
+  _deviceCfmResult=null;
+  if(_deviceRcpV){try{_deviceRcpV.clear();}catch(e){}_deviceRcpV=null;}
+  var modal=document.getElementById('deviceModal');
+  if(modal)modal.remove();
+  /* 로그아웃 */
+  window._auth.signOut().then(function(){
+    document.getElementById('authPg').style.display='flex';
+    switchAuthTab('login');
+  });
+}
+
 
 </script>
 </body>
