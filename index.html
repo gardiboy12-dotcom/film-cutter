@@ -2354,26 +2354,26 @@ function _checkDeviceRegistration(onPass, onNewDevice){
     .then(function(doc){
       if(!doc.exists){onPass();return;}
       var data=doc.data();
-      var registeredFp=data.deviceFingerprint;
 
+      /* 테스트 계정은 기기 인증 건너뜀 */
+      if(data.isTestAccount===true){onPass();return;}
+
+      var registeredFp=data.deviceFingerprint;
       if(!registeredFp){
-        /* 최초 기기 등록 */
         window._db.collection('users').doc(curUser.uid).update({
-          deviceFingerprint: currentFp,
-          deviceRegisteredAt: firebase.firestore.FieldValue.serverTimestamp()
+          deviceFingerprint:currentFp,
+          deviceRegisteredAt:firebase.firestore.FieldValue.serverTimestamp()
         }).catch(function(){});
         onPass();
       } else if(registeredFp===currentFp){
-        /* 등록된 기기 → 정상 */
         onPass();
       } else {
-        /* 다른 기기 → OTP 재인증 필요 */
         onNewDevice(currentFp);
       }
     })
     .catch(function(e){
       console.warn('기기 확인 오류:', e);
-      onPass(); /* 오류 시 허용 */
+      onPass();
     });
 }
 
