@@ -601,19 +601,20 @@ tr:hover td{background:#faf8f5;}
           <div class="plan-radio"></div>
           <div class="plan-card-top">
             <span class="plan-name">월 구독</span>
+            <span class="plan-badge">무제한</span>
           </div>
           <div class="plan-price">9,900<span>원 / 월</span></div>
           <div class="plan-desc">매월 자동 결제 · 언제든 해지 가능</div>
         </div>
-        <div class="plan-card" id="planYearly" onclick="selectPlan('yearly')">
+        <div class="plan-card" id="planSingle" onclick="selectPlan('single')">
           <div class="plan-radio"></div>
           <div class="plan-card-top">
-            <span class="plan-name">연 구독</span>
-            <span class="plan-badge">2개월 무료</span>
+            <span class="plan-name">단건 계산</span>
           </div>
-          <div class="plan-price">99,000<span>원 / 년</span></div>
-          <div class="plan-desc">월 8,250원 · 연 1회 결제</div>
+          <div class="plan-price">990<span>원 / 회</span></div>
+          <div class="plan-desc">1회 계산 · 결과 저장 포함</div>
         </div>
+
       </div>
       <button class="sub-pay-btn" id="subPayBtn" onclick="startPayment()">결제하기</button>
       <p class="sub-notice">
@@ -719,7 +720,7 @@ tr:hover td{background:#faf8f5;}
         <div style="font-size:11px;color:rgba(255,255,255,.5);line-height:1.9;">
           ✔ 무료 체험: 가입 후 7일<br>
           ✔ 월 구독: <strong style="color:#e8c14a;">9,900원</strong> / 월 (자동 갱신)<br>
-          ✔ 연 구독: <strong style="color:#e8c14a;">99,000원</strong> / 년 (약 2개월 무료)
+          ✔ 단건 계산: <strong style="color:#e8c14a;">990원</strong> / 회 (1회 계산, 24시간 유효)
         </div>
       </div>
       <div class="footer-company">
@@ -758,7 +759,7 @@ tr:hover td{background:#faf8f5;}
         <div style="font-size:11px;color:rgba(255,255,255,.5);line-height:1.9;">
           ✔ 무료 체험: 가입 후 7일<br>
           ✔ 월 구독: <strong style="color:#e8c14a;">9,900원</strong> / 월 (자동 갱신)<br>
-          ✔ 연 구독: <strong style="color:#e8c14a;">99,000원</strong> / 년 (약 2개월 무료)
+          ✔ 단건 계산: <strong style="color:#e8c14a;">990원</strong> / 회 (1회 계산, 24시간 유효)
         </div>
       </div>
       <div class="footer-company">
@@ -799,7 +800,7 @@ tr:hover td{background:#faf8f5;}
         <div style="font-size:11px;color:rgba(255,255,255,.5);line-height:1.9;">
           ✔ 무료 체험: 가입 후 7일<br>
           ✔ 월 구독: <strong style="color:#e8c14a;">9,900원</strong> / 월 (자동 갱신)<br>
-          ✔ 연 구독: <strong style="color:#e8c14a;">99,000원</strong> / 년 (약 2개월 무료)
+          ✔ 단건 계산: <strong style="color:#e8c14a;">990원</strong> / 회 (1회 계산, 24시간 유효)
         </div>
       </div>
       <div class="footer-company">
@@ -1121,6 +1122,48 @@ function pack(pieces,fw){return hasPat?packFixed(pieces,fw):packRot(pieces,fw);}
 
 function calculate(){
   var items=getItems();if(!items.length){alert("항목을 먼저 추가하세요.");return;}
+
+  /* trial 상태면 계산 전 횟수 차감 */
+  if(curUser&&window._db){
+    window._db.collection('users').doc(curUser.uid).get()
+      .then(function(doc){
+        if(!doc.exists){_doCalculate();return;}
+        var data=doc.data();
+        var status=data.subscriptionStatus||'expired';
+        if(status==='trial'){
+          var count=data.trialCalcCount||0;
+          if(count>=3){
+            showSubBanner('expired');
+            lockCalcFeatures();
+            alert('무료 계산 3회를 모두 사용했습니다.\n구독 후 계속 이용해주세요!');
+            showSubPage();
+            return;
+          }
+          /* 횟수 차감 후 계산 */
+          window._db.collection('users').doc(curUser.uid)
+            .update({trialCalcCount:count+1})
+            .then(function(){
+              var remaining=3-(count+1);
+              if(remaining>0){
+                showSubBanner('trial',remaining);
+              } else {
+                showSubBanner('expired');
+              }
+              _doCalculate();
+            })
+            .catch(function(){_doCalculate();});
+        } else {
+          _doCalculate();
+        }
+      })
+      .catch(function(){_doCalculate();});
+    return;
+  }
+  _doCalculate();
+}
+
+function _doCalculate(){
+  var items=getItems();if(!items.length){return;}
   var fw=parseFloat(document.getElementById("fw").value)||1220;
   var fl=(parseFloat(document.getElementById("fl").value)||0)*1000;
   var pieces=[];
@@ -1525,7 +1568,16 @@ function checkSubscription(callback){
       var status=data.subscriptionStatus||'expired';
       var now=new Date();
 
-      if(status==='active'){
+      if(status==='single'){
+        /* 단건 만료 체크 (24시간) */
+        if(data.singleEnd&&new Date(data.singleEnd)<now){
+          window._db.collection('users').doc(curUser.uid)
+            .update({subscriptionStatus:'expired'});
+          callback('expired');
+        } else {
+          callback('active');
+        }
+      } else if(status==='active'){
         /* 구독 만료 체크 */
         if(data.subscriptionEnd&&new Date(data.subscriptionEnd)<now){
           window._db.collection('users').doc(curUser.uid)
@@ -1873,7 +1925,7 @@ function showSettings(){
             if(doc.exists){
               var d=doc.data();
               var end=d.subscriptionEnd?new Date(d.subscriptionEnd).toLocaleDateString('ko-KR'):'';
-              var plan=d.planType==='monthly'?'월 구독':'연 구독';
+              var plan='월 구독';
               el.textContent=plan+' 이용 중'+(end?' ('+end+' 만료)':'');
             }
           }).catch(function(){el.textContent='구독 중';});
@@ -2013,7 +2065,7 @@ var TERMS_HTML=`
 <h3>요금제</h3>
 <ul>
 <li>월 구독: 9,900원/월 (매월 자동 결제)</li>
-<li>연 구독: 99,000원/년 (연 1회 결제, 약 2개월 혜택)</li>
+<li>단건 계산: 990원/회 (결제 후 24시간 이용 가능)</li>
 </ul>
 <h3>환불</h3>
 <ul>
@@ -2162,7 +2214,7 @@ function closeSubPage(){
 function selectPlan(plan){
   _selectedPlan=plan;
   document.getElementById('planMonthly').className='plan-card'+(plan==='monthly'?' on':'');
-  document.getElementById('planYearly').className='plan-card'+(plan==='yearly'?' on':'');
+  document.getElementById('planSingle').className='plan-card'+(plan==='single'?' on':'');
 }
 
 /* ── 포트원 결제 ── */
@@ -2176,37 +2228,82 @@ function startPayment(){
     btn.disabled=false;btn.textContent='결제하기';return;
   }
 
-  var amount=_selectedPlan==='monthly'?9900:99000;
-  var planName=_selectedPlan==='monthly'?'재단왕 월 구독':'재단왕 연 구독';
+  var amount=_selectedPlan==='single'?990:9900;
+  var planName=_selectedPlan==='single'?'재단왕 단건 계산':'재단왕 월 구독';
   var paymentId='jdw'+curUser.uid.slice(0,8).replace(/[^a-zA-Z0-9]/g,'')+String(Date.now());
 
-  /* KPN V2 결제창 방식 - 빌링키 발급 + 즉시결제 동시 처리
-   * requestPayment에 customer_uid 포함하면 빌링키 발급+결제 동시 가능 */
-  PortOne.requestPayment({
+  /* 단건 결제: 일반 결제 */
+  if(_selectedPlan==='single'){
+    PortOne.requestPayment({
+      storeId:'store-03c5990a-a966-48d2-b142-6a3d17ed7a2c',
+      channelKey:'channel-key-562ea2df-f6a0-47b8-8fd8-9048b6ae4cde',
+      paymentId:paymentId,
+      orderName:planName,
+      totalAmount:amount,
+      currency:'CURRENCY_KRW',
+      payMethod:'CARD',
+      customer:{
+        customerId:curUser.uid,
+        fullName:curUser.displayName||'재단왕 사용자',
+        phoneNumber:'010-0000-0000'
+      }
+    }).then(function(rsp){
+      btn.disabled=false;btn.textContent='결제하기';
+      console.log('단건 결제 응답:', JSON.stringify(rsp));
+      if(rsp&&rsp.code){
+        alert('결제 실패: '+(rsp.message||rsp.code));
+      } else {
+        onSinglePaymentSuccess(rsp);
+      }
+    }).catch(function(e){
+      btn.disabled=false;btn.textContent='결제하기';
+      console.error('단건 결제 오류:', e);
+      alert('오류: '+e.message);
+    });
+    return;
+  }
+
+  /* 월 구독: 빌링키 발급 후 결제 */
+  PortOne.requestIssueBillingKey({
     storeId:'store-03c5990a-a966-48d2-b142-6a3d17ed7a2c',
     channelKey:'channel-key-562ea2df-f6a0-47b8-8fd8-9048b6ae4cde',
-    paymentId:paymentId,
-    orderName:planName,
-    totalAmount:amount,
-    currency:'CURRENCY_KRW',
-    payMethod:'CARD',
+    billingKeyMethod:'CARD',
+    issueId:paymentId,
+    issueName:planName,
     customer:{
       customerId:curUser.uid,
       fullName:curUser.displayName||'재단왕 사용자',
       phoneNumber:'010-0000-0000'
-    },
-    bypass:{
-      kpn:{
-        customer_uid:'cust_'+curUser.uid
-      }
     }
   }).then(function(rsp){
+    console.log('빌링키 발급 응답:', JSON.stringify(rsp));
+    if(rsp&&rsp.code){
+      btn.disabled=false;btn.textContent='결제하기';
+      alert('카드 등록 실패: '+(rsp.message||rsp.code));
+      return;
+    }
+    return PortOne.requestPayment({
+      storeId:'store-03c5990a-a966-48d2-b142-6a3d17ed7a2c',
+      channelKey:'channel-key-562ea2df-f6a0-47b8-8fd8-9048b6ae4cde',
+      paymentId:paymentId+'p',
+      orderName:planName,
+      totalAmount:amount,
+      currency:'CURRENCY_KRW',
+      payMethod:'BILLING_KEY',
+      billingKey:rsp.billingKey,
+      customer:{
+        customerId:curUser.uid,
+        fullName:curUser.displayName||'재단왕 사용자'
+      }
+    });
+  }).then(function(rsp){
+    if(!rsp)return;
     btn.disabled=false;btn.textContent='결제하기';
-    console.log('결제 응답:', JSON.stringify(rsp));
+    console.log('구독 결제 응답:', JSON.stringify(rsp));
     if(rsp&&rsp.code){
       alert('결제 실패: '+(rsp.message||rsp.code));
     } else {
-      onPaymentSuccess(rsp,_selectedPlan);
+      onPaymentSuccess(rsp,'monthly');
     }
   }).catch(function(e){
     btn.disabled=false;btn.textContent='결제하기';
@@ -2218,11 +2315,7 @@ function startPayment(){
 function onPaymentSuccess(rsp,plan){
   var now=new Date();
   var end=new Date(now);
-  if(plan==='monthly'){
-    end.setMonth(end.getMonth()+1);
-  } else {
-    end.setFullYear(end.getFullYear()+1);
-  }
+  end.setMonth(end.getMonth()+1);
   window._db.collection('users').doc(curUser.uid).update({
     subscriptionStatus:'active',
     subscriptionEnd:end.toISOString(),
@@ -2583,6 +2676,29 @@ function _cancelDeviceVerification(){
   });
 }
 
+
+function onSinglePaymentSuccess(rsp){
+  /* 단건 결제 성공 → 1회 계산권 부여 (24시간) */
+  var now=new Date();
+  var singleEnd=new Date(now.getTime()+24*60*60*1000); /* 24시간 */
+  window._db.collection('users').doc(curUser.uid).update({
+    subscriptionStatus:'single',
+    singleEnd:singleEnd.toISOString(),
+    lastPaymentId:rsp.paymentId||''
+  }).then(function(){
+    hideSubBanner();
+    closeSubPage();
+    /* 계산 기능 잠금 해제 */
+    var goBtn=document.querySelector('.go-btn');
+    if(goBtn){goBtn.disabled=false;goBtn.textContent='최적 재단 계산하기';goBtn.onclick=calculate;}
+    var addBtn=document.querySelector('.add-btn');
+    if(addBtn){addBtn.disabled=false;addBtn.textContent='+ 항목 추가';addBtn.onclick=addItem;}
+    alert('결제 완료! 24시간 동안 계산 기능을 이용할 수 있습니다 😊');
+  }).catch(function(e){
+    console.error('단건 저장 오류:', e);
+    alert('결제는 완료됐으나 오류가 발생했습니다. 고객센터에 문의해주세요.');
+  });
+}
 
 </script>
 </body>
