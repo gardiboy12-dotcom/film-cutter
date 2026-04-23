@@ -524,6 +524,18 @@ tr:hover td{background:#faf8f5;}
       </div>
     </div>
   </div>
+
+  <!-- 로그인 페이지 하단 사업자 정보 -->
+  <div style="width:100%;max-width:420px;margin:18px auto 0;padding:0 16px 24px;box-sizing:border-box;">
+    <div style="border-top:1px solid #e0d8d0;padding-top:14px;font-size:11px;color:#8a8078;line-height:1.8;text-align:left;">
+      <div style="font-weight:700;color:#6a5f58;margin-bottom:4px;">탄탄필름</div>
+      <div>대표자: 이중원 &nbsp;|&nbsp; 사업자등록번호: 371-23-02267</div>
+      <div>주소: 경기도 성남시 수정구 남위례로 140</div>
+      <div>연락처: 0507-1328-0524</div>
+      <div id="loginFooterBizLicense" style="display:none;">통신판매신고: <span id="loginBizLicenseNo"></span></div>
+      <div style="margin-top:4px;color:#aaa;">© 2026 탄탄필름. All rights reserved.</div>
+    </div>
+  </div>
 </div>
 
 <div class="toast" id="toast">저장됐어요!</div>
@@ -728,7 +740,8 @@ tr:hover td{background:#faf8f5;}
         대표자: 이중원 &nbsp;|&nbsp; 사업자등록번호: 371-23-02267<br>
         주소: 경기도 성남시 수정구 남위례로 140<br>
         연락처: 0507-1328-0524<br>
-        © 2025 탄탄필름. All rights reserved.
+        <span class="biz-license-row" style="display:none;">통신판매신고: <span class="biz-license-no"></span><br></span>
+        © 2026 탄탄필름. All rights reserved.
       </div>
     </div>
   </div>
@@ -767,7 +780,8 @@ tr:hover td{background:#faf8f5;}
         대표자: 이중원 &nbsp;|&nbsp; 사업자등록번호: 371-23-02267<br>
         주소: 경기도 성남시 수정구 남위례로 140<br>
         연락처: 0507-1328-0524<br>
-        © 2025 탄탄필름. All rights reserved.
+        <span class="biz-license-row" style="display:none;">통신판매신고: <span class="biz-license-no"></span><br></span>
+        © 2026 탄탄필름. All rights reserved.
       </div>
     </div>
   </div>
@@ -808,7 +822,8 @@ tr:hover td{background:#faf8f5;}
         대표자: 이중원 &nbsp;|&nbsp; 사업자등록번호: 371-23-02267<br>
         주소: 경기도 성남시 수정구 남위례로 140<br>
         연락처: 0507-1328-0524<br>
-        © 2025 탄탄필름. All rights reserved.
+        <span class="biz-license-row" style="display:none;">통신판매신고: <span class="biz-license-no"></span><br></span>
+        © 2026 탄탄필름. All rights reserved.
       </div>
     </div>
   </div>
@@ -1893,7 +1908,20 @@ function addItemData(cat,pW,pL,name,qty){
 }
 
 function init(){document.getElementById("addBtn").onclick=addItem;document.getElementById("calcBtn").onclick=calculate;addItem();}
-if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",function(){init();_applyBizLicense();});else{init();_applyBizLicense();}
+
+/* ── 통신판매신고번호 설정 ── */
+/* 발급 후 아래 값을 입력하세요. 빈 문자열이면 자동으로 숨겨집니다. */
+var BIZ_LICENSE_NO = ''; /* 예시: '제2026-성남수정-0000호' */
+
+function _applyBizLicense(){
+  if(!BIZ_LICENSE_NO) return;
+  var lf=document.getElementById('loginFooterBizLicense');
+  var ln=document.getElementById('loginBizLicenseNo');
+  if(lf&&ln){ln.textContent=BIZ_LICENSE_NO;lf.style.display='';}
+  document.querySelectorAll('.biz-license-row').forEach(function(el){el.style.display='';});
+  document.querySelectorAll('.biz-license-no').forEach(function(el){el.textContent=BIZ_LICENSE_NO;});
+}
 
 /* ── 설정 페이지 ── */
 function showSettings(){
