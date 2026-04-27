@@ -493,8 +493,8 @@ tr:hover td{background:#faf8f5;}
           <div class="ph-hint">📋 핸드폰 번호 1개당 계정 1개만 가입 가능합니다.</div>
         </div>
         <div class="af">
-          <label>이메일 (선택)</label>
-          <input type="email" id="suEmail" placeholder="example@email.com">
+          <label>이메일 <span style="color:#e74c3c;">*</span></label>
+          <input type="email" id="suEmail" placeholder="example@email.com" required>
         </div>
         <div class="af">
           <label>비밀번호</label>
@@ -1332,10 +1332,12 @@ function initRcp(){
 function sendSignupOtp(){
   hideMsg();
   var name=document.getElementById('suName').value.trim();
+  var emailVal=document.getElementById('suEmail').value.trim();
   var rawPh=document.getElementById('suPhone').value.replace(/\D/g,'');
   var pw=document.getElementById('suPw').value;
   var pwC=document.getElementById('suPwC').value;
   if(!name){showErr('이름을 입력해주세요.');return;}
+  if(!emailVal||emailVal.indexOf('@')<0){showErr('이메일 주소를 정확히 입력해주세요.');return;}
   if(rawPh.length<10||rawPh.length>11){showErr('올바른 핸드폰 번호를 입력해주세요.');return;}
   if(pw.length<6){showErr('비밀번호는 6자리 이상이어야 합니다.');return;}
   if(pw!==pwC){showErr('비밀번호가 일치하지 않습니다.');return;}
@@ -1414,6 +1416,7 @@ function doSignup(){
     return window._saveUser(user.uid,{
       uid:user.uid,name:suName,
       phone:suE164,phoneDisplay:disp,
+      email:emailVal,
       createdAt:firebase.firestore.FieldValue.serverTimestamp(),
       trialEnd:_trialEnd.toISOString(),
       subscriptionStatus:'trial',
@@ -1622,10 +1625,17 @@ function checkSubscription(callback){
     .catch(function(){callback('trial',7);}); /* 오류 시 기본 허용 */
 }
 
+var _userEmail='';
 function enterApp(){
   document.getElementById('authPg').style.display='none';
   if(curUser){
     document.getElementById('uEmail').textContent=curUser.displayName||'';
+    /* Firestore에서 이메일 로드 */
+    if(window._db){
+      window._db.collection('users').doc(curUser.uid).get().then(function(doc){
+        if(doc.exists&&doc.data().email){ _userEmail=doc.data().email; }
+      }).catch(function(){});
+    }
   }
 
   /* 기기 등록 확인 */
@@ -2329,6 +2339,17 @@ function startPayment(){
   btn.disabled=true;btn.textContent='결제 준비 중...';
 
   if(!curUser){btn.disabled=false;btn.textContent='결제하기';return;}
+
+  /* 이메일 인증 체크 (월 구독 빌링키만) */
+  if(_selectedPlan==='monthly'&&!curUser.emailVerified){
+    btn.disabled=false;btn.textContent='결제하기';
+    if(confirm('이메일 인증이 필요합니다.\n인증 메일을 다시 발송할까요?')){
+      curUser.sendEmailVerification()
+        .then(function(){alert('인증 메일을 발송했습니다.\n메일함을 확인해주세요.');})
+        .catch(function(){alert('메일 발송에 실패했습니다. 잠시 후 다시 시도해주세요.');});
+    }
+    return;
+  }
   if(typeof PortOne==='undefined'){
     alert('결제 모듈 로딩 중입니다. 잠시 후 다시 시도해주세요.');
     btn.disabled=false;btn.textContent='결제하기';return;
@@ -2380,7 +2401,7 @@ function startPayment(){
       customerId:curUser.uid,
       fullName:curUser.displayName||'재단왕 사용자',
       phoneNumber:'010-0000-0000',
-      email:'test@jdw.app'
+      email:window._userEmail||'user@jdw.app'
     }
   }).then(function(rsp){
     console.log('빌링키 발급 응답:', JSON.stringify(rsp));
