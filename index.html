@@ -2340,16 +2340,7 @@ function startPayment(){
 
   if(!curUser){btn.disabled=false;btn.textContent='결제하기';return;}
 
-  /* 이메일 인증 체크 (월 구독 빌링키만) */
-  if(_selectedPlan==='monthly'&&!curUser.emailVerified){
-    btn.disabled=false;btn.textContent='결제하기';
-    if(confirm('이메일 인증이 필요합니다.\n인증 메일을 다시 발송할까요?')){
-      curUser.sendEmailVerification()
-        .then(function(){alert('인증 메일을 발송했습니다.\n메일함을 확인해주세요.');})
-        .catch(function(){alert('메일 발송에 실패했습니다. 잠시 후 다시 시도해주세요.');});
-    }
-    return;
-  }
+  /* 이메일 인증 체크 제거 */
   if(typeof PortOne==='undefined'){
     alert('결제 모듈 로딩 중입니다. 잠시 후 다시 시도해주세요.');
     btn.disabled=false;btn.textContent='결제하기';return;
