@@ -2379,7 +2379,8 @@ function startPayment(){
     customer:{
       customerId:curUser.uid,
       fullName:curUser.displayName||'재단왕 사용자',
-      phoneNumber:'010-0000-0000'
+      phoneNumber:'010-0000-0000',
+      email:curUser.email||curUser.uid+'@jdw.app'
     }
   }).then(function(rsp){
     console.log('빌링키 발급 응답:', JSON.stringify(rsp));
