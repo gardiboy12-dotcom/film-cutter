@@ -1,4 +1,4 @@
-var CACHE = 'jaedanwang-v4';
+var CACHE = 'jaedanwang-v5';
 var FILES = ['./index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', function(e) {
